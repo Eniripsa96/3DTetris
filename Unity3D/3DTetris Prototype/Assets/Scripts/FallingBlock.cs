@@ -9,7 +9,7 @@ public class FallingBlock : MonoBehaviour {
 	private bool[,] localGrid = new bool[4, 4];
 
 	private GameManager gameManager;
-	private int targetX = 3, targetY = 16;
+	private int targetX = 3, targetY = 17;
 
 	public bool[,] LocalGrid 
 	{
@@ -81,7 +81,6 @@ public class FallingBlock : MonoBehaviour {
 
 		// Sideways movement
 		float dx = targetX - this.transform.position.x;
-		Debug.Log("TargetX: " + targetX);
 		if (dx > 0) 
 		{
 			this.transform.Translate(Mathf.Min(dx, SIDE_SPEED), 0, 0);
@@ -91,14 +90,23 @@ public class FallingBlock : MonoBehaviour {
 			this.transform.Translate(Mathf.Max(dx, -SIDE_SPEED), 0, 0);
 		}
 
-		// Downward movement
-		float dy = targetY - this.transform.position.y;
+		// Downward speed
 		float speed = FALL_SPEED;
 		if (Input.GetKey(KeyCode.DownArrow))
 		{
 			speed *= 4;
 		}
+		Debug.Log("Speed: " + speed);
 
+		// Downward collisions
+		float dy = targetY - this.transform.position.y;
+		if (dy >= -speed && gameManager.canMove(this, GameManager.Direction.DOWN))
+		{
+			targetY--;
+			dy = targetY - this.transform.position.y;
+		}
+
+		// Moving downward
 		float yChange = Mathf.Max(dy, -speed);
 		if (yChange == 0 && targetX == this.transform.position.x)
 		{
@@ -107,12 +115,6 @@ public class FallingBlock : MonoBehaviour {
 		else 
 		{
 			this.transform.Translate(0, yChange, 0); 
-		}
-
-		// Downward collisions
-		if (dy >= -speed && gameManager.canMove(this, GameManager.Direction.DOWN))
-		{
-			targetY--;
 		}
 	}
 }

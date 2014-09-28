@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Handles the majority of the game logic
+/// </summary>
 public class GameManager : MonoBehaviour
 {
 	public enum Direction { LEFT, RIGHT, DOWN };
@@ -14,6 +17,7 @@ public class GameManager : MonoBehaviour
 
 	private GameObject[,] gameGrid = new GameObject[WIDTH, HEIGHT];
 
+	private bool gameOver = false;
 	private int counter = 0;
 
 	// Use this for initialization
@@ -27,16 +31,31 @@ public class GameManager : MonoBehaviour
 	{
 	}
 
+	/// <summary>
+	/// Checks if the cell in the game grid is occupied
+	/// </summary>
+	/// <returns>True if occupied, false otherwise</returns>
+	/// <param name="x">The x coordinate</param>
+	/// <param name="y">The y coordinate</param>
 	public bool isOccupied(int x, int y) 
 	{
 		return gameGrid[x, y] != null;
 	}
 
+	/// <summary>
+	/// Sets an object in a cell of the game grid
+	/// </summary>
+	/// <param name="x">The x coordinate</param>
+	/// <param name="y">The y coordinate</param>
+	/// <param name="go">Game Object to set to the cell</param>
 	public void set(int x, int y, GameObject go)
 	{
 		gameGrid[x, y] = go;
 	}
 
+	/// <summary>
+	/// Spawns a new falling block at the top of the game board
+	/// </summary>
 	public void spawnFallingBlock() 
 	{
 		int index = (int)(Random.value * blockShapes.Count);
@@ -138,6 +157,7 @@ public class GameManager : MonoBehaviour
 		int x = (int)block.transform.position.x;
 		int y = (int)block.transform.position.y;
 
+		// Merge the block into the game grid
 		bool[,] localGrid = block.LocalGrid;
 		for (int i = 0; i < 4; i++)
 		{
@@ -145,14 +165,32 @@ public class GameManager : MonoBehaviour
 			{
 				if (localGrid[i, j])
 				{
-					GameObject go = (GameObject)GameObject.Instantiate(cube);
-					go.transform.Translate(x + i, y + j, 0);
-					gameGrid[x + i, y + j] = go;
+					// Game over
+					if (y + j >= 17)
+					{
+						Debug.Log("Game Over!");
+						gameOver = true;
+					}
+
+					// Merge the cell
+					else 
+					{
+						GameObject go = (GameObject)GameObject.Instantiate(cube);
+						go.transform.Translate(x + i, y + j, 0);
+						gameGrid[x + i, y + j] = go;
+					}
 				}
 			}
 		}
+
+		// Remove the old block
 		GameObject.Destroy(block.gameObject);
-		spawnFallingBlock();
+
+		// Spawn a new block if not game over
+		if (!gameOver) 
+		{
+			spawnFallingBlock();
+		}
 	}
 }
 
