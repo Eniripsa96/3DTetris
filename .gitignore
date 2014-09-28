@@ -5,8 +5,32 @@
 # *.[oa]
 # *~
 
-# Ignored file types for Visual Studio Project
+#ignore thumbnails created by windows
+Thumbs.db
+
+#Ignore files built by Visual Studio
+*.obj
+*.exe
+*.pdb
+*.user
+*.aps
+*.pch
+*.ipch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.log
+*.dll
+*.lib
+*.sbr
 *.sdf
 
-# Ignored file types for Unity Project
+#Ignore folders built by Unity
 Unity3D/3DTetris Prototype/Library/metadata/
