@@ -29,13 +29,12 @@ Thumbs.db
 *.idb
 *.log
 *.tlog
+*.lastbuildstate
 *.dll
 *.lib
 *.sbr
 *.sdf
-*.lastbuildstate
-3DTetris/DirectX/DirectXTK/Bin/Desktop_2013/Win32/Debug
-DirectX/DirectXTK/Bin/Desktop_2013/Win32/Debug
+*.opensdf
 
 #Ignore folders built by Unity
 Unity3D/3DTetris Prototype/Library/metadata/
