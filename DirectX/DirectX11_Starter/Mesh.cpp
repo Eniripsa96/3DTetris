@@ -1,12 +1,14 @@
 #include "Mesh.h"
 #include <d3dcompiler.h>
 
-Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
+Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, SHAPE type)
 {
 	// Grab some helpful data
 	this->device = device;
-	this->deviceContext = context;
-	this->shapeType = type;
+	deviceContext = context;
+	vertexShader = vShader;
+	pixelShader = pShader;
+	shapeType = type;
 
 	// Initialize vertices based on shape type
 	if (shapeType == TRIANGLE)

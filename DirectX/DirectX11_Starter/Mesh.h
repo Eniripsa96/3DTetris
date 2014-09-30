@@ -33,7 +33,7 @@ struct VertexShaderConstantBufferLayout
 class Mesh
 {
 public:
-	Mesh(ID3D11Device*, ID3D11DeviceContext*, SHAPE);
+	Mesh(ID3D11Device*, ID3D11DeviceContext*, ID3D11VertexShader*, ID3D11PixelShader*, SHAPE);
 	~Mesh();
 
 	void CreateTrianglePoints();

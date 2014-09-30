@@ -68,6 +68,11 @@ MyDemoGame::~MyDemoGame()
 		delete entities[i];
 	}
 
+	delete triangleMesh;
+	delete quadMesh;
+
+	delete shapeMaterial;
+
 	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(inputLayout);
 }
@@ -86,9 +91,16 @@ bool MyDemoGame::Init()
 	// Load shaders that we want
 	LoadShadersAndInputLayout();
 
+	// Create meshes
+	triangleMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, TRIANGLE);
+	quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
+
+	// Create materials
+	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader);
+
 	// Create the shapes we want
-	entities.emplace_back(new Entity(device, deviceContext, new Material(device, deviceContext), vertexShader, pixelShader, TRIANGLE));
-	entities.emplace_back(new Entity(device, deviceContext, new Material(device, deviceContext), vertexShader, pixelShader, QUAD));
+	entities.emplace_back(new Entity(device, deviceContext, triangleMesh, shapeMaterial));
+	entities.emplace_back(new Entity(device, deviceContext, quadMesh, shapeMaterial));
 
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)
@@ -106,7 +118,6 @@ bool MyDemoGame::Init()
 	return true;
 }
 
-// TODO: EXTRACT CODE TO MAIN GAME AND PASS SHADER IN, THEN GIVE MESH REFERENCE TO SHADER
 // Loads shaders from compiled shader object (.cso) files, and uses the
 // vertex shader to create an input layout which is needed when sending
 // vertex data to the device

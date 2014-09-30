@@ -52,6 +52,9 @@ private:
 	XMFLOAT4X4 projectionMatrix;
 
 	std::vector<Entity*> entities;
+	Mesh* triangleMesh;
+	Mesh* quadMesh;
+	Material* shapeMaterial;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

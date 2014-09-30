@@ -6,7 +6,7 @@
 class Entity
 {
 public:
-	Entity(ID3D11Device*, ID3D11DeviceContext*, Material*, ID3D11VertexShader*, ID3D11PixelShader*, SHAPE);
+	Entity(ID3D11Device*, ID3D11DeviceContext*, Mesh*, Material*);
 	~Entity();
 
 	void Update(float);
