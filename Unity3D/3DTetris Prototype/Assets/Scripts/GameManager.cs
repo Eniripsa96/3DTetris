@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
 	/// <param name="localGrid">the local grid of the block trying to occupy the cells</param>
 	/// <param name="x">the horizontal coordinate of the block</param>
 	/// <param name="y">the vertical coordinate of the block</param>
-	private bool canOccupy(bool[,] localGrid, int x, int y)
+	public bool canOccupy(bool[,] localGrid, int x, int y)
 	{
 		for (int i = 0; i < 4; i++) 
 		{

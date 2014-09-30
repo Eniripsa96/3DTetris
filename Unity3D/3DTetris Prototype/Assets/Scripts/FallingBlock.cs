@@ -7,6 +7,7 @@ public class FallingBlock : MonoBehaviour {
 	public static float SIDE_SPEED = 0.1f;
 
 	private bool[,] localGrid = new bool[4, 4];
+	private bool[,] tempGrid = new bool[4, 4];
 
 	private GameManager gameManager;
 	private int targetX = 3, targetY = 17;
@@ -42,9 +43,11 @@ public class FallingBlock : MonoBehaviour {
 		for (int i = 0; i < this.transform.childCount; i++) 
 		{
 			Transform child = this.transform.GetChild(i);
-			int x = (int)(child.position.x - this.transform.position.x);
-			int y = (int)(child.position.y - this.transform.position.y);
+			int x = (int)(child.localPosition.x);
+			int y = (int)(child.localPosition.y);
 			localGrid[x, y] = true;
+			Debug.Log("Block: (" + child.localPosition.x + ", " + child.localPosition.y + ")");
+			Debug.Log("Grid: (" + x + ", " + y + ")");
 		}
 	}
 
@@ -96,7 +99,7 @@ public class FallingBlock : MonoBehaviour {
 		{
 			speed *= 4;
 		}
-		Debug.Log("Speed: " + speed);
+		//Debug.Log("Speed: " + speed);
 
 		// Downward collisions
 		float dy = targetY - this.transform.position.y;
@@ -116,5 +119,70 @@ public class FallingBlock : MonoBehaviour {
 		{
 			this.transform.Translate(0, yChange, 0); 
 		}
+
+		// Rotating
+		if (Input.GetKeyDown(KeyCode.UpArrow))
+		{
+			// Rotate the local grid
+			for (int i = 0; i < 4; i++) 
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					tempGrid[i, j] = localGrid[3 - j, i];
+				}
+			}
+
+			// See if it can rotate
+			bool canRotateNormal = canRotate(0, 0);
+			bool canRotateRight = !canRotateNormal && canRotate(1, 0);
+			bool canRotateLeft = !canRotateNormal && canRotate(-1, 0);
+			if (canRotateNormal || canRotateLeft || canRotateRight) 
+			{
+				// Move if necesssary
+				if (canRotateRight)
+				{
+					this.transform.Translate(1, 0, 0);
+				}
+				else if (canRotateLeft)
+				{
+					this.transform.Translate(-1, 0, 0);
+				}
+
+				// Apply the rotation
+				for (int i = 0; i < this.transform.childCount; i++)
+				{
+					Transform child = this.transform.GetChild(i);
+					child.localPosition = new Vector3(child.localPosition.y, 3 - child.localPosition.x);
+					Debug.Log("Block: (" + child.localPosition.x + ", " + child.localPosition.y + ")");
+				}
+				for (int i = 0; i < 4; i++) 
+				{
+					for (int j = 0; j < 4; j++)
+					{
+						localGrid[i, j] = tempGrid[i, j];
+						if (localGrid[i, j]) {
+							Debug.Log ("Grid: (" + i + ", " + j + ")");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private bool canRotate(int xOffset, int yOffset)
+	{
+		int xMin = (int)this.transform.position.x + xOffset;
+		int yMin = (int)this.transform.position.y + yOffset;
+		int xMax = (int)Mathf.Ceil(this.transform.position.x) + xOffset;
+		int yMax = (int)Mathf.Ceil(this.transform.position.y) + yOffset;
+		bool canOccupy = true;
+		for (int i = xMin; i <= xMax; i++)
+		{
+			for (int j = yMin; j <= yMax; j++)
+			{
+				canOccupy = canOccupy && gameManager.canOccupy(tempGrid, i, j);
+			}
+		}
+		return canOccupy;
 	}
 }
