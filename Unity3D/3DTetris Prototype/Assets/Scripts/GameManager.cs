@@ -82,7 +82,6 @@ public class GameManager : MonoBehaviour
 			case Direction.LEFT:
 				
 				x = block.TargetX - 1;
-				Debug.Log("Testing X: " + x);
 				return canOccupy(block.LocalGrid, x, (int)pos.y)
 					&& canOccupy(block.LocalGrid, x, (int)Mathf.Ceil(pos.y));
 
@@ -125,7 +124,6 @@ public class GameManager : MonoBehaviour
 				// Limit it to the game board
 				if (x + i < 0 || x + i >= WIDTH || y + j < 0) 
 				{
-					Debug.Log("Collision with game walls");
 					return false;
 				}
 
@@ -138,7 +136,6 @@ public class GameManager : MonoBehaviour
 				// Check for collision
 				if (gameGrid[x + i, y + j])
 				{
-					Debug.Log("Collision at (" + (x + i) + ", " + (y + j) + ")");
 					return false;
 				}
 			}

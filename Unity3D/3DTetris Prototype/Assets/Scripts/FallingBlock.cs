@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Class for handling the logic for controllable falling blocks
+/// </summary>
 public class FallingBlock : MonoBehaviour {
 
 	public static float FALL_SPEED = 0.05f;
@@ -12,6 +15,11 @@ public class FallingBlock : MonoBehaviour {
 	private GameManager gameManager;
 	private int targetX = 3, targetY = 17;
 
+	/// <summary>
+	/// The local occupied cell grid for the block used
+	/// to determine collisions when compared to the game grid
+	/// </summary>
+	/// <value>The local occupied cell grid for the block</value>
 	public bool[,] LocalGrid 
 	{
 		get 
@@ -20,6 +28,11 @@ public class FallingBlock : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// The horizontal target position of the block used for
+	/// smoothly moving to the next cell
+	/// </summary>
+	/// <value>The horizontal target position of the block</value>
 	public int TargetX
 	{
 		get
@@ -28,6 +41,11 @@ public class FallingBlock : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// The vertical target position of the block used for
+	/// smoothly moving to the next cell
+	/// </summary>
+	/// <value>The vertical target position of the block</value>
 	public int TargetY
 	{
 		get
@@ -46,8 +64,6 @@ public class FallingBlock : MonoBehaviour {
 			int x = (int)(child.localPosition.x);
 			int y = (int)(child.localPosition.y);
 			localGrid[x, y] = true;
-			Debug.Log("Block: (" + child.localPosition.x + ", " + child.localPosition.y + ")");
-			Debug.Log("Grid: (" + x + ", " + y + ")");
 		}
 	}
 
@@ -142,10 +158,12 @@ public class FallingBlock : MonoBehaviour {
 				if (canRotateRight)
 				{
 					this.transform.Translate(1, 0, 0);
+					this.targetX++;
 				}
 				else if (canRotateLeft)
 				{
 					this.transform.Translate(-1, 0, 0);
+					this.targetX--;
 				}
 
 				// Apply the rotation
@@ -153,28 +171,33 @@ public class FallingBlock : MonoBehaviour {
 				{
 					Transform child = this.transform.GetChild(i);
 					child.localPosition = new Vector3(child.localPosition.y, 3 - child.localPosition.x);
-					Debug.Log("Block: (" + child.localPosition.x + ", " + child.localPosition.y + ")");
 				}
 				for (int i = 0; i < 4; i++) 
 				{
 					for (int j = 0; j < 4; j++)
 					{
 						localGrid[i, j] = tempGrid[i, j];
-						if (localGrid[i, j]) {
-							Debug.Log ("Grid: (" + i + ", " + j + ")");
-						}
 					}
 				}
 			}
 		}
 	}
 
+	/// <summary>
+	/// Checks whether or not the block can rotate when moving the given offsets
+	/// </summary>
+	/// <returns>True if able to rotate, false otherwise</returns>
+	/// <param name="xOffset">Horizontal offset</param>
+	/// <param name="yOffset">Vertical offset</param>
 	private bool canRotate(int xOffset, int yOffset)
 	{
+		// Get the bounds
 		int xMin = (int)this.transform.position.x + xOffset;
 		int yMin = (int)this.transform.position.y + yOffset;
 		int xMax = (int)Mathf.Ceil(this.transform.position.x) + xOffset;
 		int yMax = (int)Mathf.Ceil(this.transform.position.y) + yOffset;
+
+		// Check for collisions
 		bool canOccupy = true;
 		for (int i = xMin; i <= xMax; i++)
 		{
@@ -183,6 +206,8 @@ public class FallingBlock : MonoBehaviour {
 				canOccupy = canOccupy && gameManager.canOccupy(tempGrid, i, j);
 			}
 		}
+
+		// Return the result
 		return canOccupy;
 	}
 }
