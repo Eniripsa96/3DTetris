@@ -1,16 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Class for handling the logic for controllable falling blocks
+/// </summary>
 public class FallingBlock : MonoBehaviour {
 
 	public static float FALL_SPEED = 0.05f;
 	public static float SIDE_SPEED = 0.1f;
 
 	private bool[,] localGrid = new bool[4, 4];
+	private bool[,] tempGrid = new bool[4, 4];
 
 	private GameManager gameManager;
-	private int targetX = 3, targetY = 16;
+	private int targetX = 3, targetY = 17;
 
+	/// <summary>
+	/// The local occupied cell grid for the block used
+	/// to determine collisions when compared to the game grid
+	/// </summary>
+	/// <value>The local occupied cell grid for the block</value>
 	public bool[,] LocalGrid 
 	{
 		get 
@@ -19,6 +28,11 @@ public class FallingBlock : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// The horizontal target position of the block used for
+	/// smoothly moving to the next cell
+	/// </summary>
+	/// <value>The horizontal target position of the block</value>
 	public int TargetX
 	{
 		get
@@ -27,6 +41,11 @@ public class FallingBlock : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// The vertical target position of the block used for
+	/// smoothly moving to the next cell
+	/// </summary>
+	/// <value>The vertical target position of the block</value>
 	public int TargetY
 	{
 		get
@@ -42,8 +61,8 @@ public class FallingBlock : MonoBehaviour {
 		for (int i = 0; i < this.transform.childCount; i++) 
 		{
 			Transform child = this.transform.GetChild(i);
-			int x = (int)(child.position.x - this.transform.position.x);
-			int y = (int)(child.position.y - this.transform.position.y);
+			int x = (int)(child.localPosition.x);
+			int y = (int)(child.localPosition.y);
 			localGrid[x, y] = true;
 		}
 	}
@@ -81,7 +100,6 @@ public class FallingBlock : MonoBehaviour {
 
 		// Sideways movement
 		float dx = targetX - this.transform.position.x;
-		Debug.Log("TargetX: " + targetX);
 		if (dx > 0) 
 		{
 			this.transform.Translate(Mathf.Min(dx, SIDE_SPEED), 0, 0);
@@ -91,14 +109,23 @@ public class FallingBlock : MonoBehaviour {
 			this.transform.Translate(Mathf.Max(dx, -SIDE_SPEED), 0, 0);
 		}
 
-		// Downward movement
-		float dy = targetY - this.transform.position.y;
+		// Downward speed
 		float speed = FALL_SPEED;
 		if (Input.GetKey(KeyCode.DownArrow))
 		{
 			speed *= 4;
 		}
+		//Debug.Log("Speed: " + speed);
 
+		// Downward collisions
+		float dy = targetY - this.transform.position.y;
+		if (dy >= -speed && gameManager.canMove(this, GameManager.Direction.DOWN))
+		{
+			targetY--;
+			dy = targetY - this.transform.position.y;
+		}
+
+		// Moving downward
 		float yChange = Mathf.Max(dy, -speed);
 		if (yChange == 0 && targetX == this.transform.position.x)
 		{
@@ -109,10 +136,78 @@ public class FallingBlock : MonoBehaviour {
 			this.transform.Translate(0, yChange, 0); 
 		}
 
-		// Downward collisions
-		if (dy >= -speed && gameManager.canMove(this, GameManager.Direction.DOWN))
+		// Rotating
+		if (Input.GetKeyDown(KeyCode.UpArrow))
 		{
-			targetY--;
+			// Rotate the local grid
+			for (int i = 0; i < 4; i++) 
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					tempGrid[i, j] = localGrid[3 - j, i];
+				}
+			}
+
+			// See if it can rotate
+			bool canRotateNormal = canRotate(0, 0);
+			bool canRotateRight = !canRotateNormal && canRotate(1, 0);
+			bool canRotateLeft = !canRotateNormal && canRotate(-1, 0);
+			if (canRotateNormal || canRotateLeft || canRotateRight) 
+			{
+				// Move if necesssary
+				if (canRotateRight)
+				{
+					this.transform.Translate(1, 0, 0);
+					this.targetX++;
+				}
+				else if (canRotateLeft)
+				{
+					this.transform.Translate(-1, 0, 0);
+					this.targetX--;
+				}
+
+				// Apply the rotation
+				for (int i = 0; i < this.transform.childCount; i++)
+				{
+					Transform child = this.transform.GetChild(i);
+					child.localPosition = new Vector3(child.localPosition.y, 3 - child.localPosition.x);
+				}
+				for (int i = 0; i < 4; i++) 
+				{
+					for (int j = 0; j < 4; j++)
+					{
+						localGrid[i, j] = tempGrid[i, j];
+					}
+				}
+			}
 		}
+	}
+
+	/// <summary>
+	/// Checks whether or not the block can rotate when moving the given offsets
+	/// </summary>
+	/// <returns>True if able to rotate, false otherwise</returns>
+	/// <param name="xOffset">Horizontal offset</param>
+	/// <param name="yOffset">Vertical offset</param>
+	private bool canRotate(int xOffset, int yOffset)
+	{
+		// Get the bounds
+		int xMin = (int)this.transform.position.x + xOffset;
+		int yMin = (int)this.transform.position.y + yOffset;
+		int xMax = (int)Mathf.Ceil(this.transform.position.x) + xOffset;
+		int yMax = (int)Mathf.Ceil(this.transform.position.y) + yOffset;
+
+		// Check for collisions
+		bool canOccupy = true;
+		for (int i = xMin; i <= xMax; i++)
+		{
+			for (int j = yMin; j <= yMax; j++)
+			{
+				canOccupy = canOccupy && gameManager.canOccupy(tempGrid, i, j);
+			}
+		}
+
+		// Return the result
+		return canOccupy;
 	}
 }
