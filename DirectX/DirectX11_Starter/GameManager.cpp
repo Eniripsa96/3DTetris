@@ -198,6 +198,10 @@ void GameManager::UpdateScene(float dt)
 		1.0f,
 		0);
 
+	// Set up the input assembler for gamee objects
+	deviceContext->IASetInputLayout(inputLayout);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	// Update each mesh
 	for (UINT i = 0; i < gameObjects.size(); i++)
 	{
@@ -224,13 +228,12 @@ void GameManager::UpdateScene(float dt)
 			1,
 			&(vsConstantBuffer));
 
-		// Set up the input assembler
-		deviceContext->IASetInputLayout(inputLayout);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 		// Draw the gameObject
 		gameObjects[i]->Draw();
 	}
+
+	// TODO Update UI Objects
+	//for (UINT i = 0; i < uiObjects.size(); i++) { }
 
 	// Present the buffer
 	HR(swapChain->Present(0, 0));
