@@ -15,6 +15,12 @@
 // For DirectX Math
 using namespace DirectX;
 
+enum GAME_STATE
+{
+	MENU,
+	GAME
+};
+
 // Demo class which extends the base DirectXGame class
 class GameManager : public DirectXGame
 {
@@ -45,6 +51,8 @@ public:
 	ID3D11Buffer* vsConstantBuffer;
 	VertexShaderConstantBufferLayout dataToSendToVSConstantBuffer;
 
+	GAME_STATE gameState;
+
 private:
 
 	// The matrices to go from model space
@@ -53,6 +61,7 @@ private:
 	XMFLOAT4X4 projectionMatrix;
 
 	std::vector<GameObject*> gameObjects;
+	std::vector<GameObject*> uiObjects;
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Material* shapeMaterial;
