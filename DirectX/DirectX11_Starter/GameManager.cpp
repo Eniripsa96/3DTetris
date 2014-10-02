@@ -58,6 +58,8 @@ GameManager::GameManager(HINSTANCE hInstance) : DirectXGame(hInstance)
 	windowCaption = L"Demo DX11 Game";
 	windowWidth = 800;
 	windowHeight = 600;
+
+	gameState = GAME;
 }
 
 GameManager::~GameManager()
@@ -96,7 +98,7 @@ bool GameManager::Init()
 	quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
 
 	// Create materials
-	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader);
+	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
 
 	// Create the shapes we want
 	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh, shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f)));
@@ -198,38 +200,41 @@ void GameManager::UpdateScene(float dt)
 		1.0f,
 		0);
 
-	// Set up the input assembler for gamee objects
-	deviceContext->IASetInputLayout(inputLayout);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Update each mesh
-	for (UINT i = 0; i < gameObjects.size(); i++)
+	if (gameState == GAME)
 	{
-		// Update this gameObject
-		gameObjects[i]->Update(dt);
+		// Set up the input assembler for game objects
+		deviceContext->IASetInputLayout(inputLayout);
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// Update constant buffer data
-		dataToSendToVSConstantBuffer.world = gameObjects[i]->worldMatrix;
-		dataToSendToVSConstantBuffer.view = viewMatrix;
-		dataToSendToVSConstantBuffer.projection = projectionMatrix;
+		// Update each mesh
+		for (UINT i = 0; i < gameObjects.size(); i++)
+		{
+			// Update this gameObject
+			gameObjects[i]->Update(dt);
 
-		// Update the constant buffer itself
-		deviceContext->UpdateSubresource(
-			vsConstantBuffer,
-			0,
-			NULL,
-			&dataToSendToVSConstantBuffer,
-			0,
-			0);
+			// Update constant buffer data
+			dataToSendToVSConstantBuffer.world = gameObjects[i]->worldMatrix;
+			dataToSendToVSConstantBuffer.view = viewMatrix;
+			dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
-		// Set the constant buffer in the device
-		deviceContext->VSSetConstantBuffers(
-			0,	// Corresponds to the constant buffer's register in the vertex shader
-			1,
-			&(vsConstantBuffer));
+			// Update the constant buffer itself
+			deviceContext->UpdateSubresource(
+				vsConstantBuffer,
+				0,
+				NULL,
+				&dataToSendToVSConstantBuffer,
+				0,
+				0);
 
-		// Draw the gameObject
-		gameObjects[i]->Draw();
+			// Set the constant buffer in the device
+			deviceContext->VSSetConstantBuffers(
+				0,	// Corresponds to the constant buffer's register in the vertex shader
+				1,
+				&(vsConstantBuffer));
+
+			// Draw the gameObject
+			gameObjects[i]->Draw();
+		}
 	}
 
 	// TODO Update UI Objects

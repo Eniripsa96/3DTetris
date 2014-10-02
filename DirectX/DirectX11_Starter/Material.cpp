@@ -1,6 +1,6 @@
 #include "Material.h"
 
-Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader)
+Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, const wchar_t* texPath)
 {
 	deviceContext = context;
 	vertexShader = vShader;
@@ -15,7 +15,7 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 
 	HRESULT result1 = device->CreateSamplerState(samplerDesc, &samplerState);
 
-	HRESULT result2 = CreateWICTextureFromFile(device, context, L"image.png", 0, &resourceView);
+	HRESULT result2 = CreateWICTextureFromFile(device, context, texPath, 0, &resourceView);
 
 	delete samplerDesc;
 }
