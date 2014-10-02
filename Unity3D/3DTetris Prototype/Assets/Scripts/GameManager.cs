@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
 	public GameObject cube;
 
 	private GameObject[,] gameGrid = new GameObject[WIDTH, HEIGHT];
+	private FallingBlock heldBlock;
 
 	private bool gameOver = false;
 
@@ -55,11 +56,18 @@ public class GameManager : MonoBehaviour
 	/// <summary>
 	/// Spawns a new falling block at the top of the game board
 	/// </summary>
-	public void SpawnFallingBlock() 
+	public void SpawnFallingBlock(bool holdReplacement = false) 
 	{
 		int index = (int)(Random.value * blockShapes.Count);
 		GameObject go = (GameObject)GameObject.Instantiate(blockShapes[index]);
-		go.transform.Translate(3, 17, 0);
+		go.transform.Translate((WIDTH - 4) / 2, HEIGHT, 0);
+
+		if (holdReplacement) 
+		{
+			FallingBlock block = go.GetComponent<FallingBlock>();
+			block.Held = true;
+			block.Held = false;
+		}
 	}
 
 	/// <summary>
@@ -142,6 +150,30 @@ public class GameManager : MonoBehaviour
 
 		// No collisions
 		return true;
+	}
+
+	/// <summary>
+	/// Moves the block to being held, freezing it to the side and replacing
+	/// it with a new block or the previously held block.
+	/// </summary>
+	/// <param name="block">Block.</param>
+	public void HoldBlock(FallingBlock block) 
+	{
+		// Get a replacement block
+		if (heldBlock == null) 
+		{
+			SpawnFallingBlock(true);
+		}
+		else
+		{
+			heldBlock.Held = false;
+			heldBlock.transform.position = new Vector3((WIDTH - 4) / 2, HEIGHT);
+		}
+
+		// Hold the new block
+		block.Held = true;
+		block.transform.position = new Vector3(-5, HEIGHT - 4);
+		heldBlock = block;
 	}
 
 	/// <summary>
