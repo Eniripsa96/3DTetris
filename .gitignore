@@ -38,3 +38,6 @@ Thumbs.db
 
 #Ignore folders built by Unity
 Unity3D/3DTetris Prototype/Library/metadata/
+Unity3D/3DTetris Prototype/Library/ScriptAssemblies/
+Unity3D/3DTetris Prototype/Assets/bin/
+Unity3D/3DTetris Prototype/Temp/
