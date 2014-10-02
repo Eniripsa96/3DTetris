@@ -1,16 +1,16 @@
-#include "Entity.h"
+#include "GameObject.h"
 
 // Constructor gives us device, device context, a material, shaders, and a shape type
-Entity::Entity(ID3D11Device* device, ID3D11DeviceContext* context, Mesh* mesh, Material* mat)
+GameObject::GameObject(ID3D11Device* device, ID3D11DeviceContext* context, Mesh* mesh, Material* mat)
 {
 	// Set mesh and material
 	this->mesh = mesh;
 	material = mat;
 }
 
-Entity::~Entity() { }
+GameObject::~GameObject() { }
 
-void Entity::Update(float dt)
+void GameObject::Update(float dt)
 {
 	// Translate position
 	if (mesh->shapeType == TRIANGLE)
@@ -23,7 +23,7 @@ void Entity::Update(float dt)
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(translation /* * rotation * scale */));
 }
 
-void Entity::Draw()
+void GameObject::Draw()
 {
 	material->Draw();
 	mesh->Draw();

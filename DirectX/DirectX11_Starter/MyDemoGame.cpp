@@ -63,9 +63,9 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance) : DirectXGame(hInstance)
 MyDemoGame::~MyDemoGame()
 {
 	// Clean up here
-	for (UINT i = 0; i < entities.size(); i++)
+	for (UINT i = 0; i < gameObjects.size(); i++)
 	{
-		delete entities[i];
+		delete gameObjects[i];
 	}
 
 	delete triangleMesh;
@@ -99,8 +99,8 @@ bool MyDemoGame::Init()
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader);
 
 	// Create the shapes we want
-	entities.emplace_back(new Entity(device, deviceContext, triangleMesh, shapeMaterial));
-	entities.emplace_back(new Entity(device, deviceContext, quadMesh, shapeMaterial));
+	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh, shapeMaterial));
+	gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh, shapeMaterial));
 
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)
@@ -112,8 +112,8 @@ bool MyDemoGame::Init()
 
 	// Set up the world matrix for each mesh
 	XMMATRIX W = XMMatrixIdentity();
-	for (UINT i = 0; i < entities.size(); i++)
-		XMStoreFloat4x4(&(entities[i]->worldMatrix), XMMatrixTranspose(W));
+	for (UINT i = 0; i < gameObjects.size(); i++)
+		XMStoreFloat4x4(&(gameObjects[i]->worldMatrix), XMMatrixTranspose(W));
 
 	return true;
 }
@@ -205,7 +205,7 @@ void MyDemoGame::OnResize()
 #pragma region Game Loop
 
 // Updates the buffers (and pushes them to the buffer on the device)
-// and draws for each entity
+// and draws for each gameObject
 void MyDemoGame::UpdateScene(float dt)
 {
 	// Clear the buffer
@@ -217,13 +217,13 @@ void MyDemoGame::UpdateScene(float dt)
 		0);
 
 	// Update each mesh
-	for (UINT i = 0; i < entities.size(); i++)
+	for (UINT i = 0; i < gameObjects.size(); i++)
 	{
-		// Update this entity
-		entities[i]->Update(dt);
+		// Update this gameObject
+		gameObjects[i]->Update(dt);
 
 		// Update constant buffer data
-		dataToSendToVSConstantBuffer.world = entities[i]->worldMatrix;
+		dataToSendToVSConstantBuffer.world = gameObjects[i]->worldMatrix;
 		dataToSendToVSConstantBuffer.view = viewMatrix;
 		dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
@@ -246,8 +246,8 @@ void MyDemoGame::UpdateScene(float dt)
 		deviceContext->IASetInputLayout(inputLayout);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// Draw the entity
-		entities[i]->Draw();
+		// Draw the gameObject
+		gameObjects[i]->Draw();
 	}
 
 	// Present the buffer

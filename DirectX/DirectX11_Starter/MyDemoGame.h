@@ -2,7 +2,7 @@
 
 #include <DirectXMath.h>
 #include "DirectXGame.h"
-#include "Entity.h"
+#include "GameObject.h"
 #include <vector>
 
 // Include run-time memory checking in debug builds
@@ -26,7 +26,7 @@ public:
 	void LoadShadersAndInputLayout();
 	void OnResize();
 	void UpdateScene(float dt);
-	void DrawScene(); 
+	void DrawScene();	// Deprecated
 
 	// For handing mouse input
 	void OnMouseDown(WPARAM btnState, int x, int y);
@@ -51,7 +51,7 @@ private:
 	XMFLOAT4X4 viewMatrix;
 	XMFLOAT4X4 projectionMatrix;
 
-	std::vector<Entity*> entities;
+	std::vector<GameObject*> gameObjects;
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Material* shapeMaterial;

@@ -1,13 +1,13 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef GAMEOBJECT_H
+#define GAMEOBJECT_H
 
 #include "Mesh.h"
 
-class Entity
+class GameObject
 {
 public:
-	Entity(ID3D11Device*, ID3D11DeviceContext*, Mesh*, Material*);
-	~Entity();
+	GameObject(ID3D11Device*, ID3D11DeviceContext*, Mesh*, Material*);
+	~GameObject();
 
 	void Update(float);
 	void Draw(void);
