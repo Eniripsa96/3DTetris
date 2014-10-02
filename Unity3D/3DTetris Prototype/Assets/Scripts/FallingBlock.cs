@@ -8,12 +8,14 @@ public class FallingBlock : MonoBehaviour {
 
 	public static float FALL_SPEED = 0.05f;
 	public static float SIDE_SPEED = 0.1f;
+	public static float SPEED_INCREASE = 0.01f;
 
 	private bool[,] localGrid = new bool[4, 4];
 	private bool[,] tempGrid = new bool[4, 4];
 
 	private GameManager gameManager;
 	private int targetX = 3, targetY = 17;
+	private float speedMultiplier = 1.0f;
 
 	/// <summary>
 	/// The local occupied cell grid for the block used
@@ -80,7 +82,7 @@ public class FallingBlock : MonoBehaviour {
 				targetX--;
 			}
 			else if (transform.position.x - targetX <= SIDE_SPEED
-			    && gameManager.canMove(this, GameManager.Direction.LEFT))
+			    && gameManager.CanMove(this, GameManager.Direction.LEFT))
 			{
 				targetX -= 1;
 			}
@@ -92,7 +94,7 @@ public class FallingBlock : MonoBehaviour {
 				targetX++;
 			}
 			else if (targetX - this.transform.position.x <= SIDE_SPEED
-			    && gameManager.canMove(this, GameManager.Direction.RIGHT))
+			    && gameManager.CanMove(this, GameManager.Direction.RIGHT))
 			{
 				targetX += 1;
 			}
@@ -102,24 +104,23 @@ public class FallingBlock : MonoBehaviour {
 		float dx = targetX - this.transform.position.x;
 		if (dx > 0) 
 		{
-			this.transform.Translate(Mathf.Min(dx, SIDE_SPEED), 0, 0);
+			this.transform.Translate(Mathf.Min(dx, SIDE_SPEED * speedMultiplier), 0, 0);
 		}
 		else
 		{
-			this.transform.Translate(Mathf.Max(dx, -SIDE_SPEED), 0, 0);
+			this.transform.Translate(Mathf.Max(dx, -SIDE_SPEED * speedMultiplier), 0, 0);
 		}
 
 		// Downward speed
-		float speed = FALL_SPEED;
+		float speed = FALL_SPEED * speedMultiplier;
 		if (Input.GetKey(KeyCode.DownArrow))
 		{
 			speed *= 4;
 		}
-		//Debug.Log("Speed: " + speed);
 
 		// Downward collisions
 		float dy = targetY - this.transform.position.y;
-		if (dy >= -speed && gameManager.canMove(this, GameManager.Direction.DOWN))
+		if (dy >= -speed && gameManager.CanMove(this, GameManager.Direction.DOWN))
 		{
 			targetY--;
 			dy = targetY - this.transform.position.y;
@@ -130,6 +131,7 @@ public class FallingBlock : MonoBehaviour {
 		if (yChange == 0 && targetX == this.transform.position.x)
 		{
 			gameManager.Merge(this);
+			speedMultiplier += SPEED_INCREASE;
 		}
 		else 
 		{
@@ -149,9 +151,9 @@ public class FallingBlock : MonoBehaviour {
 			}
 
 			// See if it can rotate
-			bool canRotateNormal = canRotate(0, 0);
-			bool canRotateRight = !canRotateNormal && canRotate(1, 0);
-			bool canRotateLeft = !canRotateNormal && canRotate(-1, 0);
+			bool canRotateNormal = CanRotate(0, 0);
+			bool canRotateRight = !canRotateNormal && CanRotate(1, 0);
+			bool canRotateLeft = !canRotateNormal && CanRotate(-1, 0);
 			if (canRotateNormal || canRotateLeft || canRotateRight) 
 			{
 				// Move if necesssary
@@ -189,7 +191,7 @@ public class FallingBlock : MonoBehaviour {
 	/// <returns>True if able to rotate, false otherwise</returns>
 	/// <param name="xOffset">Horizontal offset</param>
 	/// <param name="yOffset">Vertical offset</param>
-	private bool canRotate(int xOffset, int yOffset)
+	private bool CanRotate(int xOffset, int yOffset)
 	{
 		// Get the bounds
 		int xMin = (int)this.transform.position.x + xOffset;
@@ -203,7 +205,7 @@ public class FallingBlock : MonoBehaviour {
 		{
 			for (int j = yMin; j <= yMax; j++)
 			{
-				canOccupy = canOccupy && gameManager.canOccupy(tempGrid, i, j);
+				canOccupy = canOccupy && gameManager.CanOccupy(tempGrid, i, j);
 			}
 		}
 
