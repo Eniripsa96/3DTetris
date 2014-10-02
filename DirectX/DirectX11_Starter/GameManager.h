@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAMEMANAGER_H
+#define GAMEMANAGER_H
 
 #include <DirectXMath.h>
 #include "DirectXGame.h"
@@ -15,11 +16,11 @@
 using namespace DirectX;
 
 // Demo class which extends the base DirectXGame class
-class MyDemoGame : public DirectXGame
+class GameManager : public DirectXGame
 {
 public:
-	MyDemoGame(HINSTANCE hInstance);
-	~MyDemoGame();
+	GameManager(HINSTANCE hInstance);
+	~GameManager();
 
 	// Overrides for base level methods
 	bool Init();
@@ -60,3 +61,5 @@ private:
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
 };
+
+#endif

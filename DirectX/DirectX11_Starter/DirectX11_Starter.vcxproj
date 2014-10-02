@@ -71,7 +71,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MyDemoGame.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DirectXGame.cpp" />
     <ClCompile Include="GameTimer.cpp" />
@@ -80,7 +80,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MyDemoGame.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DirectXGame.h" />
     <ClInclude Include="GameTimer.h" />
