@@ -99,8 +99,8 @@ bool GameManager::Init()
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader);
 
 	// Create the shapes we want
-	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh, shapeMaterial));
-	gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh, shapeMaterial));
+	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh, shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f)));
+	gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh, shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f)));
 
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)
