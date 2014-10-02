@@ -18,12 +18,11 @@ public class GameManager : MonoBehaviour
 	private GameObject[,] gameGrid = new GameObject[WIDTH, HEIGHT];
 
 	private bool gameOver = false;
-	private int counter = 0;
 
 	// Use this for initialization
 	void Start()
 	{
-		spawnFallingBlock();
+		SpawnFallingBlock();
 	} 
 	
 	// Update is called once per frame
@@ -37,7 +36,7 @@ public class GameManager : MonoBehaviour
 	/// <returns>True if occupied, false otherwise</returns>
 	/// <param name="x">The x coordinate</param>
 	/// <param name="y">The y coordinate</param>
-	public bool isOccupied(int x, int y) 
+	public bool IsOccupied(int x, int y) 
 	{
 		return gameGrid[x, y] != null;
 	}
@@ -48,7 +47,7 @@ public class GameManager : MonoBehaviour
 	/// <param name="x">The x coordinate</param>
 	/// <param name="y">The y coordinate</param>
 	/// <param name="go">Game Object to set to the cell</param>
-	public void set(int x, int y, GameObject go)
+	public void Set(int x, int y, GameObject go)
 	{
 		gameGrid[x, y] = go;
 	}
@@ -56,7 +55,7 @@ public class GameManager : MonoBehaviour
 	/// <summary>
 	/// Spawns a new falling block at the top of the game board
 	/// </summary>
-	public void spawnFallingBlock() 
+	public void SpawnFallingBlock() 
 	{
 		int index = (int)(Random.value * blockShapes.Count);
 		GameObject go = (GameObject)GameObject.Instantiate(blockShapes[index]);
@@ -71,7 +70,7 @@ public class GameManager : MonoBehaviour
 	/// <returns>true if can move, false otherwise</returns>
 	/// <param name="block">the block to check for</param>
 	/// <param name="direction">the direction of the movement</param>
-	public bool canMove(FallingBlock block, Direction direction) {
+	public bool CanMove(FallingBlock block, Direction direction) {
 
 		Vector3 pos = block.gameObject.transform.position;
 
@@ -82,20 +81,20 @@ public class GameManager : MonoBehaviour
 			case Direction.LEFT:
 				
 				x = block.TargetX - 1;
-				return canOccupy(block.LocalGrid, x, (int)pos.y)
-					&& canOccupy(block.LocalGrid, x, (int)Mathf.Ceil(pos.y));
+				return CanOccupy(block.LocalGrid, x, (int)pos.y)
+					&& CanOccupy(block.LocalGrid, x, (int)Mathf.Ceil(pos.y));
 
 			case Direction.RIGHT:
 
 				x = block.TargetX + 1;
-				return canOccupy(block.LocalGrid, x, (int)pos.y)
-					&& canOccupy(block.LocalGrid, x, (int)Mathf.Ceil(pos.y));
+				return CanOccupy(block.LocalGrid, x, (int)pos.y)
+					&& CanOccupy(block.LocalGrid, x, (int)Mathf.Ceil(pos.y));
 
 			case Direction.DOWN:
 
 				y = block.TargetY - 1;
-				return canOccupy(block.LocalGrid, (int)pos.x, y)
-					&& canOccupy(block.LocalGrid, (int)Mathf.Ceil(pos.x), y);
+				return CanOccupy(block.LocalGrid, (int)pos.x, y)
+					&& CanOccupy(block.LocalGrid, (int)Mathf.Ceil(pos.x), y);
 		}
 
 		return false;
@@ -109,7 +108,7 @@ public class GameManager : MonoBehaviour
 	/// <param name="localGrid">the local grid of the block trying to occupy the cells</param>
 	/// <param name="x">the horizontal coordinate of the block</param>
 	/// <param name="y">the vertical coordinate of the block</param>
-	public bool canOccupy(bool[,] localGrid, int x, int y)
+	public bool CanOccupy(bool[,] localGrid, int x, int y)
 	{
 		for (int i = 0; i < 4; i++) 
 		{
@@ -151,11 +150,13 @@ public class GameManager : MonoBehaviour
 	/// <param name="block">Block to merge into the grid</param>
 	public void Merge(FallingBlock block)
 	{
+		Material mat = block.transform.GetChild(0).gameObject.renderer.material;
 		int x = (int)block.transform.position.x;
 		int y = (int)block.transform.position.y;
 
 		// Merge the block into the game grid
 		bool[,] localGrid = block.LocalGrid;
+		int min = HEIGHT, max = 0;
 		for (int i = 0; i < 4; i++)
 		{
 			for (int j = 0; j < 4; j++)
@@ -163,7 +164,7 @@ public class GameManager : MonoBehaviour
 				if (localGrid[i, j])
 				{
 					// Game over
-					if (y + j >= 17)
+					if (y + j >= HEIGHT)
 					{
 						Debug.Log("Game Over!");
 						gameOver = true;
@@ -172,7 +173,17 @@ public class GameManager : MonoBehaviour
 					// Merge the cell
 					else 
 					{
+						if (y + j < min)
+						{
+							min = y + j;
+						}
+						if (y + j > max)
+						{
+							max = y + j;
+						}
+
 						GameObject go = (GameObject)GameObject.Instantiate(cube);
+						go.renderer.material = mat;
 						go.transform.Translate(x + i, y + j, 0);
 						gameGrid[x + i, y + j] = go;
 					}
@@ -186,7 +197,53 @@ public class GameManager : MonoBehaviour
 		// Spawn a new block if not game over
 		if (!gameOver) 
 		{
-			spawnFallingBlock();
+			CheckLines(min, max);
+			SpawnFallingBlock();
+		}
+	}
+
+	/// <summary>
+	/// Checks the game grid for completed lines
+	/// </summary>
+	private void CheckLines(int min, int max)
+	{
+		// Check each line in the bounds
+		// Going backwards to prevent moving down complete lines
+		for (int j = max; j >= min; j--)
+		{
+			// See if the individual line is complete
+			bool complete = true;
+			for (int i = 0; i < WIDTH; i++)
+			{
+				complete &= gameGrid[i, j];
+			}
+
+			// A line is complete
+			if (complete)
+			{
+				// Delete completed row
+				for (int i = 0; i < WIDTH; i++)
+				{
+					if (gameGrid[i, j] != null)
+					{
+						GameObject.Destroy(gameGrid[i, j]);
+					}
+				}
+
+				// Move down above rows
+				for (int k = j; k < HEIGHT - 1; k++)
+				{
+					for (int i = 0; i < WIDTH; i++)
+					{
+						gameGrid[i, k] = gameGrid[i, k + 1];
+						gameGrid[i, k + 1] = null;
+						if (gameGrid[i, k] != null)
+						{
+							gameGrid[i, k].transform.Translate(0, -1, 0);
+						}
+					}
+				}
+			}
 		}
 	}
 }
