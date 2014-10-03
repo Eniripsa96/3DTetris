@@ -172,7 +172,7 @@ public class GameManager : MonoBehaviour
 
 		// Hold the new block
 		block.Held = true;
-		block.transform.position = new Vector3(-5, HEIGHT - 4);
+		block.transform.position = new Vector3(-4, HEIGHT - 4.5f);
 		heldBlock = block;
 	}
 
