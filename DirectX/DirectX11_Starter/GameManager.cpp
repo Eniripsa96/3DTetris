@@ -276,8 +276,22 @@ void GameManager::DrawScene()
 }
 
 #pragma endregion
+#pragma region User Input
 
-#pragma region Mouse Input
+LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case VK_SPACE:
+			gameState = (gameState == MENU) ? GAME : MENU;
+		}
+	}
+
+	return DirectXGame::MsgProc(hwnd, msg, wParam, lParam);
+}
 
 // These methods don't do much currently, but can be used for mouse-related input
 

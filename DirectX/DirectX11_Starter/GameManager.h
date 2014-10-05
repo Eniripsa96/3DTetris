@@ -40,6 +40,8 @@ public:
 	void OnMouseUp(WPARAM btnState, int x, int y);
 	void OnMouseMove(WPARAM btnState, int x, int y);
 
+	LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
+
 	// Shaders
 	ID3D11PixelShader* pixelShader;
 	ID3D11VertexShader* vertexShader;
