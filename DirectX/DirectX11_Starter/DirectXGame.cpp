@@ -502,7 +502,11 @@ LRESULT DirectXGame::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
 	case WM_KEYDOWN:
-		PostQuitMessage(0);
+		switch (wParam)
+		{
+		case VK_ESCAPE:
+			PostQuitMessage(0);
+		}
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
