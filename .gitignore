@@ -35,6 +35,7 @@ Thumbs.db
 *.sbr
 *.sdf
 *.opensdf
+*.cso
 
 #Ignore folders built by Unity
 Unity3D/3DTetris Prototype/Library/metadata/
