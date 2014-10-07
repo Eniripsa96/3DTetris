@@ -62,8 +62,9 @@ private:
 	XMFLOAT4X4 viewMatrix;
 	XMFLOAT4X4 projectionMatrix;
 
+	std::vector<GameObject*> allObjects;
 	std::vector<GameObject*> gameObjects;
-	std::vector<GameObject*> uiObjects;
+	std::vector<GameObject*> menuObjects;
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Material* shapeMaterial;

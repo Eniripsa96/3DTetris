@@ -59,7 +59,7 @@ GameManager::GameManager(HINSTANCE hInstance) : DirectXGame(hInstance)
 	windowWidth = 800;
 	windowHeight = 600;
 
-	gameState = GAME;
+	gameState = MENU;
 }
 
 GameManager::~GameManager()
@@ -97,14 +97,19 @@ bool GameManager::Init()
 
 	// Create meshes
 	triangleMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, TRIANGLE);
-	//quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
+	quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
 
-	// Create the shapes we want
-	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh, shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f)));
-	//gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh, shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f)));
+	// Create the game objects we want
+	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+
+	// Create the menu objects we want
+	menuObjects.emplace_back(new GameObject(device, deviceContext, quadMesh,		shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
+
+	allObjects = menuObjects;
 
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)
@@ -202,45 +207,39 @@ void GameManager::UpdateScene(float dt)
 		1.0f,
 		0);
 
-	if (gameState == GAME)
+	// [DRAW] Set up the input assembler for objects
+	deviceContext->IASetInputLayout(inputLayout);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Update each mesh
+	for (UINT i = 0; i < allObjects.size(); i++)
 	{
-		// Set up the input assembler for game objects
-		deviceContext->IASetInputLayout(inputLayout);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		// [UPDATE] Update this object
+		allObjects[i]->Update(dt);
 
-		// Update each mesh
-		for (UINT i = 0; i < gameObjects.size(); i++)
-		{
-			// Update this gameObject
-			gameObjects[i]->Update(dt);
+		// [UPDATE] Update constant buffer data using this object
+		dataToSendToVSConstantBuffer.world = allObjects[i]->worldMatrix;
+		dataToSendToVSConstantBuffer.view = viewMatrix;
+		dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
-			// Update constant buffer data
-			dataToSendToVSConstantBuffer.world = gameObjects[i]->worldMatrix;
-			dataToSendToVSConstantBuffer.view = viewMatrix;
-			dataToSendToVSConstantBuffer.projection = projectionMatrix;
+		// [UPDATE] Update the constant buffer itself
+		deviceContext->UpdateSubresource(
+			vsConstantBuffer,
+			0,
+			NULL,
+			&dataToSendToVSConstantBuffer,
+			0,
+			0);
 
-			// Update the constant buffer itself
-			deviceContext->UpdateSubresource(
-				vsConstantBuffer,
-				0,
-				NULL,
-				&dataToSendToVSConstantBuffer,
-				0,
-				0);
+		// [DRAW] Set the constant buffer in the device
+		deviceContext->VSSetConstantBuffers(
+			0,	// Corresponds to the constant buffer's register in the vertex shader
+			1,
+			&(vsConstantBuffer));
 
-			// Set the constant buffer in the device
-			deviceContext->VSSetConstantBuffers(
-				0,	// Corresponds to the constant buffer's register in the vertex shader
-				1,
-				&(vsConstantBuffer));
-
-			// Draw the gameObject
-			gameObjects[i]->Draw();
-		}
+		// [DRAW] Draw the object
+		allObjects[i]->Draw();
 	}
-
-	// TODO Update UI Objects
-	//for (UINT i = 0; i < uiObjects.size(); i++) { }
 
 	// Present the buffer
 	HR(swapChain->Present(0, 0));
@@ -289,6 +288,11 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 		case VK_SPACE:
 			gameState = (gameState == MENU) ? GAME : MENU;
+
+			if (gameState == MENU)
+				allObjects = menuObjects;
+			else if (gameState == GAME)
+				allObjects = gameObjects;
 		}
 	}
 

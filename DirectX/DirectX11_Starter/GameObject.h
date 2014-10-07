@@ -6,7 +6,7 @@
 class GameObject
 {
 public:
-	GameObject(ID3D11Device*, ID3D11DeviceContext*, Mesh*, Material*, XMFLOAT3*);
+	GameObject(ID3D11Device*, ID3D11DeviceContext*, Mesh*, Material*, XMFLOAT3*, XMFLOAT3*);
 	~GameObject();
 
 	void Update(float);
@@ -18,6 +18,8 @@ public:
 	XMFLOAT3 position;
 	XMFLOAT3 rotation;
 	XMFLOAT3 scale;
+
+	XMFLOAT3 velocity;
 
 	XMFLOAT4X4 worldMatrix;
 };
