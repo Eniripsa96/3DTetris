@@ -97,14 +97,14 @@ bool GameManager::Init()
 
 	// Create meshes
 	triangleMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, TRIANGLE);
-	quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
+	//quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
 
 	// Create the shapes we want
 	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh, shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f)));
-	gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh, shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f)));
+	//gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh, shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f)));
 
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)

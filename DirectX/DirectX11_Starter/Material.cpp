@@ -26,11 +26,9 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 
 Material::~Material()
 {
-	ReleaseMacro(vertexShader);
-	ReleaseMacro(pixelShader);
-
 	ReleaseMacro(samplerState);
-	//ReleaseMacro(resourceView);
+	//ReleaseMacro(resourceView);	// This causes error
+	resourceView->Release();
 }
 
 void Material::Draw()

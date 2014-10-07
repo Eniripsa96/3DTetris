@@ -22,8 +22,6 @@ Mesh::~Mesh()
 	// Release all of the D3D stuff that's still hanging out
 	ReleaseMacro(vertexBuffer);
 	ReleaseMacro(indexBuffer);
-	ReleaseMacro(vertexShader);
-	ReleaseMacro(pixelShader);
 }
 
 void Mesh::CreateTrianglePoints()

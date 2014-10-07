@@ -39,7 +39,6 @@ public:
 	void CreateTrianglePoints();
 	void CreateQuadPoints();
 	void CreateGeometryBuffers(Vertex[]);
-//	void LoadShadersAndInputLayout();
 	void Update();
 	void Draw();
 
