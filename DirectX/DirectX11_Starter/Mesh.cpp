@@ -15,8 +15,6 @@ Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShade
 		CreateTrianglePoints();
 	else if (shapeType == QUAD)
 		CreateQuadPoints();
-
-	//LoadShadersAndInputLayout();
 }
 
 Mesh::~Mesh()
@@ -26,8 +24,6 @@ Mesh::~Mesh()
 	ReleaseMacro(indexBuffer);
 	ReleaseMacro(vertexShader);
 	ReleaseMacro(pixelShader);
-	//ReleaseMacro(vsConstantBuffer);
-	//ReleaseMacro(inputLayout);
 }
 
 void Mesh::CreateTrianglePoints()

@@ -77,6 +77,8 @@ GameManager::~GameManager()
 
 	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(inputLayout);
+	ReleaseMacro(vertexShader);
+	ReleaseMacro(pixelShader);
 }
 
 #pragma endregion

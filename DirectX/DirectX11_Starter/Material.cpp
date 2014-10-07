@@ -8,7 +8,7 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 	pixelShader = pShader;
 
 	// Create SRV
-	HRESULT result1 = device->CreateShaderResourceView(NULL , NULL, &resourceView);	// Error here: Cannot create an SRV from a null resource (first param)
+	//HRESULT result1 = device->CreateShaderResourceView(NULL , NULL, &resourceView);	// Error from having a NULL resource is intentional
 
 	// Create sampler description
 	D3D11_SAMPLER_DESC* samplerDesc = new D3D11_SAMPLER_DESC();
@@ -16,10 +16,10 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 	samplerDesc->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	HRESULT result2 = device->CreateSamplerState(samplerDesc, &samplerState);
+	HRESULT result1 = device->CreateSamplerState(samplerDesc, &samplerState);
 
 	// Create texture
-	HRESULT result3 = CreateWICTextureFromFile(device, context, texPath, 0, &resourceView);
+	HRESULT result2 = CreateWICTextureFromFile(device, context, texPath, 0, &resourceView);
 
 	delete samplerDesc;
 }
@@ -28,6 +28,9 @@ Material::~Material()
 {
 	ReleaseMacro(vertexShader);
 	ReleaseMacro(pixelShader);
+
+	ReleaseMacro(samplerState);
+	//ReleaseMacro(resourceView);
 }
 
 void Material::Draw()
