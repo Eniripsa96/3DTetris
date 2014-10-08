@@ -16,6 +16,8 @@ public class FallingBlock : MonoBehaviour {
 	private GameManager gameManager;
 	private int targetX = 3, targetY = 17;
 	private float speedMultiplier = 1.0f;
+	private bool held = false;
+	private bool wasHeld = false;
 
 	/// <summary>
 	/// The local occupied cell grid for the block used
@@ -31,6 +33,23 @@ public class FallingBlock : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Whether or not the block is currently being held
+	/// </summary>
+	/// <value>true if held, false otherwise</value>
+	public bool Held 
+	{
+		get
+		{
+			return held;
+		}
+		set
+		{
+			held = value;
+			wasHeld = wasHeld || value;
+		}
+	}
+
+	/// <summary>
 	/// The horizontal target position of the block used for
 	/// smoothly moving to the next cell
 	/// </summary>
@@ -40,6 +59,10 @@ public class FallingBlock : MonoBehaviour {
 		get
 		{
 			return targetX;
+		}
+		set
+		{
+			targetX = value;
 		}
 	}
 
@@ -53,6 +76,10 @@ public class FallingBlock : MonoBehaviour {
 		get
 		{
 			return targetY;
+		}
+		set
+		{
+			targetY = value;
 		}
 	}
 
@@ -72,6 +99,19 @@ public class FallingBlock : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		// Do nothing if held
+		if (held)
+		{
+			return;
+		}
+		
+		// Swap out if space is pressed
+		if (!wasHeld && Input.GetKey(KeyCode.Space))
+		{
+			gameManager.HoldBlock(this);
+			return;
+		}
+
 		// Key input for moving sideways
 		bool left = Input.GetKey(KeyCode.LeftArrow);
 		bool right = Input.GetKey(KeyCode.RightArrow);
