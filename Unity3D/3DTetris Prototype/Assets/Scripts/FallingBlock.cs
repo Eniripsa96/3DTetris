@@ -9,6 +9,7 @@ public class FallingBlock : MonoBehaviour {
 	public static float FALL_SPEED = 0.05f;
 	public static float SIDE_SPEED = 0.1f;
 	public static float SPEED_INCREASE = 0.01f;
+	public static float ROTATION_SPEED = 720f;
 
 	private bool[,] localGrid = new bool[4, 4];
 	private bool[,] tempGrid = new bool[4, 4];
@@ -18,6 +19,7 @@ public class FallingBlock : MonoBehaviour {
 	private float speedMultiplier = 1.0f;
 	private bool held = false;
 	private bool wasHeld = false;
+	private float rotation = 0;
 
 	/// <summary>
 	/// The local occupied cell grid for the block used
@@ -117,26 +119,18 @@ public class FallingBlock : MonoBehaviour {
 		bool right = Input.GetKey(KeyCode.RightArrow);
 		if (left && !right)
 		{
-			if (transform.position.x < targetX) 
-			{
-				targetX--;
-			}
-			else if (transform.position.x - targetX <= SIDE_SPEED
+			if (transform.position.x - targetX <= SIDE_SPEED
 			    && gameManager.CanMove(this, GameManager.Direction.LEFT))
 			{
-				targetX -= 1;
+				targetX--;
 			}
 		}
 		else if (right && !left)
 		{
-			if (transform.position.x > targetX)
-			{
-				targetX++;
-			}
-			else if (targetX - this.transform.position.x <= SIDE_SPEED
+			if (targetX - this.transform.position.x <= SIDE_SPEED
 			    && gameManager.CanMove(this, GameManager.Direction.RIGHT))
 			{
-				targetX += 1;
+				targetX++;
 			}
 		}
 
@@ -168,7 +162,7 @@ public class FallingBlock : MonoBehaviour {
 
 		// Moving downward
 		float yChange = Mathf.Max(dy, -speed);
-		if (yChange == 0 && targetX == this.transform.position.x)
+		if (yChange == 0 && targetX == this.transform.position.x && rotation == 0)
 		{
 			gameManager.Merge(this);
 			speedMultiplier += SPEED_INCREASE;
@@ -179,7 +173,7 @@ public class FallingBlock : MonoBehaviour {
 		}
 
 		// Rotating
-		if (Input.GetKeyDown(KeyCode.UpArrow))
+		if (Input.GetKeyDown(KeyCode.UpArrow) && rotation < 1)
 		{
 			// Rotate the local grid
 			for (int i = 0; i < 4; i++) 
@@ -199,21 +193,17 @@ public class FallingBlock : MonoBehaviour {
 				// Move if necesssary
 				if (canRotateRight)
 				{
-					this.transform.Translate(1, 0, 0);
+					//this.transform.Translate(1, 0, 0);
 					this.targetX++;
 				}
 				else if (canRotateLeft)
 				{
-					this.transform.Translate(-1, 0, 0);
+					//this.transform.Translate(-1, 0, 0);
 					this.targetX--;
 				}
 
 				// Apply the rotation
-				for (int i = 0; i < this.transform.childCount; i++)
-				{
-					Transform child = this.transform.GetChild(i);
-					child.localPosition = new Vector3(child.localPosition.y, 3 - child.localPosition.x);
-				}
+				rotation = 90;
 				for (int i = 0; i < 4; i++) 
 				{
 					for (int j = 0; j < 4; j++)
@@ -222,6 +212,19 @@ public class FallingBlock : MonoBehaviour {
 					}
 				}
 			}
+		}
+
+		// Rotate to the target
+		if (rotation > 0) 
+		{
+			float angle = Mathf.Min(Time.deltaTime * ROTATION_SPEED, rotation);
+			for (int i = 0; i < this.transform.childCount; i++)
+			{
+				Transform child = this.transform.GetChild(i);
+				//child.localPosition = new Vector3(child.localPosition.y, 3 - child.localPosition.x);
+				child.RotateAround(new Vector3(transform.position.x + 1.5f, transform.position.y + 1.5f, 0), new Vector3(0, 0, 1), -angle);
+			}
+			rotation -= angle;
 		}
 	}
 

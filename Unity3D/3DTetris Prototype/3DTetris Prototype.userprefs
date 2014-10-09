@@ -1,9 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\FallingBlock.cs" Line="117" Column="4" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="246" Column="6" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="181" Column="15" />
+      <File FileName="Assets\Scripts\FallingBlock.cs" Line="82" Column="20" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
