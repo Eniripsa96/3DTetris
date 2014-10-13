@@ -15,12 +15,19 @@ GameObject::~GameObject() { }
 void GameObject::Update(float dt)
 {
 	// Update position via velocity
-	position.x += velocity.x * dt;
-	position.y += velocity.y * dt;
+	//position.x += velocity.x * dt;
+	//position.y += velocity.y * dt;
 	
 	// Apply translation to world matrix
 	XMMATRIX translation = XMMatrixTranslation(position.x, position.y, position.z);
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(translation /* * rotation * scale */));
+}
+
+void GameObject::Move(XMFLOAT3* move)
+{
+	position.x += move->x;
+	position.y += move->y;
+	position.z += move->z;
 }
 
 void GameObject::Draw()

@@ -69,6 +69,10 @@ GameManager::~GameManager()
 	{
 		delete gameObjects[i];
 	}
+	for (UINT i = 0; i < menuObjects.size(); i++)
+	{
+		delete menuObjects[i];
+	}
 
 	delete triangleMesh;
 	delete quadMesh;
@@ -286,6 +290,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
+		// Change state
 		case VK_SPACE:
 			gameState = (gameState == MENU) ? GAME : MENU;
 
@@ -293,6 +298,25 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				allObjects = menuObjects;
 			else if (gameState == GAME)
 				allObjects = gameObjects;
+			break;
+
+		// Movement of game object
+		case 'w':
+		case 'W':
+			allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
+			break;
+		case 's':
+		case 'S':
+			allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
+			break;
+		case 'd':
+		case 'D':
+			allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
+			break;
+		case 'a':
+		case 'A':
+			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
+			break;
 		}
 	}
 
