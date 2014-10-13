@@ -281,6 +281,7 @@ void GameManager::DrawScene()
 }
 
 #pragma endregion
+
 #pragma region User Input
 
 LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -316,6 +317,14 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'a':
 		case 'A':
 			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
+			break;
+		case 'q':
+		case 'Q':
+			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
+			break;
+		case 'e':
+		case 'E':
+			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
 		}
 	}

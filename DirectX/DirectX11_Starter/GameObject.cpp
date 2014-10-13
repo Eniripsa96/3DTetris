@@ -20,7 +20,9 @@ void GameObject::Update(float dt)
 	
 	// Apply translation to world matrix
 	XMMATRIX translation = XMMatrixTranslation(position.x, position.y, position.z);
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(translation /* * rotation * scale */));
+	XMMATRIX rotate = XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+	
+	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(rotate * translation /** scale */));
 }
 
 void GameObject::Move(XMFLOAT3* move)
@@ -28,6 +30,13 @@ void GameObject::Move(XMFLOAT3* move)
 	position.x += move->x;
 	position.y += move->y;
 	position.z += move->z;
+}
+
+void GameObject::Rotate(XMFLOAT3* rotate)
+{
+	rotation.x += rotate->x;
+	rotation.y += rotate->y;
+	rotation.z += rotate->z;
 }
 
 void GameObject::Draw()

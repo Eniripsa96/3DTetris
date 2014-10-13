@@ -43,10 +43,10 @@ void Mesh::CreateQuadPoints()
 	Vertex vertices[] =
 	{
 		// NOTE TEXTURE COORDS ARE 0,0 TOP LEFT AND 1,1 BOTTOM RIGHT
-		{ XMFLOAT3(+0.0f, +1.0f, +0.0f), RED,	XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(+0.0f, +0.0f, +0.0f), GREEN, XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(+1.0f, +1.0f, +0.0f), BLUE,	XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(+1.0f, +0.0f, +0.0f), RED,	XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(-0.5f, +0.5f, +0.0f), RED,	XMFLOAT2(0.0f, 0.0f) },	// Top left
+		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), GREEN, XMFLOAT2(0.0f, 1.0f) },	// Bottom left
+		{ XMFLOAT3(+0.5f, +0.5f, +0.0f), BLUE,	XMFLOAT2(1.0f, 0.0f) },	// Top right
+		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), RED,	XMFLOAT2(1.0f, 1.0f) },	// Bottom right
 	};
 
 	CreateGeometryBuffers(vertices);

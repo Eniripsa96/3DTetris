@@ -12,6 +12,7 @@ public:
 	void Update(float);
 	void Draw(void);
 	void Move(XMFLOAT3*);
+	void Rotate(XMFLOAT3*);	
 
 	Mesh* mesh;
 	Material* material;
