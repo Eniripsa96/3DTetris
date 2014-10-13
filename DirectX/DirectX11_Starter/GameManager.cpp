@@ -100,8 +100,8 @@ bool GameManager::Init()
 	LoadShadersAndInputLayout();
 
 	// Create meshes
-	triangleMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, TRIANGLE);
-	quadMesh = new Mesh(device, deviceContext, vertexShader, pixelShader, QUAD);
+	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
+	quadMesh = new Mesh(device, deviceContext, QUAD);
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
@@ -113,6 +113,7 @@ bool GameManager::Init()
 	// Create the menu objects we want
 	menuObjects.emplace_back(new GameObject(device, deviceContext, quadMesh,		shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
+	// Start out displaying the objects for the menu
 	allObjects = menuObjects;
 
 	// Set up view matrix (camera)

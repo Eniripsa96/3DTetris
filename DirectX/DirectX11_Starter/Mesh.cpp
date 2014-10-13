@@ -1,13 +1,11 @@
 #include "Mesh.h"
 #include <d3dcompiler.h>
 
-Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, SHAPE type)
+Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
 {
 	// Grab some helpful data
 	this->device = device;
 	deviceContext = context;
-	vertexShader = vShader;
-	pixelShader = pShader;
 	shapeType = type;
 
 	// Initialize vertices based on shape type
@@ -95,10 +93,6 @@ void Mesh::Draw()
 	UINT offset = 0;
 	deviceContext->IASetVertexBuffers(0, 1, &(vertexBuffer), &stride, &offset);
 	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	// Set the current vertex and pixel shaders, as well the constant buffer for the vert shader
-	deviceContext->VSSetShader(vertexShader, NULL, 0);
-	deviceContext->PSSetShader(pixelShader, NULL, 0);
 
 	// Finally do the actual drawing
 	deviceContext->DrawIndexed(
