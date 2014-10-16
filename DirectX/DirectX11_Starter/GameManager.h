@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include "DirectXGame.h"
 #include "GameObject.h"
+#include "Camera.h"
 #include <vector>
 
 // Include run-time memory checking in debug builds
@@ -56,18 +57,15 @@ public:
 	GAME_STATE gameState;
 
 private:
-
-	// The matrices to go from model space
-	// to screen space
-	XMFLOAT4X4 viewMatrix;
-	XMFLOAT4X4 projectionMatrix;
-
 	std::vector<GameObject*> allObjects;
 	std::vector<GameObject*> gameObjects;
 	std::vector<GameObject*> menuObjects;
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Material* shapeMaterial;
+
+	Camera* camera;
+	XMFLOAT4X4 projectionMatrix;
 
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.

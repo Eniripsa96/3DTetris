@@ -79,6 +79,8 @@ GameManager::~GameManager()
 
 	delete shapeMaterial;
 
+	delete camera;
+
 	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
@@ -116,13 +118,7 @@ bool GameManager::Init()
 	// Start out displaying the objects for the menu
 	allObjects = menuObjects;
 
-	// Set up view matrix (camera)
-	// In an actual game, update this when the camera moves (every frame)
-	XMVECTOR position	= XMVectorSet(0, 0, -5, 0);
-	XMVECTOR target		= XMVectorSet(0, 0, 0, 0);
-	XMVECTOR up			= XMVectorSet(0, 1, 0, 0);
-	XMMATRIX V			= XMMatrixLookAtLH(position, target, up);
-	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
+		camera = new Camera();
 
 	// Set up the world matrix for each mesh
 	XMMATRIX W = XMMatrixIdentity();
@@ -216,6 +212,9 @@ void GameManager::UpdateScene(float dt)
 	deviceContext->IASetInputLayout(inputLayout);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	// Update the camera
+	camera->Update(dt);
+
 	// Update each mesh
 	for (UINT i = 0; i < allObjects.size(); i++)
 	{
@@ -224,7 +223,7 @@ void GameManager::UpdateScene(float dt)
 
 		// [UPDATE] Update constant buffer data using this object
 		dataToSendToVSConstantBuffer.world = allObjects[i]->worldMatrix;
-		dataToSendToVSConstantBuffer.view = viewMatrix;
+		dataToSendToVSConstantBuffer.view = camera->viewMatrix;
 		dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 		// [UPDATE] Update the constant buffer itself
@@ -327,6 +326,18 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'E':
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
+		case VK_LEFT:
+			camera->Move(&XMFLOAT4(-1.0f, 0.0f, 0.0f, 0.0f));
+			break;
+		case VK_RIGHT:
+			camera->Move(&XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
+			break;
+		case VK_UP:
+			camera->Move(&XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f));
+			break;
+		case VK_DOWN:
+			camera->Move(&XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f));
+			break;
 		}
 	}
 
@@ -369,6 +380,9 @@ void GameManager::OnResize()
 		AspectRatio(),
 		0.1f,
 		100.0f);
-	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+
+	// TODO fix the fact that there is an if statement needed here
+	//if (camera)
+		XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
 }
 #pragma endregion
