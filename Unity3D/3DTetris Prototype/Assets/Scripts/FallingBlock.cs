@@ -236,23 +236,6 @@ public class FallingBlock : MonoBehaviour {
 	/// <param name="yOffset">Vertical offset</param>
 	private bool CanRotate(int xOffset, int yOffset)
 	{
-		// Get the bounds
-		int xMin = (int)this.transform.position.x + xOffset;
-		int yMin = (int)this.transform.position.y + yOffset;
-		int xMax = (int)Mathf.Ceil(this.transform.position.x) + xOffset;
-		int yMax = (int)Mathf.Ceil(this.transform.position.y) + yOffset;
-
-		// Check for collisions
-		bool canOccupy = true;
-		for (int i = xMin; i <= xMax; i++)
-		{
-			for (int j = yMin; j <= yMax; j++)
-			{
-				canOccupy = canOccupy && gameManager.CanOccupy(tempGrid, i, j);
-			}
-		}
-
-		// Return the result
-		return canOccupy;
+		return gameManager.CanOccupy(tempGrid, this.targetX + xOffset, this.targetY + yOffset);
 	}
 }
