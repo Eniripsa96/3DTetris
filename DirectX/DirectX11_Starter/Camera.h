@@ -24,6 +24,7 @@ private:
 	XMVECTOR up;
 
 	XMFLOAT4 myPosition;
+	XMFLOAT4 myTarget;
 };
 
 #endif

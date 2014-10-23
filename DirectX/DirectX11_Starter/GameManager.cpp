@@ -318,6 +318,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'A':
 			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
 			break;
+		// Rotation of game object
 		case 'q':
 		case 'Q':
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
@@ -326,6 +327,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'E':
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
+		// Movement of camera
 		case VK_LEFT:
 			camera->Move(&XMFLOAT4(-1.0f, 0.0f, 0.0f, 0.0f));
 			break;
