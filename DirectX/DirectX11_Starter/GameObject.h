@@ -6,7 +6,7 @@
 class GameObject
 {
 public:
-	GameObject(ID3D11Device*, ID3D11DeviceContext*, Mesh*, Material*, XMFLOAT3*, XMFLOAT3*);
+	GameObject(Mesh*, Material*, XMFLOAT3*, XMFLOAT3*);
 	~GameObject();
 
 	void Update(float);

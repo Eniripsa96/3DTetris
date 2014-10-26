@@ -1,9 +1,13 @@
 #include "BlockManager.h"
 
 // Initializes the BlockManager given 
-// the minimum X coordinate for blocks and the width of each block
-BlockManager::BlockManager(XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
+// the minimum coordinates for blocks, the hold position for blocks, 
+// and the width of each block
+BlockManager::BlockManager(BlockType* pBlocks, int pNumBlocks, Mesh* pCube, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
 {
+	blocks = pBlocks;
+	numBlocks = pNumBlocks;
+	cube = pCube;
 	min = pMin;
 	holdPos = pHoldPos;
 	blockWidth = pBlockWidth;
@@ -21,6 +25,11 @@ BlockManager::~BlockManager()
 // Updates the blocks in the game
 void BlockManager::update() 
 {
+	// Cannot update if the game is not active
+	if (activeBlock == NULL) {
+		return;
+	}
+
 	// Convert block position to grid position
 	XMFLOAT3 pos = activeBlock->gameObject->position;
 	float x = (pos.x / blockWidth) - min.x;
@@ -65,9 +74,24 @@ void BlockManager::update()
 	}
 }
 
+// Draws the blocks in the game
+void BlockManager::draw()
+{
+	activeBlock->gameObject->Draw();
+	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
+		gameGrid[i]->gameObject->Draw();
+	}
+}
+
 // Checks whether or not a move in the given direction can be made
 bool BlockManager::canMove(MoveDirection direction)
 {
+	// If the game is not active, no moves can be made
+	if (activeBlock == NULL) {
+		return false;
+	}
+
+	// Check for collisions when active
 	switch (direction)
 	{
 	case LEFT:
@@ -83,6 +107,12 @@ bool BlockManager::canMove(MoveDirection direction)
 // with it's current orientation
 bool BlockManager::canOccupy(int x, int y)
 {
+	// Cannot check if the game is not active
+	if (activeBlock == NULL) {
+		return false;
+	}
+
+	// Compare the active block's local grid with the game grid at the position
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
@@ -112,17 +142,35 @@ bool BlockManager::canOccupy(int x, int y)
 			}
 		}
 	}
+
+	// No collisions
+	return true;
 }
 
 // Spawns a new falling block at the top of the game
-void BlockManager::spawnFallingBlock(bool holdReplacement) 
+void BlockManager::spawnFallingBlock() 
 {
-	
+	Block block;
+	BlockType type = blocks[rand() % numBlocks];
+	float x = blockWidth * ((GRID_WIDTH - 4) / 2) + min.x;
+	float y = blockWidth * GRID_HEIGHT + min.y;
+	float z = min.z;
+	block.gameObject = new GameObject(type.mesh, type.material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
+	block.localGrid = new bool[16];
+	block.tempGrid = new bool[16];
+	copy(type.localGrid, block.localGrid, 16);
+	copy(type.localGrid, block.tempGrid, 16);
+	activeBlock = &block;
 }
 
 // Tries to move the active block in the given direction
 void BlockManager::move(MoveDirection direction)
 {
+	// Cannot move if the game is not active
+	if (activeBlock == NULL) {
+		return;
+	}
+
 	// Convert block position to grid position
 	float x = (activeBlock->gameObject->position.x / blockWidth) - min.x;
 
@@ -145,6 +193,11 @@ void BlockManager::move(MoveDirection direction)
 // Rotates the active block if able to
 void BlockManager::rotate()
 {
+	// Cannot rotate if the game is not active
+	if (activeBlock == NULL) {
+		return;
+	}
+
 	// Rotate the temp grid into the local grid
 	for (int i = 0; i < 4; i++)
 	{
@@ -172,25 +225,13 @@ void BlockManager::rotate()
 
 		// Update the temp grid
 		rotation = 90.0f;
-		for (int i = 0; i < 4; i++)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				activeBlock->tempGrid[i + j * 4] = activeBlock->localGrid[i + j * 4];
-			}
-		}
+		copy(activeBlock->localGrid, activeBlock->tempGrid, 16);
 	}
 
 	// Restore the local grid if it cannot rotate
 	else
 	{
-		for (int i = 0; i < 4; i++)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				activeBlock->localGrid[i + j * 4] = activeBlock->tempGrid[i + j * 4];
-			}
-		}
+		copy(activeBlock->tempGrid, activeBlock->localGrid, 16);
 	}
 }
 
@@ -198,31 +239,90 @@ void BlockManager::rotate()
 // or the previously held block
 void BlockManager::holdBlock()
 {
-	Block* held = activeBlock;
-
-	// If there is no held block, spawn a new one
-	if (heldBlock == NULL)
-	{
-		spawnFallingBlock(true);
+	// Cannot hold a block if the game is not active
+	if (activeBlock == NULL) {
+		return;
 	}
 
-	// Otherwise grab the falling block
-	else
+	if (canSwap)
 	{
-		targetX = (GRID_WIDTH - 4) / 2;
-		targetY = GRID_HEIGHT;
-		heldBlock->gameObject->position = XMFLOAT3((targetX + min.x) * blockWidth, (targetY + min.y) * blockWidth, min.z * blockWidth);
-		activeBlock = heldBlock;
-	}
+		Block* held = activeBlock;
+		canSwap = false;
 
-	// Hold the block
-	heldBlock = held;
+		// If there is no held block, spawn a new one
+		if (heldBlock == NULL)
+		{
+			spawnFallingBlock();
+		}
+
+		// Otherwise grab the falling block
+		else
+		{
+			targetX = (GRID_WIDTH - 4) / 2;
+			targetY = GRID_HEIGHT;
+			heldBlock->gameObject->position = XMFLOAT3((targetX + min.x) * blockWidth, (targetY + min.y) * blockWidth, min.z * blockWidth);
+			activeBlock = heldBlock;
+		}
+
+		// Hold the block
+		heldBlock = held;
+	}
 }
 
 // Merges the active block into the game grid
 void BlockManager::mergeBlock()
 {
+	// Cannot merge a block if the game is not active
+	if (activeBlock == NULL) {
+		return;
+	}
 
+	canSwap = true;
+
+	int minY = GRID_HEIGHT;
+	int maxY = 0;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (activeBlock->localGrid[i + j * 4]) 
+			{
+				// Game over
+				if (targetY + j >= GRID_HEIGHT || gameGrid[i + j * 4] != NULL)  
+				{
+					gameOver = true;
+					delete activeBlock;
+					activeBlock = NULL;
+					return;
+				}
+
+				// Mark the min/max rows for checking lines
+				if (targetY + j < minY)
+				{
+					minY = targetY + j;
+				}
+				if (targetY + j > maxY)
+				{
+					maxY = targetY + j;
+				}
+
+				// Merge the cell
+				Block block;
+				float x = (targetX + i) * blockWidth + min.x;
+				float y = (targetY + j) * blockWidth + min.y;
+				float z = min.z;
+				block.gameObject = new GameObject(cube, activeBlock->gameObject->material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
+				gameGrid[targetX + i + (targetY + j) * 4] = &block;
+			}
+		}
+	}
+
+	// Delete the old active block
+	delete activeBlock;
+
+	// Check lines for completion
+	checkLines(minY, maxY);
+
+	// Spawn a new block
+	spawnFallingBlock();
 }
 
 // Checks the game grid for cleared lines
@@ -260,10 +360,16 @@ void BlockManager::checkLines(int min, int max)
 					if (gameGrid[index] != NULL)
 					{
 						gameGrid[index]->gameObject->position.y -= 1;
-
 					}
 				}
 			}
 		}
+	}
+}
+
+// Copies the elements from the source array to the target array
+void BlockManager::copy(bool* src, bool* dest, int num) {
+	for (int i = 0; i < num; i++) {
+		dest[i] = src[i];
 	}
 }
