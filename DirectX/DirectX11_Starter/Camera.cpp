@@ -21,7 +21,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::Move(XMFLOAT4* move)
+void Camera::Move(XMFLOAT3* move)
 {
 	myPosition.x += move->x / 10.0f;
 	myPosition.y += move->y / 10.0f;
@@ -32,10 +32,18 @@ void Camera::Move(XMFLOAT4* move)
 	myTarget.z += move->z / 10.0f;
 }
 
+void Camera::Rotate(XMFLOAT3* rotate)
+{
+	myPosition.x += rotate->x / 10.0f;
+	myPosition.y += rotate->y / 10.0f;
+	myPosition.z += rotate->z / 10.0f;
+}
+
 void Camera::Update(float dt)
 {
 	position = XMVectorSet(myPosition.x, myPosition.y, myPosition.z, 0.0f);
 	target = XMVectorSet(myTarget.x, myTarget.y, myTarget.z, 0.0f);
 	XMMATRIX V = XMMatrixLookAtLH(position, target, up);
 	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
+	//XMMatrixPerspectiveFovLH
 }

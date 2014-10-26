@@ -302,43 +302,58 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		// Movement of game object
-		case 'w':
-		case 'W':
+		case VK_NUMPAD8:
 			allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
 			break;
-		case 's':
-		case 'S':
+		case VK_NUMPAD5:
 			allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
 			break;
-		case 'd':
-		case 'D':
+		case VK_NUMPAD6:
 			allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
 			break;
-		case 'a':
-		case 'A':
+		case VK_NUMPAD4:
 			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
 			break;
 		// Rotation of game object
-		case 'q':
-		case 'Q':
+		case VK_NUMPAD7:
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
 			break;
-		case 'e':
-		case 'E':
+		case VK_NUMPAD9:
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
 		// Movement of camera
-		case VK_LEFT:
-			camera->Move(&XMFLOAT4(-1.0f, 0.0f, 0.0f, 0.0f));
+		case 'a':
+		case 'A':
+			camera->Move(&XMFLOAT3(-1.0f, 0.0f, 0.0f));
 			break;
-		case VK_RIGHT:
-			camera->Move(&XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f));
+		//case 'd':
+		case 'D':
+			camera->Move(&XMFLOAT3(1.0f, 0.0f, 0.0f));
 			break;
-		case VK_UP:
-			camera->Move(&XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f));
+		case 'w':
+		case 'W':
+			camera->Move(&XMFLOAT3(0.0f, 1.0f, 0.0f));
 			break;
-		case VK_DOWN:
-			camera->Move(&XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f));
+		case 's':
+		case 'S':
+			camera->Move(&XMFLOAT3(0.0f, -1.0f, 0.0f));
+			break;
+		// Rotation of camera
+		case 'j':
+		case 'J':
+			camera->Rotate(&XMFLOAT3(1.0f, 0.0f, 0.0f));
+			break;
+		case 'l':
+		case 'L':
+			camera->Rotate(&XMFLOAT3(-1.0f, 0.0f, 1.0f));
+			break;
+		//case 'i':
+		case 'I':
+			camera->Rotate(&XMFLOAT3(0.0f, 1.0f, 1.0f));
+			break;
+		case 'k':
+		case 'K':
+			camera->Rotate(&XMFLOAT3(0.0f, -1.0f, 0.0f));
 			break;
 		}
 	}

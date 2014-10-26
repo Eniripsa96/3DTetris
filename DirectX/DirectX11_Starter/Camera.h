@@ -11,7 +11,8 @@ public:
 	~Camera();
 
 	void Update(float);
-	void Move(XMFLOAT4*);
+	void Move(XMFLOAT3*);
+	void Rotate(XMFLOAT3*);
 
 	// The matrices to go from model space
 	// to screen space
