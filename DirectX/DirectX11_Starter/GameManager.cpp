@@ -109,11 +109,11 @@ bool GameManager::Init()
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
 
 	// Create the game objects we want
-	gameObjects.emplace_back(new GameObject(device, deviceContext, triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
-	gameObjects.emplace_back(new GameObject(device, deviceContext, quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
 
 	// Create the menu objects we want
-	menuObjects.emplace_back(new GameObject(device, deviceContext, quadMesh,		shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
+	menuObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
 	// Start out displaying the objects for the menu
 	allObjects = menuObjects;
