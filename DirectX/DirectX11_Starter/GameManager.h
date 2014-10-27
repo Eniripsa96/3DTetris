@@ -5,6 +5,7 @@
 #include "DirectXGame.h"
 #include "GameObject.h"
 #include "Camera.h"
+#include "BlockManager.h"
 #include <vector>
 
 // Include run-time memory checking in debug builds
@@ -60,6 +61,7 @@ private:
 	std::vector<GameObject*> allObjects;
 	std::vector<GameObject*> gameObjects;
 	std::vector<GameObject*> menuObjects;
+	BlockManager* blockManager;
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Material* shapeMaterial;

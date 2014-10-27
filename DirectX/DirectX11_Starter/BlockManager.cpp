@@ -113,12 +113,13 @@ bool BlockManager::canOccupy(int x, int y)
 	}
 
 	// Compare the active block's local grid with the game grid at the position
-	for (int i = 0; i < 4; i++)
+	int size = activeBlock->threeByThree ? 3 : 4;
+	for (int i = 0; i < size; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < size; j++)
 		{
 			// Ignore empty cells of the block
-			if (!activeBlock->localGrid[i + j * 4])
+			if (!activeBlock->localGrid[i + j * size])
 			{
 				continue;
 			}
@@ -156,10 +157,12 @@ void BlockManager::spawnFallingBlock()
 	float y = blockWidth * GRID_HEIGHT + min.y;
 	float z = min.z;
 	block.gameObject = new GameObject(type.mesh, type.material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
-	block.localGrid = new bool[16];
-	block.tempGrid = new bool[16];
-	copy(type.localGrid, block.localGrid, 16);
-	copy(type.localGrid, block.tempGrid, 16);
+	block.threeByThree = type.threeByThree;
+	int size = block.threeByThree ? 9 : 16;
+	block.localGrid = new bool[size];
+	block.tempGrid = new bool[size];
+	copy(type.localGrid, block.localGrid, size);
+	copy(type.localGrid, block.tempGrid, size);
 	activeBlock = &block;
 }
 
@@ -199,11 +202,12 @@ void BlockManager::rotate()
 	}
 
 	// Rotate the temp grid into the local grid
-	for (int i = 0; i < 4; i++)
+	int size = activeBlock->threeByThree ? 3 : 4;
+	for (int i = 0; i < size; i++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int j = 0; j < size; j++)
 		{
-			activeBlock->localGrid[i + j * 4] = activeBlock->tempGrid[3 - j + i * 4];
+			activeBlock->localGrid[i + j * size] = activeBlock->tempGrid[size - 1 - j + i * size];
 		}
 	}
 
@@ -225,13 +229,13 @@ void BlockManager::rotate()
 
 		// Update the temp grid
 		rotation = 90.0f;
-		copy(activeBlock->localGrid, activeBlock->tempGrid, 16);
+		copy(activeBlock->localGrid, activeBlock->tempGrid, size);
 	}
 
 	// Restore the local grid if it cannot rotate
 	else
 	{
-		copy(activeBlock->tempGrid, activeBlock->localGrid, 16);
+		copy(activeBlock->tempGrid, activeBlock->localGrid, size);
 	}
 }
 
@@ -281,12 +285,13 @@ void BlockManager::mergeBlock()
 
 	int minY = GRID_HEIGHT;
 	int maxY = 0;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			if (activeBlock->localGrid[i + j * 4]) 
+	int size = activeBlock->threeByThree ? 3 : 4;
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			if (activeBlock->localGrid[i + j * size]) 
 			{
 				// Game over
-				if (targetY + j >= GRID_HEIGHT || gameGrid[i + j * 4] != NULL)  
+				if (targetY + j >= GRID_HEIGHT || gameGrid[i + j * size] != NULL)  
 				{
 					gameOver = true;
 					delete activeBlock;
@@ -310,7 +315,7 @@ void BlockManager::mergeBlock()
 				float y = (targetY + j) * blockWidth + min.y;
 				float z = min.z;
 				block.gameObject = new GameObject(cube, activeBlock->gameObject->material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
-				gameGrid[targetX + i + (targetY + j) * 4] = &block;
+				gameGrid[targetX + i + (targetY + j) * size] = &block;
 			}
 		}
 	}

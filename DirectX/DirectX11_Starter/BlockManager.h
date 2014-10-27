@@ -17,7 +17,7 @@
 struct Block
 {
 	GameObject* gameObject;
-	XMFLOAT2 center;
+	bool threeByThree;
 	bool* localGrid;
 	bool* tempGrid;
 };
@@ -27,7 +27,7 @@ struct BlockType
 {
 	Mesh* mesh;
 	Material* material;
-	XMFLOAT2 center;
+	bool threeByThree;
 	bool* localGrid;
 };
 
