@@ -13,6 +13,8 @@ BlockManager::BlockManager(BlockType* pBlocks, int pNumBlocks, Mesh* pCube, XMFL
 	blockWidth = pBlockWidth;
 	Block* arr = new Block[GRID_WIDTH * GRID_HEIGHT];
 	gameGrid = &arr;
+	typeOrder = new int[numBlocks];
+	shuffle();
 }
 
 // Clears the pointers used by the block manager on deconstruct
@@ -152,10 +154,20 @@ bool BlockManager::canOccupy(int x, int y)
 void BlockManager::spawnFallingBlock() 
 {
 	Block block;
-	BlockType type = blocks[rand() % numBlocks];
+
+	// Get a random block
+	BlockType type = blocks[typeOrder[typeId++]];
+	if (typeId == numBlocks) 
+	{
+		shuffle();
+	}
+
+	// Get the spawn location
 	float x = blockWidth * ((GRID_WIDTH - 4) / 2) + min.x;
 	float y = blockWidth * GRID_HEIGHT + min.y;
 	float z = min.z;
+
+	// Create the block
 	block.gameObject = new GameObject(type.mesh, type.material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
 	block.threeByThree = type.threeByThree;
 	int size = block.threeByThree ? 9 : 16;
@@ -163,6 +175,8 @@ void BlockManager::spawnFallingBlock()
 	block.tempGrid = new bool[size];
 	copy(type.localGrid, block.localGrid, size);
 	copy(type.localGrid, block.tempGrid, size);
+
+	// Make it the active block
 	activeBlock = &block;
 }
 
@@ -376,5 +390,22 @@ void BlockManager::checkLines(int min, int max)
 void BlockManager::copy(bool* src, bool* dest, int num) {
 	for (int i = 0; i < num; i++) {
 		dest[i] = src[i];
+	}
+}
+
+// Shuffles the order of block types to spawn
+void BlockManager::shuffle() {
+	typeId = 0;
+	for (int i = 0; i < numBlocks; i++) {
+		typeOrder[i] = -1;
+	}
+	for (int i = 0; i < numBlocks; i++) {
+		int index;
+		do 
+		{
+			index = rand() % numBlocks;
+		} 
+		while (typeOrder[index] != -1);
+		typeOrder[index] = i;
 	}
 }

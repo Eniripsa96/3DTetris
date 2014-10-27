@@ -66,6 +66,7 @@ private:
 	Block* activeBlock;
 	Block* heldBlock;
 	Mesh* cube;
+	int* typeOrder;
 	
 	XMFLOAT3 min;
 	XMFLOAT3 holdPos;
@@ -76,7 +77,9 @@ private:
 	int numBlocks;
 	int targetX;
 	int targetY;
+	int typeId;
 
 	void copy(bool* src, bool* dest, int num);
+	void shuffle();
 };
 
