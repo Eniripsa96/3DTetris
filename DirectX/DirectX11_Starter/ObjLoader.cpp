@@ -30,13 +30,8 @@ ObjObject* ObjLoader::load(char* fileName)
 		switch (c)
 		{
 
-		// Ignore comment lines
-		case '#':
-			do
-			{
-				c = (char)read.get();
-			} 
-			while (c != '\n');
+		// If it's the end of a line, go to the next character
+		case '\n':
 			break;
 
 		// Vertex data
@@ -87,7 +82,7 @@ ObjObject* ObjLoader::load(char* fileName)
 						sets++;
 					}
 				} 
-				while (c != '\n');
+				while (c != '\n' && read);
 				
 				// If it ended with a space, there's one less tri
 				if (faceData[faceData.length() - 1] == ' ')
@@ -193,7 +188,13 @@ ObjObject* ObjLoader::load(char* fileName)
 			}
 			break;
 
+		// Ignore other types of lines
 		default:
+			do
+			{
+				c = (char)read.get();
+			} 
+			while (c != '\n' && read);
 			break;
 		}
 	}
