@@ -37,14 +37,13 @@ void Camera::Move(XMFLOAT3* move)
 
 void Camera::Rotate(XMFLOAT3* rotate)
 {
-	XMFLOAT4 up = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
-	XMVECTOR UP = XMLoadFloat4(&up);
+	myTarget.x +=  -1.0f * rotate->x / 5.0f;
+	myTarget.y +=  -1.0f * rotate->y / 5.0f;
+	myTarget.z +=  -1.0f * rotate->z / 5.0f;
 
-	myTarget.x += -1.0f * rotate->x / 5.0f;
-	myTarget.y += -1.0f * rotate->y / 5.0f;
-	myTarget.z += -1.0f * rotate->z / 5.0f;
-
-	XMVECTOR vector = XMVECTOR();
+	//XMFLOAT4 up = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
+	//XMVECTOR UP = XMLoadFloat4(&up);
+	//XMVECTOR vector = XMVECTOR();
 
 	/*XMFLOAT4 newTarget = myTarget;
 	vector = XMLoadFloat4(&newTarget);
@@ -60,6 +59,4 @@ void Camera::Update(float dt)
 	target = XMVectorSet(myTarget.x, myTarget.y, myTarget.z, 0.0f);
 	XMMATRIX V = XMMatrixLookAtLH(position, target, up);
 	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
-	//XMMatrixPerspectiveFovLH
-	//	XMMatrixPerspectiveFovLH
 }

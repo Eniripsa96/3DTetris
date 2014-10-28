@@ -352,11 +352,11 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		case 'l':
 		case 'L':
-			camera->Rotate(&XMFLOAT3(-1.0f, 0.0f, 1.0f));
+			camera->Rotate(&XMFLOAT3(-1.0f, 0.0f, 0.0f));
 			break;
 		//case 'i':
 		case 'I':
-			camera->Rotate(&XMFLOAT3(0.0f, 1.0f, 1.0f));
+			camera->Rotate(&XMFLOAT3(0.0f, 1.0f, 0.0f));
 			break;
 		case 'k':
 		case 'K':
