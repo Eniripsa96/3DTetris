@@ -102,6 +102,8 @@ bool BlockManager::canMove(MoveDirection direction)
 		return canOccupy(targetX + 1, targetY);
 	case DOWN:
 		return canOccupy(targetX, targetY - 1);
+	default:
+		return false;
 	}
 }
 

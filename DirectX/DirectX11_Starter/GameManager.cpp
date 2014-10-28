@@ -101,6 +101,13 @@ bool GameManager::Init()
 	// Load shaders that we want
 	LoadShadersAndInputLayout();
 
+	// Test OBJ loader
+	/*
+	ObjLoader* loader = new ObjLoader();
+	ObjObject* test = loader->load("test.obj");
+	delete loader;
+	*/
+
 	// Create meshes
 	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
