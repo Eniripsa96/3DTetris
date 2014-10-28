@@ -15,8 +15,10 @@ ObjObject* ObjLoader::load(char* fileName)
 	// Initialize data
 	char c;
 	vector<XMFLOAT3> positions;
+	vector<XMFLOAT3> normals;
 	vector<XMFLOAT2> uvs;
 	vector<UINT> posIndices;
+	vector<UINT> normalIndices;
 	vector<UINT> uvIndices;
 
 	// Read the file
@@ -60,6 +62,9 @@ ObjObject* ObjLoader::load(char* fileName)
 			// Normals
 			if (c == 'n')
 			{
+				float x, y, z;
+				read >> x >> y >> z;
+				normals.push_back(XMFLOAT3(x, y, z));
 			}
 			break;
 
@@ -90,18 +95,19 @@ ObjObject* ObjLoader::load(char* fileName)
 					sets--;
 				}
 
-				// Stat parsing the line
+				// Start parsing the line
 				wstringstream stream(faceData);
 				if (faceData.length() > 0)
 				{
 					int vIndex1, vIndex2;
+					int nIndex1, nIndex2;
 					int uvIndex1, uvIndex2;
 					for (int i = 0; i < sets; ++i)
 					{
 						stream >> vertexData;	
 
 						std::wstring part;
-						int vIndex, uvIndex;
+						int vIndex, nIndex, uvIndex;
 						int type = 0;		
 
 						//Parse this set
@@ -134,6 +140,8 @@ ObjObject* ObjLoader::load(char* fileName)
 								// Normal
 								else if (type == 2)
 								{
+									intStream >> nIndex;
+									nIndex -= 1;
 								}
 
 								part = L"";
@@ -145,6 +153,7 @@ ObjObject* ObjLoader::load(char* fileName)
 						if (i == 0)
 						{
 							vIndex1 = vIndex;
+							nIndex1 = nIndex;
 							uvIndex1 = uvIndex;
 						}
 
@@ -152,6 +161,7 @@ ObjObject* ObjLoader::load(char* fileName)
 						else if (i == 1)
 						{
 							vIndex2 = vIndex;
+							nIndex2 = nIndex;
 							uvIndex2 = uvIndex;
 						}
 
@@ -163,6 +173,11 @@ ObjObject* ObjLoader::load(char* fileName)
 							posIndices.push_back(vIndex2);
 							posIndices.push_back(vIndex);
 
+							// Add the ti normals to the index list
+							normalIndices.push_back(nIndex1);
+							normalIndices.push_back(nIndex2);
+							normalIndices.push_back(nIndex);
+
 							// Add the tri uvs to the index list
 							uvIndices.push_back(uvIndex1);
 							uvIndices.push_back(uvIndex2);
@@ -170,6 +185,7 @@ ObjObject* ObjLoader::load(char* fileName)
 							
 							// Get ready for the next tri
 							vIndex2 = vIndex;
+							nIndex2 = nIndex;
 							uvIndex2 = uvIndex;
 						}
 					}
@@ -187,17 +203,23 @@ ObjObject* ObjLoader::load(char* fileName)
 	
 	// Sizes
 	data.positionsLength = positions.size();
+	data.normalsLength = normals.size();
 	data.uvsLength = uvs.size();
 	data.posIndicesLength = posIndices.size();
+	data.normalIndicesLength = normalIndices.size();
 	data.uvIndicesLength = uvIndices.size();
 
 	// Data
 	data.positions = new XMFLOAT3[data.positionsLength];
 	memcpy(data.positions, &positions[0], sizeof(XMFLOAT3) * data.positionsLength);
+	data.normals = new XMFLOAT3[data.normalsLength];
+	memcpy(data.normals, &normals[0], sizeof(XMFLOAT3)* data.normalsLength);
 	data.uvs = new XMFLOAT2[data.uvsLength];
 	memcpy(data.uvs, &uvs[0], sizeof(XMFLOAT2) * data.uvsLength);
 	data.posIndices = new UINT[data.posIndicesLength];
 	memcpy(data.posIndices, &posIndices[0], sizeof(UINT) * data.posIndicesLength);
+	data.normalIndices = new UINT[data.normalIndicesLength];
+	memcpy(data.normalIndices, &normalIndices[0], sizeof(UINT) * data.normalIndicesLength);
 	data.uvIndices = new UINT[data.uvIndicesLength];
 	memcpy(data.uvIndices, &uvIndices[0], sizeof(UINT) * data.uvIndicesLength);
 	return &data;

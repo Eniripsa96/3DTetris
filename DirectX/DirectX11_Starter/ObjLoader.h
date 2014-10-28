@@ -12,12 +12,16 @@ using namespace std;
 
 struct ObjObject {
 	XMFLOAT3* positions;
+	XMFLOAT3* normals;
 	XMFLOAT2* uvs;
 	UINT* posIndices;
+	UINT* normalIndices;
 	UINT* uvIndices;
 	int positionsLength;
+	int normalsLength;
 	int uvsLength;
 	int posIndicesLength;
+	int normalIndicesLength;
 	int uvIndicesLength;
 };
 
