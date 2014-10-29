@@ -15,34 +15,12 @@ Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
 		CreateQuadPoints();
 }
 
-Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ObjObject* obj)
+Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer)
 {
 	this->device = device;
 	deviceContext = context;
-
-	// Create the vertex buffer
-	D3D11_BUFFER_DESC vbd;
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * obj->vertexLength;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA initialVertexData;
-	initialVertexData.pSysMem = obj->vertices;
-	HR(device->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer));
-
-	// Create the index buffer
-	D3D11_BUFFER_DESC ibd;
-	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT) * obj->indexLength;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = 0;
-	ibd.MiscFlags = 0;
-	ibd.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA initialIndexData;
-	initialIndexData.pSysMem = obj->indices;
-	HR(device->CreateBuffer(&ibd, &initialIndexData, &indexBuffer));
+	vertexBuffer = pVertexBuffer;
+	indexBuffer = pIndexBuffer;
 }
 
 Mesh::~Mesh()

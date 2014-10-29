@@ -2,7 +2,6 @@
 #define MESH_H
 
 #include "Material.h"
-#include "ObjLoader.h"
 
 using namespace DirectX;
 
@@ -35,7 +34,7 @@ class Mesh
 {
 public:
 	Mesh(ID3D11Device*, ID3D11DeviceContext*, SHAPE);
-	Mesh(ID3D11Device*, ID3D11DeviceContext*, ObjObject* obj);
+	Mesh(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer);
 	~Mesh();
 
 	void CreateTrianglePoints();

@@ -3,16 +3,10 @@
 #include <sstream>
 #include <vector>
 #include "Mesh.h"
+#include "GameManager.h"
 
 using namespace DirectX;
 using namespace std;
-
-struct ObjObject {
-	Vertex* vertices;
-	UINT* indices;
-	int vertexLength;
-	int indexLength;
-};
 
 class ObjLoader
 {
@@ -20,6 +14,6 @@ public:
 	ObjLoader();
 	~ObjLoader();
 
-	ObjObject* load(char* fileName);
+	void load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer);
 };
 
