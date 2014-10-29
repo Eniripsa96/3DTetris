@@ -199,29 +199,27 @@ ObjObject* ObjLoader::load(char* fileName)
 		}
 	}
 	
+	// Translate data to vertexes
+	// Currently doesn't share vertices, could improve this
+	// Need to watch for dissimilar indexes between normals/uvs/positions though
+	vector<Vertex> vertices;
+	vector<UINT> indices;
+	Vertex temp;
+	for (int i = 0; i < posIndices.size(); i++)
+	{
+		temp.Position = positions[posIndices[i]];
+		temp.Normal = normals[normalIndices[i]];
+		temp.UV = uvs[uvIndices[i]];
+
+		vertices.push_back(temp);
+		indices.push_back(i);
+	}
+
 	// Store the results in a struct to return it
 	ObjObject data;
-	
-	// Sizes
-	data.positionsLength = positions.size();
-	data.normalsLength = normals.size();
-	data.uvsLength = uvs.size();
-	data.posIndicesLength = posIndices.size();
-	data.normalIndicesLength = normalIndices.size();
-	data.uvIndicesLength = uvIndices.size();
-
-	// Data
-	data.positions = new XMFLOAT3[data.positionsLength];
-	memcpy(data.positions, &positions[0], sizeof(XMFLOAT3) * data.positionsLength);
-	data.normals = new XMFLOAT3[data.normalsLength];
-	memcpy(data.normals, &normals[0], sizeof(XMFLOAT3)* data.normalsLength);
-	data.uvs = new XMFLOAT2[data.uvsLength];
-	memcpy(data.uvs, &uvs[0], sizeof(XMFLOAT2) * data.uvsLength);
-	data.posIndices = new UINT[data.posIndicesLength];
-	memcpy(data.posIndices, &posIndices[0], sizeof(UINT) * data.posIndicesLength);
-	data.normalIndices = new UINT[data.normalIndicesLength];
-	memcpy(data.normalIndices, &normalIndices[0], sizeof(UINT) * data.normalIndicesLength);
-	data.uvIndices = new UINT[data.uvIndicesLength];
-	memcpy(data.uvIndices, &uvIndices[0], sizeof(UINT) * data.uvIndicesLength);
+	data.vertices = new Vertex[vertices.size()];
+	memcpy(data.vertices, &vertices[0], sizeof(Vertex) * vertices.size());
+	data.indices = new UINT[indices.size()];
+	memcpy(data.indices, &indices[0], sizeof(UINT) * indices.size());
 	return &data;
 }

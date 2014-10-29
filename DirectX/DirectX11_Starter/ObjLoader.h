@@ -2,27 +2,16 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "Material.h"
-
-#define MAX_LINE_SIZE 64
-#define MAX_WORDS 32
+#include "Mesh.h"
 
 using namespace DirectX;
 using namespace std;
 
 struct ObjObject {
-	XMFLOAT3* positions;
-	XMFLOAT3* normals;
-	XMFLOAT2* uvs;
-	UINT* posIndices;
-	UINT* normalIndices;
-	UINT* uvIndices;
-	int positionsLength;
-	int normalsLength;
-	int uvsLength;
-	int posIndicesLength;
-	int normalIndicesLength;
-	int uvIndicesLength;
+	Vertex* vertices;
+	UINT* indices;
+	int vertexLength;
+	int indexLength;
 };
 
 class ObjLoader

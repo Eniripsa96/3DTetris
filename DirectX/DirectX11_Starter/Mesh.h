@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "Material.h"
+#include "ObjLoader.h"
 
 using namespace DirectX;
 
@@ -16,7 +17,7 @@ enum SHAPE
 struct Vertex
 {
 	XMFLOAT3 Position;
-	XMFLOAT4 Color;
+	XMFLOAT3 Normal;
 	XMFLOAT2 UV;
 };
 
@@ -34,6 +35,7 @@ class Mesh
 {
 public:
 	Mesh(ID3D11Device*, ID3D11DeviceContext*, SHAPE);
+	Mesh(ID3D11Device*, ID3D11DeviceContext*, ObjObject* obj);
 	~Mesh();
 
 	void CreateTrianglePoints();
@@ -51,6 +53,8 @@ public:
 	const XMFLOAT4 RED = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	const XMFLOAT4 GREEN = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	const XMFLOAT4 BLUE = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+	const XMFLOAT3 NORMALS_2D = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 private:
 	ID3D11Device* device;
