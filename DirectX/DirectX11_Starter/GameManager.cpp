@@ -102,18 +102,18 @@ bool GameManager::Init()
 	LoadShadersAndInputLayout();
 
 	// Test OBJ loader
-	///*
+	/*
 	ObjLoader* loader = new ObjLoader();
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
 	loader->load("test.obj", device, &vertexBuffer, &indexBuffer);
 	delete loader;
 	quadMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer);
-	//*/
+	*/
 
 	// Create meshes
 	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
-	//quadMesh = new Mesh(device, deviceContext, QUAD);
+	quadMesh = new Mesh(device, deviceContext, QUAD);
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");

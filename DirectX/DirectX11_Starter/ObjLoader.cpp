@@ -218,7 +218,7 @@ void ObjLoader::load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertex
 	// Create the vertex buffer
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex)* vertices.size(); // Number of vertices in the "model" you want to draw
+	vbd.ByteWidth = sizeof(Vertex)* vertices.size();
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
@@ -230,7 +230,7 @@ void ObjLoader::load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertex
 	// Create the index buffer
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT)* indices.size(); // Number of indices in the "model" you want to draw
+	ibd.ByteWidth = sizeof(UINT)* indices.size();
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
