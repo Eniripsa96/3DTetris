@@ -7,8 +7,8 @@ SamplerState mySampler: register(s0);
 struct VertexToPixel
 {
 	float4 position		: SV_POSITION;
-	float4 color		: COLOR;
-	float2 uv			: TEXCOORD0;
+	float4 normal		: TEXCOORD0;
+	float2 uv			: TEXCOORD1;
 };
 
 // Entry point for this pixel shader

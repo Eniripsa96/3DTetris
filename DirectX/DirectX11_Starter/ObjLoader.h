@@ -2,28 +2,11 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "Material.h"
-
-#define MAX_LINE_SIZE 64
-#define MAX_WORDS 32
+#include "Mesh.h"
+#include "GameManager.h"
 
 using namespace DirectX;
 using namespace std;
-
-struct ObjObject {
-	XMFLOAT3* positions;
-	XMFLOAT3* normals;
-	XMFLOAT2* uvs;
-	UINT* posIndices;
-	UINT* normalIndices;
-	UINT* uvIndices;
-	int positionsLength;
-	int normalsLength;
-	int uvsLength;
-	int posIndicesLength;
-	int normalIndicesLength;
-	int uvIndicesLength;
-};
 
 class ObjLoader
 {
@@ -31,6 +14,6 @@ public:
 	ObjLoader();
 	~ObjLoader();
 
-	ObjObject* load(char* fileName);
+	void load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer);
 };
 

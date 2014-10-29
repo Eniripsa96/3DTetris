@@ -10,7 +10,7 @@ ObjLoader::~ObjLoader()
 
 // Loads an OBJ model from a file
 // Loosely based off the tutorial here: http://www.braynzarsoft.net/index.php?p=D3D11OBJMODEL
-ObjObject* ObjLoader::load(char* fileName) 
+void ObjLoader::load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer)
 {
 	// Initialize data
 	char c;
@@ -199,29 +199,43 @@ ObjObject* ObjLoader::load(char* fileName)
 		}
 	}
 	
-	// Store the results in a struct to return it
-	ObjObject data;
-	
-	// Sizes
-	data.positionsLength = positions.size();
-	data.normalsLength = normals.size();
-	data.uvsLength = uvs.size();
-	data.posIndicesLength = posIndices.size();
-	data.normalIndicesLength = normalIndices.size();
-	data.uvIndicesLength = uvIndices.size();
+	// Translate data to vertexes
+	// Currently doesn't share vertices, could improve this
+	// Need to watch for dissimilar indexes between normals/uvs/positions though
+	vector<Vertex> vertices;
+	vector<UINT> indices;
+	Vertex temp;
+	for (int i = 0; i < posIndices.size(); i++)
+	{
+		temp.Position = positions[posIndices[i]];
+		temp.Normal = normals[normalIndices[i]];
+		temp.UV = uvs[uvIndices[i]];
 
-	// Data
-	data.positions = new XMFLOAT3[data.positionsLength];
-	memcpy(data.positions, &positions[0], sizeof(XMFLOAT3) * data.positionsLength);
-	data.normals = new XMFLOAT3[data.normalsLength];
-	memcpy(data.normals, &normals[0], sizeof(XMFLOAT3)* data.normalsLength);
-	data.uvs = new XMFLOAT2[data.uvsLength];
-	memcpy(data.uvs, &uvs[0], sizeof(XMFLOAT2) * data.uvsLength);
-	data.posIndices = new UINT[data.posIndicesLength];
-	memcpy(data.posIndices, &posIndices[0], sizeof(UINT) * data.posIndicesLength);
-	data.normalIndices = new UINT[data.normalIndicesLength];
-	memcpy(data.normalIndices, &normalIndices[0], sizeof(UINT) * data.normalIndicesLength);
-	data.uvIndices = new UINT[data.uvIndicesLength];
-	memcpy(data.uvIndices, &uvIndices[0], sizeof(UINT) * data.uvIndicesLength);
-	return &data;
+		vertices.push_back(temp);
+		indices.push_back(i);
+	}
+
+	// Create the vertex buffer
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(Vertex)* vertices.size();
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.StructureByteStride = 0;
+	D3D11_SUBRESOURCE_DATA initialVertexData;
+	initialVertexData.pSysMem = &vertices[0];
+	HR(device->CreateBuffer(&vbd, &initialVertexData, vertexBuffer));
+
+	// Create the index buffer
+	D3D11_BUFFER_DESC ibd;
+	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+	ibd.ByteWidth = sizeof(UINT)* indices.size();
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+	ibd.StructureByteStride = 0;
+	D3D11_SUBRESOURCE_DATA initialIndexData;
+	initialIndexData.pSysMem = &indices[0];
+	HR(device->CreateBuffer(&ibd, &initialIndexData, indexBuffer));
 }

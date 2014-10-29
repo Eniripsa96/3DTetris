@@ -15,6 +15,14 @@ Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
 		CreateQuadPoints();
 }
 
+Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer)
+{
+	this->device = device;
+	deviceContext = context;
+	vertexBuffer = pVertexBuffer;
+	indexBuffer = pIndexBuffer;
+}
+
 Mesh::~Mesh()
 {
 	// Release all of the D3D stuff that's still hanging out
@@ -27,9 +35,9 @@ void Mesh::CreateTrianglePoints()
 	// Set up the vertices for a triangle
 	Vertex vertices[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), RED,	XMFLOAT2(0.5f, 0.0f)},
-		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), GREEN, XMFLOAT2(0.0f, 1.0f)},
-		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), BLUE,	XMFLOAT2(1.0f, 1.0f)},
+		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.5f, 0.0f)},
+		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.0f, 1.0f) },
+		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(1.0f, 1.0f) },
 	};
 
 	CreateGeometryBuffers(vertices);
@@ -41,10 +49,10 @@ void Mesh::CreateQuadPoints()
 	Vertex vertices[] =
 	{
 		// NOTE TEXTURE COORDS ARE 0,0 TOP LEFT AND 1,1 BOTTOM RIGHT
-		{ XMFLOAT3(-0.5f, +0.5f, +0.0f), RED,	XMFLOAT2(0.0f, 0.0f) },	// Top left
-		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), GREEN, XMFLOAT2(0.0f, 1.0f) },	// Bottom left
-		{ XMFLOAT3(+0.5f, +0.5f, +0.0f), BLUE,	XMFLOAT2(1.0f, 0.0f) },	// Top right
-		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), RED,	XMFLOAT2(1.0f, 1.0f) },	// Bottom right
+		{ XMFLOAT3(-0.5f, +0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.0f, 0.0f) },	// Top left
+		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.0f, 1.0f) },	// Bottom left
+		{ XMFLOAT3(+0.5f, +0.5f, +0.0f), NORMALS_2D, XMFLOAT2(1.0f, 0.0f) },	// Top right
+		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(1.0f, 1.0f) },	// Bottom right
 	};
 
 	CreateGeometryBuffers(vertices);
