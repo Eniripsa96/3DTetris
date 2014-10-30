@@ -24,8 +24,9 @@ struct VertexShaderInput
 struct VertexToPixel
 {
 	float4 position		: SV_POSITION;	// System Value Position - Has specific meaning to the pipeline!
-	float4 normal		: NORMAL;
+	float3 normal		: NORMAL;
 	float2 uv			: TEXCOORD0;
+	float3 light        : float3;
 };
 
 // The entry point for our vertex shader
@@ -37,9 +38,15 @@ VertexToPixel main( VertexShaderInput input )
 	// Calculate output position
 	matrix worldViewProj = mul(mul(world, view), projection);
 	output.position = mul(float4(input.position, 1.0f), worldViewProj);
-	
+
+	// Pass a light direction through
+	float3 light = normalize(float3(1, -1, -1));
+	output.light = light;
+	//output.light = normalize(mul(light, (float3x3)worldViewProj));
+
 	// Pass the normal through - will be interpolated per-pixel by the rasterizer
-	output.normal = float4(mul((input.normal), (float3x3)worldViewProj), 1.0f);
+	output.normal = normalize(input.normal);
+	//output.normal = normalize(mul((input.normal), (float3x3)worldjViewProj));
 
 	// Pass the UV coordinates
 	output.uv = input.uv;
