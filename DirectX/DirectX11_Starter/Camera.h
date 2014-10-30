@@ -13,6 +13,9 @@ public:
 
 	void Update(float);
 	void Move(XMFLOAT3*);
+	void MoveVertical(float);
+	void MoveHorizontal(float);
+	void MoveDepth(float);
 	void Rotate(XMFLOAT3*);
 
 	// The matrices to go from model space
@@ -25,8 +28,12 @@ private:
 	XMVECTOR target;
 	XMVECTOR up;
 
-	XMFLOAT4 myPosition;
+	XMFLOAT3 myPosition;
 	XMFLOAT3 myTarget;
+
+	XMVECTOR forward();
+	XMFLOAT3 right();
+	//XMFLOAT3 up();
 };
 
 #endif

@@ -17,7 +17,7 @@ Camera::Camera()
 	XMMATRIX V = XMMatrixLookAtLH(position, target, up);
 	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
 
-	myPosition = XMFLOAT4(0.0f, 0.0f, zPos, 0);
+	myPosition = XMFLOAT3(0.0f, 0.0f, zPos);
 	myTarget = XMFLOAT3(0.0f, 0.0f, zTar);
 
 	projectionMatrix = XMFLOAT4X4();
@@ -38,28 +38,30 @@ void Camera::Move(XMFLOAT3* move)
 	myTarget.z += move->z / 10.0f;
 }
 
+void Camera::MoveVertical(float move)
+{
+
+}
+void Camera::MoveHorizontal(float move)
+{
+
+}
+void Camera::MoveDepth(float move)
+{
+	//myPosition = myPosition + forward();
+	position += move * forward() / 100.0f;
+	target += move * forward() / 100.0f;
+	//XMStoreFloat3(&myPosition, position);
+}
+
 void Camera::Rotate(XMFLOAT3* rotate)
 {
-	myTarget.x += -1.0f * rotate->x;
-	myTarget.y += -1.0f * rotate->y;
-	myTarget.z += -1.0f * rotate->z;
-
-	// This is my more complicated attempt
-	//XMFLOAT4 up = XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f);
-	//XMVECTOR UP = XMLoadFloat4(&up);
-	//XMVECTOR vector = XMVECTOR();
-	/*XMFLOAT4 newTarget = myTarget;
-	vector = XMLoadFloat4(&newTarget);
-	vector = XMVector3Rotate(vector, XMQuaternionRotationMatrix(XMMatrixRotationAxis(UP, -1.0f * rotate->x * XM_PI / 32)));
-	vector += target;*/
-	//XMStoreFloat4(&myTarget, vector);
-	
-	// This is probably the better way
-	/*XMMATRIX R = XMMatrixRotationY(rotate->x * XM_PI / 8.0f);
+	XMMATRIX R = XMMatrixRotationY(-1.0f * rotate->x);
 	XMFLOAT3 UP = XMFLOAT3();
 	XMStoreFloat3(&UP, up);
 	XMStoreFloat3(&UP, XMVector3TransformNormal(XMLoadFloat3(&UP), R));
-	XMStoreFloat3(&myTarget, XMVector3TransformNormal(XMLoadFloat3(&myTarget), R));*/
+	//XMStoreFloat3(&myTarget, XMVector3TransformNormal(XMLoadFloat3(&myPosition), R));
+	XMStoreFloat3(&myTarget, XMVector3TransformNormal(XMLoadFloat3(&myTarget), R));
 }
 
 void Camera::Update(float dt)
@@ -68,4 +70,13 @@ void Camera::Update(float dt)
 	target = XMVectorSet(myTarget.x, myTarget.y, myTarget.z, 0.0f);
 	XMMATRIX V = XMMatrixLookAtLH(position, target, up);
 	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
+}
+
+XMVECTOR Camera::forward()
+{
+	//return XMVector4Normalize(XMLoadFloat3(&myTarget) - XMLoadFloat3(&myPosition));
+	//XMFLOAT3 temp;
+	//XMStoreFloat3(&temp, XMVector4Normalize(target - position));
+	//return temp;
+	return XMVector4Normalize(target - position);
 }

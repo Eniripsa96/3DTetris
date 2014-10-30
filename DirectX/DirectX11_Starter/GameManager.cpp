@@ -306,8 +306,10 @@ void GameManager::CheckKeyBoard(float dt)
 		camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
 	// Forward movement of camera
 	if (GetAsyncKeyState('W'))
+		//camera->MoveDepth(1.0f);
 		camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
 	else if (GetAsyncKeyState('S'))
+		//camera->MoveDepth(-1.0f);
 		camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
 
 	// Horizontal rotation of camera
