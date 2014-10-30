@@ -210,6 +210,8 @@ void GameManager::LoadShadersAndInputLayout()
 // and draws for each gameObject
 void GameManager::UpdateScene(float dt)
 {
+	CheckKeyBoard(dt);
+
 	// Clear the buffer
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	deviceContext->ClearDepthStencilView(
@@ -294,6 +296,33 @@ void GameManager::DrawScene()
 
 #pragma region User Input
 
+// Continuous while key pressed
+void GameManager::CheckKeyBoard(float dt)
+{	
+	// Strafing of camera
+	if (GetAsyncKeyState('A'))
+		camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+	else if (GetAsyncKeyState('D'))
+		camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+	// Forward movement of camera
+	if (GetAsyncKeyState('W'))
+		camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
+	else if (GetAsyncKeyState('S'))
+		camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
+
+	// Horizontal rotation of camera
+	if (GetAsyncKeyState('J'))
+		camera->Rotate(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+	else if (GetAsyncKeyState('L'))
+		camera->Rotate(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+	// Vertical rotation of camera
+	if (GetAsyncKeyState('I'))
+		camera->Rotate(&XMFLOAT3(0.0f, CAMERA_MOVE_FACTOR * dt, 0.0f));
+	else if (GetAsyncKeyState('K'))
+			camera->Rotate(&XMFLOAT3(0.0f, -CAMERA_MOVE_FACTOR * dt, 0.0f));
+}
+
+// Once per key press
 LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -301,7 +330,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
-		// Change state
+			// Change state
 		case VK_SPACE:
 			gameState = (gameState == MENU) ? GAME : MENU;
 
@@ -311,7 +340,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				allObjects = gameObjects;
 			break;
 
-		// Movement of game object
+			// Movement of game object
 		case VK_NUMPAD8:
 			allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
 			break;
@@ -324,47 +353,14 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case VK_NUMPAD4:
 			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
 			break;
-		// Rotation of game object
+			// Rotation of game object
 		case VK_NUMPAD7:
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
 			break;
 		case VK_NUMPAD9:
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
-		// Movement of camera
-		case 'a':
-		case 'A':
-			camera->Move(&XMFLOAT3(-1.0f, 0.0f, 0.0f));
-			break;
-		//case 'd':
-		case 'D':
-			camera->Move(&XMFLOAT3(1.0f, 0.0f, 0.0f));
-			break;
-		case 'w':
-		case 'W':
-			camera->Move(&XMFLOAT3(0.0f, 1.0f, 0.0f));
-			break;
-		case 's':
-		case 'S':
-			camera->Move(&XMFLOAT3(0.0f, -1.0f, 0.0f));
-			break;
-		// Rotation of camera
-		case 'j':
-		case 'J':
-			camera->Rotate(&XMFLOAT3(1.0f, 0.0f, 0.0f));
-			break;
-		case 'l':
-		case 'L':
-			camera->Rotate(&XMFLOAT3(-1.0f, 0.0f, 0.0f));
-			break;
-		//case 'i':
-		case 'I':
-			camera->Rotate(&XMFLOAT3(0.0f, 1.0f, 0.0f));
-			break;
-		case 'k':
-		case 'K':
-			camera->Rotate(&XMFLOAT3(0.0f, -1.0f, 0.0f));
-			break;
+
 		}
 	}
 
@@ -391,6 +387,7 @@ void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 }
+
 #pragma endregion
 
 #pragma region Window Resizing

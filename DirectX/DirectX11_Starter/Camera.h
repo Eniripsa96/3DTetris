@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include <DirectXMath.h>
+#include <Windows.h>
 using namespace DirectX;
 
 class Camera
@@ -25,7 +26,7 @@ private:
 	XMVECTOR up;
 
 	XMFLOAT4 myPosition;
-	XMFLOAT4 myTarget;
+	XMFLOAT3 myTarget;
 };
 
 #endif

@@ -36,6 +36,7 @@ public:
 	void LoadShadersAndInputLayout();
 	void OnResize();
 	void UpdateScene(float dt);
+	void CheckKeyBoard(float dt);
 	void DrawScene();	// Deprecated
 
 	// For handing mouse input
@@ -73,6 +74,8 @@ private:
 	// Keeps track of the old mouse position.  Useful for 
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
+
+	const float CAMERA_MOVE_FACTOR = 10.0f;
 };
 
 #endif
