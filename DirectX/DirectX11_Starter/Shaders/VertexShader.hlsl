@@ -14,8 +14,8 @@ cbuffer perModel : register( b0 )
 struct VertexShaderInput
 {
 	float3 position		: POSITION;
-	float3 normal		: TEXCOORD0;
-	float2 uv			: TEXCOORD1;
+	float3 normal		: NORMAL;
+	float2 uv			: TEXCOORD0;
 };
 
 // Defines the output data of our vertex shader
@@ -24,8 +24,8 @@ struct VertexShaderInput
 struct VertexToPixel
 {
 	float4 position		: SV_POSITION;	// System Value Position - Has specific meaning to the pipeline!
-	float4 normal		: TEXCOORD0;
-	float2 uv			: TEXCOORD1;
+	float4 normal		: NORMAL;
+	float2 uv			: TEXCOORD0;
 };
 
 // The entry point for our vertex shader
