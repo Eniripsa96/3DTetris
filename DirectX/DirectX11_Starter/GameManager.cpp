@@ -76,6 +76,7 @@ GameManager::~GameManager()
 
 	delete triangleMesh;
 	delete quadMesh;
+	delete cubeMesh;
 
 	delete shapeMaterial;
 
@@ -102,14 +103,13 @@ bool GameManager::Init()
 	LoadShadersAndInputLayout();
 
 	// Test OBJ loader
-	/*
+	
 	ObjLoader* loader = new ObjLoader();
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	loader->load("test.obj", device, &vertexBuffer, &indexBuffer);
+	UINT i = loader->Load("cube.obj", device, &vertexBuffer, &indexBuffer);
 	delete loader;
-	quadMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer);
-	*/
+	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
 
 	// Create meshes
 	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
@@ -123,12 +123,12 @@ bool GameManager::Init()
 	gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
 
 	// Create the menu objects we want
-	menuObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
+	menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
 	// Start out displaying the objects for the menu
 	allObjects = menuObjects;
 
-		camera = new Camera();
+	camera = new Camera();
 
 	// Set up the world matrix for each mesh
 	XMMATRIX W = XMMatrixIdentity();
@@ -150,7 +150,7 @@ void GameManager::LoadShadersAndInputLayout()
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Load Vertex Shader --------------------------------------

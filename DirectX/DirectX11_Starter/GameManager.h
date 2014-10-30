@@ -64,8 +64,10 @@ private:
 	std::vector<GameObject*> gameObjects;
 	std::vector<GameObject*> menuObjects;
 	BlockManager* blockManager;
+
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
+	Mesh* cubeMesh;
 	Material* shapeMaterial;
 
 	Camera* camera;
