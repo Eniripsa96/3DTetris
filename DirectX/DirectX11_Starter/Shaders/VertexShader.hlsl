@@ -39,7 +39,7 @@ VertexToPixel main( VertexShaderInput input )
 	output.position = mul(float4(input.position, 1.0f), worldViewProj);
 	
 	// Pass the normal through - will be interpolated per-pixel by the rasterizer
-	output.normal = float4(input.normal, 1.0f);
+	output.normal = float4(mul((input.normal), (float3x3)worldViewProj), 1.0f);
 
 	// Pass the UV coordinates
 	output.uv = input.uv;
