@@ -34,7 +34,7 @@ class Mesh
 {
 public:
 	Mesh(ID3D11Device*, ID3D11DeviceContext*, SHAPE);
-	Mesh(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer* vertexBuffer, ID3D11Buffer* indexBuffer);
+	Mesh(ID3D11Device*, ID3D11DeviceContext*, ID3D11Buffer*, ID3D11Buffer*, UINT);
 	~Mesh();
 
 	void CreateTrianglePoints();
@@ -58,6 +58,7 @@ public:
 private:
 	ID3D11Device* device;
 	ID3D11DeviceContext* deviceContext;
+	UINT iBufferSize;
 };
 
 #endif

@@ -15,12 +15,13 @@ Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
 		CreateQuadPoints();
 }
 
-Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer)
+Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer, UINT iBufferSize)
 {
 	this->device = device;
 	deviceContext = context;
 	vertexBuffer = pVertexBuffer;
 	indexBuffer = pIndexBuffer;
+	this->iBufferSize = iBufferSize;
 }
 
 Mesh::~Mesh()
@@ -102,9 +103,19 @@ void Mesh::Draw()
 	deviceContext->IASetVertexBuffers(0, 1, &(vertexBuffer), &stride, &offset);
 	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	// Finally do the actual drawing
-	deviceContext->DrawIndexed(
-		3 * (int)this->shapeType,	// The number of indices we're using in this draw
-		0,
-		0);
+	if (shapeType != NONE)
+	{
+		// Finally do the actual drawing
+		deviceContext->DrawIndexed(
+			3 * (int)this->shapeType,	// The number of indices we're using in this draw
+			0,
+			0);
+	}
+	else
+	{
+		deviceContext->DrawIndexed(
+			iBufferSize,	// The number of indices we're using in this draw
+			0,
+			0);
+	}
 }
