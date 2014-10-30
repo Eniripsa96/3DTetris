@@ -107,7 +107,7 @@ bool GameManager::Init()
 	ObjLoader* loader = new ObjLoader();
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	UINT i = loader->Load("cube.obj", device, &vertexBuffer, &indexBuffer);
+	UINT i = loader->Load("cube.txt", device, &vertexBuffer, &indexBuffer);
 	delete loader;
 	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
 
