@@ -10,7 +10,8 @@ ObjLoader::~ObjLoader()
 
 // Loads an OBJ model from a file
 // Loosely based off the tutorial here: http://www.braynzarsoft.net/index.php?p=D3D11OBJMODEL
-void ObjLoader::load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer)
+// Returns number of indices which is needed by the mesh
+UINT ObjLoader::Load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer)
 {
 	// Initialize data
 	char c;
@@ -218,7 +219,7 @@ void ObjLoader::load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertex
 	// Create the vertex buffer
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex)* vertices.size();
+	vbd.ByteWidth = sizeof(Vertex) * vertices.size();
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
@@ -238,4 +239,6 @@ void ObjLoader::load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertex
 	D3D11_SUBRESOURCE_DATA initialIndexData;
 	initialIndexData.pSysMem = &indices[0];
 	HR(device->CreateBuffer(&ibd, &initialIndexData, indexBuffer));
+
+	return indices.size();
 }

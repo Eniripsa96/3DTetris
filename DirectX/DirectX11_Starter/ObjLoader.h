@@ -14,6 +14,6 @@ public:
 	ObjLoader();
 	~ObjLoader();
 
-	void load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer);
+	UINT Load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertexBuffer, ID3D11Buffer** indexBuffer);
 };
 
