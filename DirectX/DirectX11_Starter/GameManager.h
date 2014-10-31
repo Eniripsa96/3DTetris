@@ -78,6 +78,7 @@ private:
 	POINT prevMousePos;
 
 	const float CAMERA_MOVE_FACTOR = 10.0f;
+	const float CAMERA_TURN_FACTOR = 1.0f;
 };
 
 #endif

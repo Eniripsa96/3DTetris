@@ -237,6 +237,7 @@ void GameManager::UpdateScene(float dt)
 		dataToSendToVSConstantBuffer.world = allObjects[i]->worldMatrix;
 		dataToSendToVSConstantBuffer.view = camera->viewMatrix;
 		dataToSendToVSConstantBuffer.projection = projectionMatrix;
+		dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
 
 		// [UPDATE] Update the constant buffer itself
 		deviceContext->UpdateSubresource(
@@ -314,14 +315,14 @@ void GameManager::CheckKeyBoard(float dt)
 
 	// Horizontal rotation of camera
 	if (GetAsyncKeyState('J'))
-		camera->Rotate(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		camera->Rotate(&XMFLOAT3(CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
 	else if (GetAsyncKeyState('L'))
-		camera->Rotate(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		camera->Rotate(&XMFLOAT3(-CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
 	// Vertical rotation of camera
 	if (GetAsyncKeyState('I'))
-		camera->Rotate(&XMFLOAT3(0.0f, CAMERA_MOVE_FACTOR * dt, 0.0f));
+		camera->Rotate(&XMFLOAT3(0.0f, CAMERA_TURN_FACTOR * dt, 0.0f));
 	else if (GetAsyncKeyState('K'))
-			camera->Rotate(&XMFLOAT3(0.0f, -CAMERA_MOVE_FACTOR * dt, 0.0f));
+		camera->Rotate(&XMFLOAT3(0.0f, -CAMERA_TURN_FACTOR * dt, 0.0f));
 }
 
 // Once per key press
