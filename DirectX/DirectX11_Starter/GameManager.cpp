@@ -115,13 +115,12 @@ bool GameManager::Init()
 	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
 
 	// Set up block types
-	blockTypes = new BlockType[1];
+	blocks = new Block[1];
 
 	int size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blockTypes[0].material = shapeMaterial;
-	blockTypes[0].threeByThree = true;
-	blockTypes[0].mesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
-	blockTypes[0].localGrid = new bool[] {
+	blocks[0].threeByThree = true;
+	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[0].grid = new bool[] {
 		true,  true,  true,
 		false, true,  false,
 		false, false, false
@@ -131,7 +130,7 @@ bool GameManager::Init()
 	delete loader;
 
 	// Set up block manager
-	blockManager = new BlockManager(blockTypes, 1, cubeMesh, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
+	blockManager = new BlockManager(blocks, 1, cubeMesh, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes

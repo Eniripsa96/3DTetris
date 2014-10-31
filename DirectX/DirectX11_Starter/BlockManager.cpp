@@ -3,7 +3,7 @@
 // Initializes the BlockManager given 
 // the minimum coordinates for blocks, the hold position for blocks, 
 // and the width of each block
-BlockManager::BlockManager(BlockType* pBlocks, int pNumBlocks, Mesh* pCube, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
+BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, Mesh* pCube, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
 {
 	blocks = pBlocks;
 	numBlocks = pNumBlocks;
@@ -157,10 +157,8 @@ bool BlockManager::canOccupy(int x, int y)
 // Spawns a new falling block at the top of the game
 void BlockManager::spawnFallingBlock() 
 {
-	Block block;
-
 	// Get a random block
-	BlockType type = blocks[typeOrder[typeId++]];
+	Block block = blocks[typeOrder[typeId++]];
 	if (typeId == numBlocks) 
 	{
 		shuffle();
@@ -171,17 +169,17 @@ void BlockManager::spawnFallingBlock()
 	float y = blockWidth * GRID_HEIGHT + min.y;
 	float z = min.z;
 
-	// Create the block
-	block.gameObject = new GameObject(type.mesh, type.material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
-	block.threeByThree = type.threeByThree;
+	// Set up the block
 	int size = block.threeByThree ? 9 : 16;
-	block.localGrid = new bool[size];
+	block.gameObject->position = XMFLOAT3(x, y, z);
 	block.tempGrid = new bool[size];
-	copy(type.localGrid, block.localGrid, size);
-	copy(type.localGrid, block.tempGrid, size);
+	block.localGrid = new bool[size];
+	copy(block.grid, block.tempGrid, size);
+	copy(block.grid, block.localGrid, size);
 
 	// Make it the active block
 	activeBlock = &block;
+	size *= 2;
 }
 
 // Tries to move the active block in the given direction

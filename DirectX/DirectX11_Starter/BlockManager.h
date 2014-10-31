@@ -20,15 +20,7 @@ struct Block
 	bool threeByThree;
 	bool* localGrid;
 	bool* tempGrid;
-};
-
-// Details for a block type used when spawning blocks
-struct BlockType
-{
-	Mesh* mesh;
-	Material* material;
-	bool threeByThree;
-	bool* localGrid;
+	bool* grid;
 };
 
 // A direction to move a block
@@ -43,7 +35,7 @@ enum MoveDirection
 class BlockManager
 {
 public:
-	BlockManager(BlockType* blocks, int numBlocks, Mesh* cube, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
+	BlockManager(Block* blocks, int numBlocks, Mesh* cube, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
 	~BlockManager();
 
 	void update();
@@ -61,7 +53,7 @@ public:
 	bool isGameOver() { return gameOver; };
 
 private:
-	BlockType* blocks;
+	Block* blocks;
 	Block** gameGrid;
 	Block* activeBlock;
 	Block* heldBlock;
