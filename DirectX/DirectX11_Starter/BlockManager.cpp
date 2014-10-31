@@ -81,7 +81,9 @@ void BlockManager::draw()
 {
 	activeBlock->gameObject->Draw();
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
-		gameGrid[i]->gameObject->Draw();
+		if (gameGrid[i] != NULL) {
+			gameGrid[i]->gameObject->Draw();
+		}
 	}
 }
 

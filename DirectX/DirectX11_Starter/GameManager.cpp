@@ -102,21 +102,41 @@ bool GameManager::Init()
 	// Load shaders that we want
 	LoadShadersAndInputLayout();
 
-	// Test OBJ loader
-	
+	// Create materials
+	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
+
+	// Prepare to load meshes
 	ObjLoader* loader = new ObjLoader();
+	
+	// Load basic cube
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
 	UINT i = loader->Load("cube.txt", device, &vertexBuffer, &indexBuffer);
-	delete loader;
 	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
 
-	// Create meshes
+	// Set up block types
+	blockTypes = new BlockType[1];
+
+	int size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blockTypes[0].material = shapeMaterial;
+	blockTypes[0].threeByThree = true;
+	blockTypes[0].mesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	blockTypes[0].localGrid = new bool[] {
+		true,  true,  true,
+		false, true,  false,
+		false, false, false
+	};
+
+	// Finished using the ObjLoader
+	delete loader;
+
+	// Set up block manager
+	blockManager = new BlockManager(blockTypes, 1, cubeMesh, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
+	blockManager->spawnFallingBlock();
+
+	// Create 2D meshes
 	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-
-	// Create materials
-	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
 
 	// Create the game objects we want
 	gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
@@ -256,6 +276,12 @@ void GameManager::UpdateScene(float dt)
 
 		// [DRAW] Draw the object
 		allObjects[i]->Draw();
+	}
+
+	// Update and draw the game if in game mode
+	if (gameState == GAME) {
+		blockManager->update();
+		blockManager->draw();
 	}
 
 	// Present the buffer

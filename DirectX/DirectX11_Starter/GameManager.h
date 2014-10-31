@@ -69,6 +69,7 @@ private:
 	Mesh* quadMesh;
 	Mesh* cubeMesh;
 	Material* shapeMaterial;
+	BlockType* blockTypes;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;
