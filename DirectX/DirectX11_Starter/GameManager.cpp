@@ -281,7 +281,7 @@ void GameManager::UpdateScene(float dt)
 
 	// Update and draw the game if in game mode
 	if (gameState == GAME) {
-		blockManager->update();
+		blockManager->update(dt);
 		blockManager->draw();
 	}
 

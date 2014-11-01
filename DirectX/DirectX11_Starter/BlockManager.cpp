@@ -11,8 +11,11 @@ BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, Mesh* pCube, XMFLOAT3
 	min = pMin;
 	holdPos = pHoldPos;
 	blockWidth = pBlockWidth;
-	Block* arr = new Block[GRID_WIDTH * GRID_HEIGHT];
-	gameGrid = &arr;
+	gameGrid = new Block*[GRID_WIDTH * GRID_HEIGHT];
+	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) 
+	{
+		gameGrid[i] = NULL;
+	}
 	typeOrder = new int[numBlocks];
 	shuffle();
 }
@@ -23,7 +26,7 @@ BlockManager::~BlockManager()
 }
 
 // Updates the blocks in the game
-void BlockManager::update() 
+void BlockManager::update(float dt) 
 {
 	// Cannot update if the game is not active
 	if (activeId == -1) {
@@ -48,22 +51,24 @@ void BlockManager::update()
 
 	// Apply "gravity"
 	float dy = targetY - y;
-	if (dy >= -SLOW_FALL_SPEED && canMove(DOWN))
+	float speed = -SLOW_FALL_SPEED * dt;
+	if (dy >= speed && canMove(DOWN))
 	{
 		targetY--;
 		dy = targetY - y;
 	}
 
 	// Apply smooth vertical movement
-	float yChange = max(dy, -SLOW_FALL_SPEED);
+	float yChange = max(dy, speed);
 	if (yChange == 0 && targetX == x && rotation == 0)
 	{
 		mergeBlock();
 	}
 	else
 	{
-		pos.y += yChange;
+		pos.y += yChange * blockWidth;
 	}
+	blocks[activeId].gameObject->position = pos;
 
 	// Apply smooth rotation
 	if (rotation > 0)
@@ -281,7 +286,7 @@ void BlockManager::holdBlock()
 		heldId = activeId;
 
 		// If there is no held block, spawn a new one
-		if (heldId == -1)
+		if (held == -1)
 		{
 			spawnFallingBlock();
 		}
@@ -314,7 +319,7 @@ void BlockManager::mergeBlock()
 			if (blocks[activeId].localGrid[i + j * size]) 
 			{
 				// Game over
-				if (targetY + j >= GRID_HEIGHT || gameGrid[i + j * size] != NULL)  
+				if (targetY + j >= GRID_HEIGHT || gameGrid[i + targetX + (j + targetY) * GRID_WIDTH] != NULL)  
 				{
 					gameOver = true;
 					activeId = -1;

@@ -38,7 +38,7 @@ public:
 	BlockManager(Block* blocks, int numBlocks, Mesh* cube, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
 	~BlockManager();
 
-	void update();
+	void update(float dt);
 	void draw();
 
 	bool canMove(MoveDirection direction);
