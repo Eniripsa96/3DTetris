@@ -120,6 +120,8 @@ bool GameManager::Init()
 	int size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[0].threeByThree = true;
 	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[0].localGrid = new bool[9];
+	blocks[0].tempGrid = new bool[9];
 	blocks[0].grid = new bool[] {
 		true,  true,  true,
 		false, true,  false,
@@ -134,12 +136,12 @@ bool GameManager::Init()
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes
-	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
-	quadMesh = new Mesh(device, deviceContext, QUAD);
+	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
+	//quadMesh = new Mesh(device, deviceContext, QUAD);
 
 	// Create the game objects we want
-	gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
-	gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	//gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
 
 	// Create the menu objects we want
 	menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));

@@ -55,8 +55,6 @@ public:
 private:
 	Block* blocks;
 	Block** gameGrid;
-	Block* activeBlock;
-	Block* heldBlock;
 	Mesh* cube;
 	int* typeOrder;
 	
@@ -69,7 +67,8 @@ private:
 	int numBlocks;
 	int targetX;
 	int targetY;
-	int typeId;
+	int activeId = -1;
+	int heldId = -1;
 
 	void copy(bool* src, bool* dest, int num);
 	void shuffle();
