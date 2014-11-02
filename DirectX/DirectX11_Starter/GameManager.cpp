@@ -385,6 +385,12 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 {
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - prevMousePos.x));
+		camera->RotateY(-dx);
+	}
+
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 }
