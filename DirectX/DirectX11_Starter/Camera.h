@@ -12,11 +12,21 @@ public:
 	~Camera();
 
 	void Update(float);
+
+	// Change Look
 	void Move(XMFLOAT3*);
 	void MoveVertical(float);
 	void MoveHorizontal(float);
 	void MoveDepth(float);
 	void Rotate(XMFLOAT3*);
+
+	// Accessors
+	XMVECTOR GetForwardXM() const;
+	XMFLOAT3 GetForward() const;
+	XMVECTOR GetRightXM() const;
+	XMFLOAT3 GetRight() const;
+	XMVECTOR GetUpXM() const;
+	XMFLOAT3 GetUp() const;
 
 	// The matrices to go from model space
 	// to screen space
@@ -26,14 +36,14 @@ public:
 private:
 	XMVECTOR position;
 	XMVECTOR target;
-	XMVECTOR up;
 
 	XMFLOAT3 myPosition;
 	XMFLOAT3 myTarget;
 
-	XMVECTOR forward();
-	XMFLOAT3 right();
-	//XMFLOAT3 up();
+	// Basis vectors
+	XMFLOAT3 forward;
+	XMFLOAT3 right;
+	XMFLOAT3 up;
 };
 
 #endif
