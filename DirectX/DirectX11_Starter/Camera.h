@@ -18,7 +18,8 @@ public:
 	void MoveVertical(float);
 	void MoveHorizontal(float);
 	void MoveDepth(float);
-	void Rotate(XMFLOAT3*);
+	void RotateY(float);
+	void Pitch(float);
 
 	// Accessors
 	XMVECTOR GetForwardXM() const;
@@ -34,11 +35,8 @@ public:
 	XMFLOAT4X4 projectionMatrix;
 
 private:
-	XMVECTOR position;
-	XMVECTOR target;
-
-	XMFLOAT3 myPosition;
-	XMFLOAT3 myTarget;
+	XMFLOAT3 position;
+	XMFLOAT3 target;
 
 	// Basis vectors
 	XMFLOAT3 forward;

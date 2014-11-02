@@ -302,27 +302,25 @@ void GameManager::CheckKeyBoard(float dt)
 {	
 	// Strafing of camera
 	if (GetAsyncKeyState('A'))
-		camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		camera->MoveHorizontal(-CAMERA_MOVE_FACTOR * dt);
 	else if (GetAsyncKeyState('D'))
-		camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		camera->MoveHorizontal(CAMERA_MOVE_FACTOR * dt);
 	// Forward movement of camera
 	if (GetAsyncKeyState('W'))
-		//camera->MoveDepth(1.0f);
-		camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
+		camera->MoveDepth(CAMERA_MOVE_FACTOR * dt);
 	else if (GetAsyncKeyState('S'))
-		//camera->MoveDepth(-1.0f);
-		camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
+		camera->MoveDepth(-CAMERA_MOVE_FACTOR * dt);
 
 	// Horizontal rotation of camera
 	if (GetAsyncKeyState('J'))
-		camera->Rotate(&XMFLOAT3(CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
+		camera->RotateY(CAMERA_TURN_FACTOR * dt);
 	else if (GetAsyncKeyState('L'))
-		camera->Rotate(&XMFLOAT3(-CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
+		camera->RotateY(-CAMERA_TURN_FACTOR * dt);
 	// Vertical rotation of camera
 	if (GetAsyncKeyState('I'))
-		camera->Rotate(&XMFLOAT3(0.0f, CAMERA_TURN_FACTOR * dt, 0.0f));
+		camera->Pitch(CAMERA_TURN_FACTOR * dt);
 	else if (GetAsyncKeyState('K'))
-		camera->Rotate(&XMFLOAT3(0.0f, -CAMERA_TURN_FACTOR * dt, 0.0f));
+		camera->Pitch(-CAMERA_TURN_FACTOR * dt);
 }
 
 // Once per key press

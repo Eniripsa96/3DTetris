@@ -77,7 +77,7 @@ private:
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
 
-	const float CAMERA_MOVE_FACTOR = 10.0f;
+	const float CAMERA_MOVE_FACTOR = 2.0f;
 	const float CAMERA_TURN_FACTOR = 1.0f;
 };
 
