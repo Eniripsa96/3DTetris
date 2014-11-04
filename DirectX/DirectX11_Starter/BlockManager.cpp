@@ -3,15 +3,15 @@
 // Initializes the BlockManager given 
 // the minimum coordinates for blocks, the hold position for blocks, 
 // and the width of each block
-BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, Mesh* pCube, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
+BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject> pCubes, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
 {
 	blocks = pBlocks;
 	numBlocks = pNumBlocks;
-	cube = pCube;
+	cubes = pCubes;
 	min = pMin;
 	holdPos = pHoldPos;
 	blockWidth = pBlockWidth;
-	gameGrid = new Block*[GRID_WIDTH * GRID_HEIGHT];
+	gameGrid = new bool[GRID_WIDTH * GRID_HEIGHT];
 	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) 
 	{
 		gameGrid[i] = NULL;
@@ -108,13 +108,33 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		blocks[activeId].gameObject->Draw();
 	}
 
-	/*
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
-		if (gameGrid[i] != NULL) {
-			gameGrid[i]->gameObject->Draw();
+		if (gameGrid[i]) {
+
+			// [UPDATE] Update constant buffer data using this object
+			cubes[i].Update(0);
+			cBufferData->world = cubes[i].worldMatrix;
+
+			// [UPDATE] Update the constant buffer itself
+			deviceContext->UpdateSubresource(
+				cBuffer,
+				0,
+				NULL,
+				cBufferData,
+				0,
+				0
+			);
+
+			// [DRAW] Set the constant buffer in the device
+			deviceContext->VSSetConstantBuffers(
+				0,
+				1,
+				&(cBuffer)
+			);
+
+			cubes[i].Draw();
 		}
 	}
-	*/
 
 	if (heldId != -1)
 	{
@@ -224,14 +244,14 @@ void BlockManager::spawnFallingBlock()
 		shuffle();
 	}
 
-	// Get the spawn location
-	float x = blockWidth * ((GRID_WIDTH - 4) / 2) + min.x;
-	float y = blockWidth * GRID_HEIGHT + min.y;
-	float z = min.z;
-
 	// Reset target position
 	targetY = GRID_HEIGHT;
 	targetX = GRID_WIDTH / 2 - 2;
+
+	// Get the spawn location
+	float x = blockWidth * targetX + min.x;
+	float y = blockWidth * targetY + min.y;
+	float z = min.z;
 
 	// Set up the block
 	int size = block.threeByThree ? 9 : 16;
@@ -384,8 +404,8 @@ void BlockManager::mergeBlock()
 				float x = (targetX + i) * blockWidth + min.x;
 				float y = (targetY + j) * blockWidth + min.y;
 				float z = min.z;
-				block.gameObject = new GameObject(cube, blocks[activeId].gameObject->material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
-				gameGrid[targetX + i + (targetY + j) * size] = &block;
+				cubes[targetX + i + (targetY + j) * GRID_WIDTH].material = blocks[activeId].gameObject->material;
+				gameGrid[targetX + i + (targetY + j) * GRID_WIDTH] = true;
 			}
 		}
 	}
@@ -417,8 +437,7 @@ void BlockManager::checkLines(int min, int max)
 			// Delete the game objects for now
 			for (int j = 0; j < GRID_WIDTH; j++)
 			{
-				delete gameGrid[j + i * GRID_WIDTH];
-				gameGrid[j + i * GRID_WIDTH] = NULL;
+				gameGrid[j + i * GRID_WIDTH] = false;
 			}
 
 			// Move down higher rows
@@ -428,11 +447,8 @@ void BlockManager::checkLines(int min, int max)
 				{
 					int index = k + j * GRID_WIDTH;
 					gameGrid[index] = gameGrid[index + GRID_WIDTH];
-					gameGrid[index + GRID_WIDTH] = NULL;
-					if (gameGrid[index] != NULL)
-					{
-						gameGrid[index]->gameObject->position.y -= 1;
-					}
+					gameGrid[index + GRID_WIDTH] = false;
+					cubes[index].material = cubes[index + GRID_WIDTH].material;
 				}
 			}
 		}

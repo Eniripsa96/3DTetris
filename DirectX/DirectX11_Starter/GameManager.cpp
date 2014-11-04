@@ -24,6 +24,7 @@
 #include <Windows.h>
 #include <d3dcompiler.h>
 #include "GameManager.h"
+#include <vector>
 
 // Background color
 const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
@@ -132,7 +133,12 @@ bool GameManager::Init()
 	delete loader;
 
 	// Set up block manager
-	blockManager = new BlockManager(blocks, 1, cubeMesh, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
+	for (int j = 0; j < GRID_HEIGHT; j++) {
+		for (int i = 0; i < GRID_WIDTH; i++) {
+			cubes.push_back(*new GameObject(cubeMesh, shapeMaterial, new XMFLOAT3(i - 4.5, j - 5, 0), new XMFLOAT3(0, 0, 0)));
+		}
+	}
+	blockManager = new BlockManager(blocks, 1, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes

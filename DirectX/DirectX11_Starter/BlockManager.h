@@ -3,6 +3,9 @@
 #include "GameObject.h"
 #include <stdlib.h>
 #include <math.h>
+#include <vector>
+
+using namespace std;
 
 // Values for the game
 #define GRID_WIDTH 10
@@ -35,7 +38,7 @@ enum MoveDirection
 class BlockManager
 {
 public:
-	BlockManager(Block* blocks, int numBlocks, Mesh* cube, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
+	BlockManager(Block* blocks, int numBlocks, vector<GameObject> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
 	~BlockManager();
 
 	void update(float dt);
@@ -54,8 +57,8 @@ public:
 
 private:
 	Block* blocks;
-	Block** gameGrid;
-	Mesh* cube;
+	bool* gameGrid;
+	vector<GameObject> cubes;
 	int* typeOrder;
 	
 	XMFLOAT3 min;
