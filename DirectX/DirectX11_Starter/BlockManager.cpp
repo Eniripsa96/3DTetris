@@ -42,11 +42,11 @@ void BlockManager::update(float dt)
 	float dx = targetX - x;
 	if (dx > 0)
 	{
-		pos.x += blockWidth * min(dx, SIDE_SPEED);
+		pos.x += blockWidth * min(dx, dt * SIDE_SPEED);
 	}
 	else
 	{
-		pos.x += blockWidth * max(dx, -SIDE_SPEED);
+		pos.x += blockWidth * max(dx, -dt * SIDE_SPEED);
 	}
 
 	// Apply "gravity"
@@ -80,9 +80,31 @@ void BlockManager::update(float dt)
 }
 
 // Draws the blocks in the game
-void BlockManager::draw()
+void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
 	if (activeId != -1) {
+
+		// [UPDATE] Update constant buffer data using this object
+		blocks[activeId].gameObject->Update(0);
+		cBufferData->world = blocks[activeId].gameObject->worldMatrix;
+
+		// [UPDATE] Update the constant buffer itself
+		deviceContext->UpdateSubresource(
+			cBuffer,
+			0,
+			NULL,
+			cBufferData,
+			0,
+			0
+		);
+
+		// [DRAW] Set the constant buffer in the device
+		deviceContext->VSSetConstantBuffers(
+			0,
+			1,
+			&(cBuffer)
+		);
+
 		blocks[activeId].gameObject->Draw();
 	}
 
@@ -98,6 +120,27 @@ void BlockManager::draw()
 	{
 		XMFLOAT3 prev = blocks[heldId].gameObject->position;
 		blocks[heldId].gameObject->position = XMFLOAT3((targetX + min.x) * blockWidth, (targetY + min.y) * blockWidth, min.z * blockWidth);
+
+		// [UPDATE] Update constant buffer data using this object
+		blocks[heldId].gameObject->Update(0);
+		cBufferData->world = blocks[heldId].gameObject->worldMatrix;
+
+		// [UPDATE] Update the constant buffer itself
+		deviceContext->UpdateSubresource(
+			cBuffer,
+			0,
+			NULL,
+			cBufferData,
+			0,
+			0
+		);
+
+		// [DRAW] Set the constant buffer in the device
+		deviceContext->VSSetConstantBuffers(
+			0,
+			1,
+			&(cBuffer)
+		);
 		blocks[heldId].gameObject->Draw();
 		blocks[heldId].gameObject->position = prev;
 	}
@@ -210,7 +253,7 @@ void BlockManager::move(MoveDirection direction)
 
 	// Ignore it if it's still mid-movement
 	float dx = abs(x - targetX);
-	if (dx > SIDE_SPEED || !canMove(direction)) return;
+	if (dx > 0.1f || !canMove(direction)) return;
 
 	// Apply the move
 	switch (direction)

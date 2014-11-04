@@ -6,7 +6,7 @@ using namespace std;
 
 Camera::Camera()
 {
-	float zPos = -5.0f;
+	float zPos = -40.0f;
 	float zTar = 10.0f;
 
 	// Set up view matrix (camera)

@@ -7,9 +7,9 @@
 // Values for the game
 #define GRID_WIDTH 10
 #define GRID_HEIGHT 20
-#define SLOW_FALL_SPEED 0.05f
-#define FAST_FALL_SPEED 0.2f
-#define SIDE_SPEED 0.1f
+#define SLOW_FALL_SPEED 1.0f
+#define FAST_FALL_SPEED 4.0f
+#define SIDE_SPEED 5.0f
 #define SPEED_INCREASE 0.01f
 #define ROTATION_SPEED 12.0f
 
@@ -39,7 +39,7 @@ public:
 	~BlockManager();
 
 	void update(float dt);
-	void draw();
+	void draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData);
 
 	bool canMove(MoveDirection direction);
 	bool canOccupy(int x, int y);

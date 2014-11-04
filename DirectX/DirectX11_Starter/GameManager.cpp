@@ -282,7 +282,7 @@ void GameManager::UpdateScene(float dt)
 	// Update and draw the game if in game mode
 	if (gameState == GAME) {
 		blockManager->update(dt);
-		blockManager->draw();
+		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
 	// Present the buffer
@@ -327,6 +327,21 @@ void GameManager::DrawScene()
 // Continuous while key pressed
 void GameManager::CheckKeyBoard(float dt)
 {	
+	if (gameState == GAME) 
+	{
+		if (GetAsyncKeyState('A')) 
+		{
+			blockManager->move(LEFT);
+		}
+		if (GetAsyncKeyState('D'))
+		{
+			blockManager->move(RIGHT);
+		}
+		if (GetAsyncKeyState('S'))
+		{
+		}
+	}
+
 	// Strafing of camera
 	if (GetAsyncKeyState('A'))
 		camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
