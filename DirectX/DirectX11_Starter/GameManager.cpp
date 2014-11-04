@@ -116,14 +116,82 @@ bool GameManager::Init()
 	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
 
 	// Set up block types
-	blocks = new Block[1];
+	blocks = new Block[7];
 
-	int size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
+	int size = loader->Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[0].threeByThree = true;
 	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
 	blocks[0].localGrid = new bool[9];
 	blocks[0].tempGrid = new bool[9];
 	blocks[0].grid = new bool[] {
+		true,  true,  true,
+		true,  false, false,
+		false, false, false
+	};
+
+	size = loader->Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[1].threeByThree = true;
+	blocks[1].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[1].localGrid = new bool[9];
+	blocks[1].tempGrid = new bool[9];
+	blocks[1].grid = new bool[] {
+		true,  true,  true,
+		false, false, true,
+		false, false, false
+	};
+
+	size = loader->Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[2].threeByThree = true;
+	blocks[2].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[2].localGrid = new bool[9];
+	blocks[2].tempGrid = new bool[9];
+	blocks[2].grid = new bool[] {
+		false, true,  true,
+		true,  true,  false,
+		false, false, false
+	};
+
+	size = loader->Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[3].threeByThree = false;
+	blocks[3].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[3].localGrid = new bool[16];
+	blocks[3].tempGrid = new bool[16];
+	blocks[3].grid = new bool[] {
+		false, false, false, false,
+		true,  true,  true,  true,
+		false, false, false, false,
+		false, false, false, false
+	};
+
+	size = loader->Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[4].threeByThree = true;
+	blocks[4].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[4].localGrid = new bool[9];
+	blocks[4].tempGrid = new bool[9];
+	blocks[4].grid = new bool[] {
+		true,  true,  false,
+		false, true,  true,
+		false, false, false
+	};
+
+	size = loader->Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[5].threeByThree = false;
+	blocks[5].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[5].localGrid = new bool[16];
+	blocks[5].tempGrid = new bool[16];
+	blocks[5].grid = new bool[] {
+		false, false, false, false,
+		false, true,  true,  false,
+		false, true,  true,  false,
+		false, false, false, false
+	};
+
+    size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[6].threeByThree = true;
+	blocks[6].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0));
+	blocks[6].localGrid = new bool[9];
+	blocks[6].tempGrid = new bool[9];
+	blocks[6].grid = new bool[] {
 		true,  true,  true,
 		false, true,  false,
 		false, false, false
@@ -138,7 +206,7 @@ bool GameManager::Init()
 			cubes.push_back(*new GameObject(cubeMesh, shapeMaterial, new XMFLOAT3(i - 4.5, j - 5, 0), new XMFLOAT3(0, 0, 0)));
 		}
 	}
-	blockManager = new BlockManager(blocks, 1, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
+	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes
@@ -345,6 +413,11 @@ void GameManager::CheckKeyBoard(float dt)
 		}
 		if (GetAsyncKeyState('S'))
 		{
+			blockManager->fallSpeed = FAST_FALL_SPEED;
+		}
+		else 
+		{
+			blockManager->fallSpeed = SLOW_FALL_SPEED;
 		}
 	}
 

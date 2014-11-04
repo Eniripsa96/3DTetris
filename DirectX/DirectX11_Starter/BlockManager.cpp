@@ -34,7 +34,7 @@ void BlockManager::update(float dt)
 	}
 
 	// Convert block position to grid position
-	XMFLOAT3 pos = blocks[activeId].gameObject->position;
+	XMFLOAT3 pos = blocks[typeOrder[activeId]].gameObject->position;
 	float x = (pos.x / blockWidth) - min.x;
 	float y = (pos.y / blockWidth) - min.y;
 
@@ -51,7 +51,7 @@ void BlockManager::update(float dt)
 
 	// Apply "gravity"
 	float dy = targetY - y;
-	float speed = -SLOW_FALL_SPEED * dt;
+	float speed = -fallSpeed * dt;
 	if (dy >= speed && canMove(DOWN))
 	{
 		targetY--;
@@ -68,13 +68,13 @@ void BlockManager::update(float dt)
 	{
 		pos.y += yChange * blockWidth;
 	}
-	blocks[activeId].gameObject->position = pos;
+	blocks[typeOrder[activeId]].gameObject->position = pos;
 
 	// Apply smooth rotation
 	if (rotation > 0)
 	{
 		float angle = min(rotation, ROTATION_SPEED);
-		blocks[activeId].gameObject->Rotate(&XMFLOAT3(0, 0, -angle));
+		blocks[typeOrder[activeId]].gameObject->Rotate(&XMFLOAT3(0, 0, -angle));
 		rotation -= angle;
 	}
 }
@@ -85,8 +85,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 	if (activeId != -1) {
 
 		// [UPDATE] Update constant buffer data using this object
-		blocks[activeId].gameObject->Update(0);
-		cBufferData->world = blocks[activeId].gameObject->worldMatrix;
+		blocks[typeOrder[activeId]].gameObject->Update(0);
+		cBufferData->world = blocks[typeOrder[activeId]].gameObject->worldMatrix;
 
 		// [UPDATE] Update the constant buffer itself
 		deviceContext->UpdateSubresource(
@@ -105,7 +105,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 			&(cBuffer)
 		);
 
-		blocks[activeId].gameObject->Draw();
+		blocks[typeOrder[activeId]].gameObject->Draw();
 	}
 
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
@@ -138,12 +138,12 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 
 	if (heldId != -1)
 	{
-		XMFLOAT3 prev = blocks[heldId].gameObject->position;
-		blocks[heldId].gameObject->position = XMFLOAT3((targetX + min.x) * blockWidth, (targetY + min.y) * blockWidth, min.z * blockWidth);
+		XMFLOAT3 prev = blocks[typeOrder[heldId]].gameObject->position;
+		blocks[typeOrder[heldId]].gameObject->position = holdPos;
 
 		// [UPDATE] Update constant buffer data using this object
-		blocks[heldId].gameObject->Update(0);
-		cBufferData->world = blocks[heldId].gameObject->worldMatrix;
+		blocks[typeOrder[heldId]].gameObject->Update(0);
+		cBufferData->world = blocks[typeOrder[heldId]].gameObject->worldMatrix;
 
 		// [UPDATE] Update the constant buffer itself
 		deviceContext->UpdateSubresource(
@@ -161,8 +161,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 			1,
 			&(cBuffer)
 		);
-		blocks[heldId].gameObject->Draw();
-		blocks[heldId].gameObject->position = prev;
+		blocks[typeOrder[heldId]].gameObject->Draw();
+		blocks[typeOrder[heldId]].gameObject->position = prev;
 	}
 }
 
@@ -198,13 +198,13 @@ bool BlockManager::canOccupy(int x, int y)
 	}
 
 	// Compare the active block's local grid with the game grid at the position
-	int size = blocks[activeId].threeByThree ? 3 : 4;
+	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
 		{
 			// Ignore empty cells of the block
-			if (!blocks[activeId].localGrid[i + j * size])
+			if (!blocks[typeOrder[activeId]].localGrid[i + j * size])
 			{
 				continue;
 			}
@@ -238,11 +238,11 @@ void BlockManager::spawnFallingBlock()
 {
 	// Get a random block
 	activeId = (activeId + 1) % numBlocks;
-	Block block = blocks[typeOrder[activeId]];
-	if (activeId == numBlocks)
+	if (activeId == 0)
 	{
 		shuffle();
 	}
+	Block block = blocks[typeOrder[activeId]];
 
 	// Reset target position
 	targetY = GRID_HEIGHT;
@@ -269,7 +269,7 @@ void BlockManager::move(MoveDirection direction)
 	}
 
 	// Convert block position to grid position
-	float x = (blocks[activeId].gameObject->position.x / blockWidth) - min.x;
+	float x = (blocks[typeOrder[activeId]].gameObject->position.x / blockWidth) - min.x;
 
 	// Ignore it if it's still mid-movement
 	float dx = abs(x - targetX);
@@ -296,12 +296,12 @@ void BlockManager::rotate()
 	}
 
 	// Rotate the temp grid into the local grid
-	int size = blocks[activeId].threeByThree ? 3 : 4;
+	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
 		{
-			blocks[activeId].localGrid[i + j * size] = blocks[activeId].tempGrid[size - 1 - j + i * size];
+			blocks[typeOrder[activeId]].localGrid[i + j * size] = blocks[typeOrder[activeId]].tempGrid[size - 1 - j + i * size];
 		}
 	}
 
@@ -323,13 +323,13 @@ void BlockManager::rotate()
 
 		// Update the temp grid
 		rotation = 90.0f;
-		copy(blocks[activeId].localGrid, blocks[activeId].tempGrid, size);
+		copy(blocks[typeOrder[activeId]].localGrid, blocks[typeOrder[activeId]].tempGrid, size);
 	}
 
 	// Restore the local grid if it cannot rotate
 	else
 	{
-		copy(blocks[activeId].tempGrid, blocks[activeId].localGrid, size);
+		copy(blocks[typeOrder[activeId]].tempGrid, blocks[typeOrder[activeId]].localGrid, size);
 	}
 }
 
@@ -376,10 +376,10 @@ void BlockManager::mergeBlock()
 
 	int minY = GRID_HEIGHT;
 	int maxY = 0;
-	int size = blocks[activeId].threeByThree ? 3 : 4;
+	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			if (blocks[activeId].localGrid[i + j * size]) 
+			if (blocks[typeOrder[activeId]].localGrid[i + j * size])
 			{
 				// Game over
 				if (targetY + j >= GRID_HEIGHT || gameGrid[i + targetX + (j + targetY) * GRID_WIDTH] != NULL)  
@@ -404,7 +404,7 @@ void BlockManager::mergeBlock()
 				float x = (targetX + i) * blockWidth + min.x;
 				float y = (targetY + j) * blockWidth + min.y;
 				float z = min.z;
-				cubes[targetX + i + (targetY + j) * GRID_WIDTH].material = blocks[activeId].gameObject->material;
+				cubes[targetX + i + (targetY + j) * GRID_WIDTH].material = blocks[typeOrder[activeId]].gameObject->material;
 				gameGrid[targetX + i + (targetY + j) * GRID_WIDTH] = true;
 			}
 		}
