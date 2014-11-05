@@ -325,13 +325,13 @@ void BlockManager::rotate()
 
 		// Update the temp grid
 		rotation += PI / 2;
-		copy(blocks[typeOrder[activeId]].localGrid, blocks[typeOrder[activeId]].tempGrid, size);
+		copy(blocks[typeOrder[activeId]].localGrid, blocks[typeOrder[activeId]].tempGrid, size * size);
 	}
 
 	// Restore the local grid if it cannot rotate
 	else
 	{
-		copy(blocks[typeOrder[activeId]].tempGrid, blocks[typeOrder[activeId]].localGrid, size);
+		copy(blocks[typeOrder[activeId]].tempGrid, blocks[typeOrder[activeId]].localGrid, size * size);
 	}
 }
 
