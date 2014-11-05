@@ -120,7 +120,7 @@ bool GameManager::Init()
 
 	int size = loader->Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[0].threeByThree = true;
-	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[0].localGrid = new bool[9];
 	blocks[0].tempGrid = new bool[9];
 	blocks[0].grid = new bool[] {
@@ -131,7 +131,7 @@ bool GameManager::Init()
 
 	size = loader->Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[1].threeByThree = true;
-	blocks[1].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[1].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[1].localGrid = new bool[9];
 	blocks[1].tempGrid = new bool[9];
 	blocks[1].grid = new bool[] {
@@ -142,7 +142,7 @@ bool GameManager::Init()
 
 	size = loader->Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[2].threeByThree = true;
-	blocks[2].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[2].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[2].localGrid = new bool[9];
 	blocks[2].tempGrid = new bool[9];
 	blocks[2].grid = new bool[] {
@@ -153,7 +153,7 @@ bool GameManager::Init()
 
 	size = loader->Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[3].threeByThree = false;
-	blocks[3].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[3].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
 	blocks[3].localGrid = new bool[16];
 	blocks[3].tempGrid = new bool[16];
 	blocks[3].grid = new bool[] {
@@ -165,7 +165,7 @@ bool GameManager::Init()
 
 	size = loader->Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[4].threeByThree = true;
-	blocks[4].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[4].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[4].localGrid = new bool[9];
 	blocks[4].tempGrid = new bool[9];
 	blocks[4].grid = new bool[] {
@@ -176,7 +176,7 @@ bool GameManager::Init()
 
 	size = loader->Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[5].threeByThree = false;
-	blocks[5].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[5].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
 	blocks[5].localGrid = new bool[16];
 	blocks[5].tempGrid = new bool[16];
 	blocks[5].grid = new bool[] {
@@ -188,7 +188,7 @@ bool GameManager::Init()
 
     size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[6].threeByThree = true;
-	blocks[6].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), shapeMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[6].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[6].localGrid = new bool[9];
 	blocks[6].tempGrid = new bool[9];
 	blocks[6].grid = new bool[] {
