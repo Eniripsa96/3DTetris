@@ -49,6 +49,7 @@ public:
 	bool canOccupy(int x, int y);
 
 	void spawnFallingBlock();
+	void resetActiveBlock();
 	void move(MoveDirection direction);
 	void rotate();
 	void holdBlock();

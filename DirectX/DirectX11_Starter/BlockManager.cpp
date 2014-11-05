@@ -191,6 +191,12 @@ void BlockManager::spawnFallingBlock()
 	{
 		shuffle();
 	}
+	resetActiveBlock();
+}
+
+// Resets the active block to the top of the game
+void BlockManager::resetActiveBlock()
+{
 	Block block = blocks[typeOrder[activeId]];
 
 	// Reset target position
@@ -307,9 +313,8 @@ void BlockManager::holdBlock()
 		// Otherwise grab the falling block
 		else
 		{
-			targetX = (GRID_WIDTH - 4) / 2;
-			targetY = GRID_HEIGHT;
 			activeId = held;
+			resetActiveBlock();
 		}
 	}
 }
