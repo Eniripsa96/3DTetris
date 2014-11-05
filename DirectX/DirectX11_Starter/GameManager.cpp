@@ -197,6 +197,10 @@ bool GameManager::Init()
 		false, false, false
 	};
 
+	// Load the frame
+	size = loader->Load("frame.txt", device, &vertexBuffer, &indexBuffer);
+	gameObjects.emplace_back(new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png"), new XMFLOAT3(-3.0f, -5.0f, 0.0f), new XMFLOAT3(0.0f, 0.0f, 0.0f)));
+
 	// Finished using the ObjLoader
 	delete loader;
 
@@ -206,7 +210,7 @@ bool GameManager::Init()
 			cubes.push_back(*new GameObject(cubeMesh, shapeMaterial, new XMFLOAT3(i - 4.5, j - 5, 0), new XMFLOAT3(0, 0, 0)));
 		}
 	}
-	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-10, 10, 0), 1);
+	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-8.25, 12.5, 0), 1);
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes
@@ -385,16 +389,22 @@ void GameManager::DrawScene()
 // Continuous while key pressed
 void GameManager::CheckKeyBoard(float dt)
 {	
+	// Game controls
 	if (gameState == GAME) 
 	{
+		// Move left
 		if (GetAsyncKeyState('A')) 
 		{
 			blockManager->move(LEFT);
 		}
+
+		// Move Right
 		if (GetAsyncKeyState('D'))
 		{
 			blockManager->move(RIGHT);
 		}
+
+		// Move down faster
 		if (GetAsyncKeyState('S'))
 		{
 			blockManager->fallSpeed = FAST_FALL_SPEED;
@@ -403,6 +413,8 @@ void GameManager::CheckKeyBoard(float dt)
 		{
 			blockManager->fallSpeed = SLOW_FALL_SPEED;
 		}
+
+		// Rotation
 		if (GetAsyncKeyState('W'))
 		{
 			if (canRotate)
@@ -415,35 +427,41 @@ void GameManager::CheckKeyBoard(float dt)
 		{
 			canRotate = true;
 		}
+
+		// Holding blocks
 		if (GetAsyncKeyState('E'))
 		{
 			blockManager->holdBlock();
 		}
 	}
 
-	// Strafing of camera
-	if (GetAsyncKeyState('A'))
-		camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
-	else if (GetAsyncKeyState('D'))
-		camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
-	// Forward movement of camera
-	if (GetAsyncKeyState('W'))
-		//camera->MoveDepth(1.0f);
-		camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
-	else if (GetAsyncKeyState('S'))
-		//camera->MoveDepth(-1.0f);
-		camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
+	else
+	{
 
-	// Horizontal rotation of camera
-	if (GetAsyncKeyState('J'))
-		camera->Rotate(&XMFLOAT3(CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
-	else if (GetAsyncKeyState('L'))
-		camera->Rotate(&XMFLOAT3(-CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
-	// Vertical rotation of camera
-	if (GetAsyncKeyState('I'))
-		camera->Rotate(&XMFLOAT3(0.0f, CAMERA_TURN_FACTOR * dt, 0.0f));
-	else if (GetAsyncKeyState('K'))
-		camera->Rotate(&XMFLOAT3(0.0f, -CAMERA_TURN_FACTOR * dt, 0.0f));
+		// Strafing of camera
+		if (GetAsyncKeyState('A'))
+			camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		else if (GetAsyncKeyState('D'))
+			camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		// Forward movement of camera
+		if (GetAsyncKeyState('W'))
+			//camera->MoveDepth(1.0f);
+			camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
+		else if (GetAsyncKeyState('S'))
+			//camera->MoveDepth(-1.0f);
+			camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
+
+		// Horizontal rotation of camera
+		if (GetAsyncKeyState('J'))
+			camera->Rotate(&XMFLOAT3(CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
+		else if (GetAsyncKeyState('L'))
+			camera->Rotate(&XMFLOAT3(-CAMERA_TURN_FACTOR * dt, 0.0f, 0.0f));
+		// Vertical rotation of camera
+		if (GetAsyncKeyState('I'))
+			camera->Rotate(&XMFLOAT3(0.0f, CAMERA_TURN_FACTOR * dt, 0.0f));
+		else if (GetAsyncKeyState('K'))
+			camera->Rotate(&XMFLOAT3(0.0f, -CAMERA_TURN_FACTOR * dt, 0.0f));
+	}
 }
 
 // Once per key press

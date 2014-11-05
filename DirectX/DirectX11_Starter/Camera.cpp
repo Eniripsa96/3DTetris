@@ -6,19 +6,23 @@ using namespace std;
 
 Camera::Camera()
 {
+	float xPos = -10.0f;
+	float xTar = 0.0f;
+	float yPos = 0.0f;
+	float yTar = 12.0f;
 	float zPos = -40.0f;
 	float zTar = 10.0f;
-
+	
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)
-	position = XMVectorSet(0.0f, 0.0f, zPos, 0.0f);
-	target = XMVectorSet(0.0f, 0.0f, zTar, 0.0f);
+	position = XMVectorSet(xPos, yPos, zPos, 0.0f);
+	target = XMVectorSet(xTar, yTar, zTar, 0.0f);
 	up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMMATRIX V = XMMatrixLookAtLH(position, target, up);
 	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
 
-	myPosition = XMFLOAT3(0.0f, 0.0f, zPos);
-	myTarget = XMFLOAT3(0.0f, 0.0f, zTar);
+	myPosition = XMFLOAT3(xPos, yPos, zPos);
+	myTarget = XMFLOAT3(xTar, yTar, zTar);
 
 	projectionMatrix = XMFLOAT4X4();
 }

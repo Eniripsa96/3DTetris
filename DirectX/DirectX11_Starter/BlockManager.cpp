@@ -102,7 +102,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 	if (heldId != -1)
 	{
 		XMFLOAT3 prev = blocks[typeOrder[heldId]].gameObject->position;
-		blocks[typeOrder[heldId]].gameObject->position = holdPos;
+		float halfSize = blocks[typeOrder[heldId]].threeByThree ? 1.5f : 2.0f;
+		blocks[typeOrder[heldId]].gameObject->position = XMFLOAT3(holdPos.x - halfSize, holdPos.y - halfSize, 0);
 		float rotation = blocks[typeOrder[heldId]].gameObject->rotation.z;
 		blocks[typeOrder[heldId]].gameObject->rotation.z = 0;
 
