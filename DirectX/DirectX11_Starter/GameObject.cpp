@@ -8,6 +8,18 @@ GameObject::GameObject(Mesh* mesh, Material* mat, XMFLOAT3* pos, XMFLOAT3* vel)
 	material = mat;
 	velocity = *vel;
 	position = *pos;
+	pivot = XMFLOAT3(0, 0, 0);
+}
+
+// Constructor gives us device, device context, a material, shaders, and a shape type
+GameObject::GameObject(Mesh* mesh, Material* mat, XMFLOAT3* pos, XMFLOAT3* vel, XMFLOAT3* pPivot)
+{
+	// Set mesh and material
+	this->mesh = mesh;
+	material = mat;
+	velocity = *vel;
+	position = *pos;
+	pivot = *pPivot;
 }
 
 GameObject::~GameObject() { }
@@ -21,8 +33,10 @@ void GameObject::Update(float dt)
 	// Apply translation to world matrix
 	XMMATRIX translation = XMMatrixTranslation(position.x, position.y, position.z);
 	XMMATRIX rotate = XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
-	
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(rotate * translation /** scale */));
+	XMMATRIX pivotMatrix = XMMatrixTranslation(pivot.x, pivot.y, pivot.z);
+	XMMATRIX inversePivotMatrix = XMMatrixTranslation(-pivot.x, -pivot.y, -pivot.z);
+
+	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(inversePivotMatrix * rotate * pivotMatrix * translation /** scale */));
 }
 
 void GameObject::Move(XMFLOAT3* move)
@@ -37,6 +51,13 @@ void GameObject::Rotate(XMFLOAT3* rotate)
 	rotation.x += rotate->x;
 	rotation.y += rotate->y;
 	rotation.z += rotate->z;
+}
+
+void GameObject::ClearRotation()
+{
+	rotation.x = 0;
+	rotation.y = 0;
+	rotation.z = 0;
 }
 
 void GameObject::Draw()

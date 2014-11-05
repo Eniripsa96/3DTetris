@@ -63,6 +63,7 @@ void BlockManager::update(float dt)
 	if (yChange == 0 && targetX == x && rotation == 0)
 	{
 		mergeBlock();
+		return;
 	}
 	else
 	{
@@ -73,7 +74,7 @@ void BlockManager::update(float dt)
 	// Apply smooth rotation
 	if (rotation > 0)
 	{
-		float angle = min(rotation, ROTATION_SPEED);
+		float angle = min(rotation, dt * ROTATION_SPEED);
 		blocks[typeOrder[activeId]].gameObject->Rotate(&XMFLOAT3(0, 0, -angle));
 		rotation -= angle;
 	}
@@ -256,6 +257,7 @@ void BlockManager::spawnFallingBlock()
 	// Set up the block
 	int size = block.threeByThree ? 9 : 16;
 	block.gameObject->position = XMFLOAT3(x, y, z);
+	block.gameObject->ClearRotation();
 	copy(block.grid, block.tempGrid, size);
 	copy(block.grid, block.localGrid, size);
 }
@@ -291,7 +293,7 @@ void BlockManager::move(MoveDirection direction)
 void BlockManager::rotate()
 {
 	// Cannot rotate if the game is not active
-	if (activeId == -1) {
+	if (activeId == -1 || rotation > 0) {
 		return;
 	}
 
@@ -301,7 +303,7 @@ void BlockManager::rotate()
 	{
 		for (int j = 0; j < size; j++)
 		{
-			blocks[typeOrder[activeId]].localGrid[i + j * size] = blocks[typeOrder[activeId]].tempGrid[size - 1 - j + i * size];
+			blocks[typeOrder[activeId]].localGrid[i + j * size] = blocks[typeOrder[activeId]].tempGrid[(size - 1 - j) + i * size];
 		}
 	}
 
@@ -322,7 +324,7 @@ void BlockManager::rotate()
 		}
 
 		// Update the temp grid
-		rotation = 90.0f;
+		rotation += PI / 2;
 		copy(blocks[typeOrder[activeId]].localGrid, blocks[typeOrder[activeId]].tempGrid, size);
 	}
 

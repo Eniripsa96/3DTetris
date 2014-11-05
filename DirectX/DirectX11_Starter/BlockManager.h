@@ -15,6 +15,7 @@ using namespace std;
 #define SIDE_SPEED 5.0f
 #define SPEED_INCREASE 0.01f
 #define ROTATION_SPEED 12.0f
+#define PI 3.1415926535f
 
 // A block object in the game
 struct Block
