@@ -11,7 +11,7 @@ public:
 	~GameObject();
 
 	void Update(float);
-	void Draw(void);
+	void Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData);
 	void Move(XMFLOAT3*);
 	void Rotate(XMFLOAT3*);	
 	void ClearRotation();

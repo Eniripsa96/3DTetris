@@ -87,26 +87,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 
 		// [UPDATE] Update constant buffer data using this object
 		blocks[typeOrder[activeId]].gameObject->Update(0);
-		cBufferData->world = blocks[typeOrder[activeId]].gameObject->worldMatrix;
-
-		// [UPDATE] Update the constant buffer itself
-		deviceContext->UpdateSubresource(
-			cBuffer,
-			0,
-			NULL,
-			cBufferData,
-			0,
-			0
-		);
-
-		// [DRAW] Set the constant buffer in the device
-		deviceContext->VSSetConstantBuffers(
-			0,
-			1,
-			&(cBuffer)
-		);
-
-		blocks[typeOrder[activeId]].gameObject->Draw();
+		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
 	}
 
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
@@ -114,26 +95,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 
 			// [UPDATE] Update constant buffer data using this object
 			cubes[i].Update(0);
-			cBufferData->world = cubes[i].worldMatrix;
-
-			// [UPDATE] Update the constant buffer itself
-			deviceContext->UpdateSubresource(
-				cBuffer,
-				0,
-				NULL,
-				cBufferData,
-				0,
-				0
-			);
-
-			// [DRAW] Set the constant buffer in the device
-			deviceContext->VSSetConstantBuffers(
-				0,
-				1,
-				&(cBuffer)
-			);
-
-			cubes[i].Draw();
+			cubes[i].Draw(deviceContext, cBuffer, cBufferData);
 		}
 	}
 
@@ -146,25 +108,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 
 		// [UPDATE] Update constant buffer data using this object
 		blocks[typeOrder[heldId]].gameObject->Update(0);
-		cBufferData->world = blocks[typeOrder[heldId]].gameObject->worldMatrix;
-
-		// [UPDATE] Update the constant buffer itself
-		deviceContext->UpdateSubresource(
-			cBuffer,
-			0,
-			NULL,
-			cBufferData,
-			0,
-			0
-		);
-
-		// [DRAW] Set the constant buffer in the device
-		deviceContext->VSSetConstantBuffers(
-			0,
-			1,
-			&(cBuffer)
-		);
-		blocks[typeOrder[heldId]].gameObject->Draw();
+		blocks[typeOrder[heldId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
 		blocks[typeOrder[heldId]].gameObject->position = prev;
 		blocks[typeOrder[heldId]].gameObject->rotation.z = rotation;
 	}

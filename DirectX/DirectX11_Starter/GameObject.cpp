@@ -60,8 +60,27 @@ void GameObject::ClearRotation()
 	rotation.z = 0;
 }
 
-void GameObject::Draw()
+void GameObject::Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
+	cBufferData->world = worldMatrix;
+
+	// [UPDATE] Update the constant buffer itself
+	deviceContext->UpdateSubresource(
+		cBuffer,
+		0,
+		NULL,
+		cBufferData,
+		0,
+		0
+		);
+
+	// [DRAW] Set the constant buffer in the device
+	deviceContext->VSSetConstantBuffers(
+		0,
+		1,
+		&(cBuffer)
+		);
+
 	material->Draw();
 	mesh->Draw();
 }

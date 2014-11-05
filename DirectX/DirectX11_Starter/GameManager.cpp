@@ -322,35 +322,19 @@ void GameManager::UpdateScene(float dt)
 	// Update the camera
 	camera->Update(dt);
 
+	// [UPDATE] Update constant buffer data
+	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
+	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
+
 	// Update each mesh
 	for (UINT i = 0; i < allObjects.size(); i++)
 	{
 		// [UPDATE] Update this object
 		allObjects[i]->Update(dt);
 
-		// [UPDATE] Update constant buffer data using this object
-		dataToSendToVSConstantBuffer.world = allObjects[i]->worldMatrix;
-		dataToSendToVSConstantBuffer.view = camera->viewMatrix;
-		dataToSendToVSConstantBuffer.projection = projectionMatrix;
-		dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
-
-		// [UPDATE] Update the constant buffer itself
-		deviceContext->UpdateSubresource(
-			vsConstantBuffer,
-			0,
-			NULL,
-			&dataToSendToVSConstantBuffer,
-			0,
-			0);
-
-		// [DRAW] Set the constant buffer in the device
-		deviceContext->VSSetConstantBuffers(
-			0,	// Corresponds to the constant buffer's register in the vertex shader
-			1,
-			&(vsConstantBuffer));
-
 		// [DRAW] Draw the object
-		allObjects[i]->Draw();
+		allObjects[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
 	// Update and draw the game if in game mode
