@@ -72,6 +72,7 @@ private:
 	Material* shapeMaterial;
 	Block* blocks;
 	vector<GameObject> cubes;
+	bool canRotate = false;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;

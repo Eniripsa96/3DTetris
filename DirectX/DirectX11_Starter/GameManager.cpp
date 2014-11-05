@@ -421,7 +421,19 @@ void GameManager::CheckKeyBoard(float dt)
 		}
 		if (GetAsyncKeyState('W'))
 		{
-			blockManager->rotate();
+			if (canRotate)
+			{
+				blockManager->rotate();
+				canRotate = false;
+			}
+		}
+		else
+		{
+			canRotate = true;
+		}
+		if (GetAsyncKeyState('E'))
+		{
+			blockManager->holdBlock();
 		}
 	}
 

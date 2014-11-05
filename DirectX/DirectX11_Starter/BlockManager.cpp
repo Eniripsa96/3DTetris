@@ -141,6 +141,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 	{
 		XMFLOAT3 prev = blocks[typeOrder[heldId]].gameObject->position;
 		blocks[typeOrder[heldId]].gameObject->position = holdPos;
+		float rotation = blocks[typeOrder[heldId]].gameObject->rotation.z;
+		blocks[typeOrder[heldId]].gameObject->rotation.z = 0;
 
 		// [UPDATE] Update constant buffer data using this object
 		blocks[typeOrder[heldId]].gameObject->Update(0);
@@ -164,6 +166,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		);
 		blocks[typeOrder[heldId]].gameObject->Draw();
 		blocks[typeOrder[heldId]].gameObject->position = prev;
+		blocks[typeOrder[heldId]].gameObject->rotation.z = rotation;
 	}
 }
 
