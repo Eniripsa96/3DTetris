@@ -419,6 +419,10 @@ void BlockManager::copy(bool* src, bool* dest, int num) {
 
 // Shuffles the order of block types to spawn
 void BlockManager::shuffle() {
+	int held = -1;
+	if (heldId >= 0) {
+		held = typeOrder[heldId];
+	}
 	for (int i = 0; i < numBlocks; i++) {
 		typeOrder[i] = -1;
 	}
@@ -430,5 +434,8 @@ void BlockManager::shuffle() {
 		} 
 		while (typeOrder[index] != -1);
 		typeOrder[index] = i;
+		if (i == held) {
+			heldId = index;
+		}
 	}
 }
