@@ -435,32 +435,18 @@ void GameManager::CheckKeyBoard(float dt)
 		}
 	}
 
-	else
+	//else
 	{
-
 		// Strafing of camera
-		if (GetAsyncKeyState('A'))
-			camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
-		else if (GetAsyncKeyState('D'))
-			camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		if (GetAsyncKeyState(VK_LEFT))
+			camera->MoveHorizontal(-CAMERA_MOVE_FACTOR * dt);
+		else if (GetAsyncKeyState(VK_RIGHT))
+			camera->MoveHorizontal(CAMERA_MOVE_FACTOR * dt);
 		// Forward movement of camera
-		if (GetAsyncKeyState('W'))
-			//camera->MoveDepth(1.0f);
-			camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
-		else if (GetAsyncKeyState('S'))
-			//camera->MoveDepth(-1.0f);
-			camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
-
-		// Horizontal rotation of camera
-		if (GetAsyncKeyState('J'))
-			camera->RotateY(CAMERA_TURN_FACTOR * dt);
-		else if (GetAsyncKeyState('L'))
-			camera->RotateY(-CAMERA_TURN_FACTOR * dt);
-		// Vertical rotation of camera
-		if (GetAsyncKeyState('I'))
-			camera->Pitch(CAMERA_TURN_FACTOR * dt);
-		else if (GetAsyncKeyState('K'))
-			camera->Pitch(-CAMERA_TURN_FACTOR * dt);
+		if (GetAsyncKeyState(VK_UP))
+			camera->MoveDepth(CAMERA_MOVE_FACTOR * dt);
+		else if (GetAsyncKeyState(VK_DOWN))
+			camera->MoveDepth(-CAMERA_MOVE_FACTOR * dt);
 	}
 }
 
@@ -526,9 +512,16 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 {
+	if ((btnState & MK_LBUTTON) != 0)
+	{
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - prevMousePos.x));
+		camera->RotateY(-dx);
+	}
+
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 }
+
 
 #pragma endregion
 

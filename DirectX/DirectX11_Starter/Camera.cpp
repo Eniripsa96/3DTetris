@@ -60,8 +60,10 @@ void Camera::MoveHorizontal(float move)
 	XMVECTOR s = XMVectorReplicate(move);
 	XMVECTOR r = XMLoadFloat3(&right);
 	XMVECTOR p = XMLoadFloat3(&position);
+	XMVECTOR t = XMLoadFloat3(&target);
 
 	XMStoreFloat3(&position, XMVectorMultiplyAdd(s, r, p));
+	XMStoreFloat3(&target, XMVectorMultiplyAdd(s, r, t));
 }
 
 void Camera::MoveDepth(float move)
@@ -70,8 +72,10 @@ void Camera::MoveDepth(float move)
 	XMVECTOR s = XMVectorReplicate(move);
 	XMVECTOR f = XMLoadFloat3(&forward);
 	XMVECTOR p = XMLoadFloat3(&position);
+	XMVECTOR t = XMLoadFloat3(&target);
 
 	XMStoreFloat3(&position, XMVectorMultiplyAdd(s, f, p));
+	XMStoreFloat3(&target, XMVectorMultiplyAdd(s, f, t));
 }
 
 void Camera::Pitch(float angle)
