@@ -252,6 +252,12 @@ void GameManager::LoadShadersAndInputLayout()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
+	D3D11_INPUT_ELEMENT_DESC uiVertexDesc[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+
 	// Load Vertex Shader --------------------------------------
 	ID3DBlob* vsBlob;
 	D3DReadFileToBlob(L"VertexShader.cso", &vsBlob);
@@ -287,6 +293,27 @@ void GameManager::LoadShadersAndInputLayout()
 
 	// Clean up
 	ReleaseMacro(psBlob);
+	
+	// Load UI Vertex Shader -----------------------------------
+	D3DReadFileToBlob(L"uiVertexShader.cso", &vsBlob);
+
+	// Create the shader on the device
+	HR(device->CreateVertexShader(
+		vsBlob->GetBufferPointer(),
+		vsBlob->GetBufferSize(),
+		NULL,
+		&vertexShader));
+
+	// Before cleaning up the data, create the input layout
+	HR(device->CreateInputLayout(
+		uiVertexDesc,
+		ARRAYSIZE(uiVertexDesc),
+		vsBlob->GetBufferPointer(),
+		vsBlob->GetBufferSize(),
+		&inputLayout));
+
+	// Clean up
+	ReleaseMacro(vsBlob);
 
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;
