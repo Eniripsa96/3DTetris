@@ -3,16 +3,19 @@
 // Initializes the BlockManager given 
 // the minimum coordinates for blocks, the hold position for blocks, 
 // and the width of each block
-BlockManager::BlockManager(BlockType* pBlocks, int pNumBlocks, Mesh* pCube, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
+BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject> pCubes, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
 {
 	blocks = pBlocks;
 	numBlocks = pNumBlocks;
-	cube = pCube;
+	cubes = pCubes;
 	min = pMin;
 	holdPos = pHoldPos;
 	blockWidth = pBlockWidth;
-	Block* arr = new Block[GRID_WIDTH * GRID_HEIGHT];
-	gameGrid = &arr;
+	gameGrid = new bool[GRID_WIDTH * GRID_HEIGHT];
+	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) 
+	{
+		gameGrid[i] = NULL;
+	}
 	typeOrder = new int[numBlocks];
 	shuffle();
 }
@@ -20,20 +23,18 @@ BlockManager::BlockManager(BlockType* pBlocks, int pNumBlocks, Mesh* pCube, XMFL
 // Clears the pointers used by the block manager on deconstruct
 BlockManager::~BlockManager()
 {
-	if (activeBlock != NULL) delete activeBlock;
-	if (heldBlock != NULL) delete heldBlock;
 }
 
 // Updates the blocks in the game
-void BlockManager::update() 
+void BlockManager::update(float dt) 
 {
 	// Cannot update if the game is not active
-	if (activeBlock == NULL) {
+	if (activeId == -1) {
 		return;
 	}
 
 	// Convert block position to grid position
-	XMFLOAT3 pos = activeBlock->gameObject->position;
+	XMFLOAT3 pos = blocks[typeOrder[activeId]].gameObject->position;
 	float x = (pos.x / blockWidth) - min.x;
 	float y = (pos.y / blockWidth) - min.y;
 
@@ -41,47 +42,76 @@ void BlockManager::update()
 	float dx = targetX - x;
 	if (dx > 0)
 	{
-		pos.x += blockWidth * min(dx, SIDE_SPEED);
+		pos.x += blockWidth * min(dx, dt * SIDE_SPEED);
 	}
 	else
 	{
-		pos.x += blockWidth * max(dx, -SIDE_SPEED);
+		pos.x += blockWidth * max(dx, -dt * SIDE_SPEED);
 	}
 
 	// Apply "gravity"
 	float dy = targetY - y;
-	if (dy >= -SLOW_FALL_SPEED && canMove(DOWN))
+	float speed = -fallSpeed * dt;
+	if (dy >= speed && canMove(DOWN))
 	{
 		targetY--;
 		dy = targetY - y;
 	}
 
 	// Apply smooth vertical movement
-	float yChange = max(dy, -SLOW_FALL_SPEED);
+	float yChange = max(dy, speed);
 	if (yChange == 0 && targetX == x && rotation == 0)
 	{
 		mergeBlock();
+		return;
 	}
 	else
 	{
-		pos.y += yChange;
+		pos.y += yChange * blockWidth;
 	}
+	blocks[typeOrder[activeId]].gameObject->position = pos;
 
 	// Apply smooth rotation
 	if (rotation > 0)
 	{
-		float angle = min(rotation, ROTATION_SPEED);
-		activeBlock->gameObject->Rotate(&XMFLOAT3(0, 0, -angle));
+		float angle = min(rotation, dt * ROTATION_SPEED);
+		blocks[typeOrder[activeId]].gameObject->Rotate(&XMFLOAT3(0, 0, -angle));
 		rotation -= angle;
 	}
 }
 
 // Draws the blocks in the game
-void BlockManager::draw()
+void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
-	activeBlock->gameObject->Draw();
+	if (activeId != -1) {
+
+		// [UPDATE] Update constant buffer data using this object
+		blocks[typeOrder[activeId]].gameObject->Update(0);
+		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
+	}
+
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
-		gameGrid[i]->gameObject->Draw();
+		if (gameGrid[i]) {
+
+			// [UPDATE] Update constant buffer data using this object
+			cubes[i].Update(0);
+			cubes[i].Draw(deviceContext, cBuffer, cBufferData);
+		}
+	}
+
+	if (heldId != -1)
+	{
+		XMFLOAT3 prev = blocks[typeOrder[heldId]].gameObject->position;
+		float halfSize = blocks[typeOrder[heldId]].threeByThree ? 1.5f : 2.0f;
+		blocks[typeOrder[heldId]].gameObject->position = XMFLOAT3(holdPos.x - halfSize, holdPos.y - halfSize, 0);
+		float rotation = blocks[typeOrder[heldId]].gameObject->rotation.z;
+		blocks[typeOrder[heldId]].gameObject->rotation.z = 0;
+
+		// [UPDATE] Update constant buffer data using this object
+		blocks[typeOrder[heldId]].gameObject->Update(0);
+		blocks[typeOrder[heldId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
+		blocks[typeOrder[heldId]].gameObject->position = prev;
+		blocks[typeOrder[heldId]].gameObject->rotation.z = rotation;
 	}
 }
 
@@ -89,7 +119,7 @@ void BlockManager::draw()
 bool BlockManager::canMove(MoveDirection direction)
 {
 	// If the game is not active, no moves can be made
-	if (activeBlock == NULL) {
+	if (activeId == -1) {
 		return false;
 	}
 
@@ -112,18 +142,18 @@ bool BlockManager::canMove(MoveDirection direction)
 bool BlockManager::canOccupy(int x, int y)
 {
 	// Cannot check if the game is not active
-	if (activeBlock == NULL) {
+	if (activeId == -1) {
 		return false;
 	}
 
 	// Compare the active block's local grid with the game grid at the position
-	int size = activeBlock->threeByThree ? 3 : 4;
+	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
 		{
 			// Ignore empty cells of the block
-			if (!activeBlock->localGrid[i + j * size])
+			if (!blocks[typeOrder[activeId]].localGrid[i + j * size])
 			{
 				continue;
 			}
@@ -155,47 +185,51 @@ bool BlockManager::canOccupy(int x, int y)
 // Spawns a new falling block at the top of the game
 void BlockManager::spawnFallingBlock() 
 {
-	Block block;
-
 	// Get a random block
-	BlockType type = blocks[typeOrder[typeId++]];
-	if (typeId == numBlocks) 
+	activeId = (activeId + 1) % numBlocks;
+	if (activeId == 0)
 	{
 		shuffle();
 	}
+	resetActiveBlock();
+}
+
+// Resets the active block to the top of the game
+void BlockManager::resetActiveBlock()
+{
+	Block block = blocks[typeOrder[activeId]];
+
+	// Reset target position
+	targetY = GRID_HEIGHT;
+	targetX = GRID_WIDTH / 2 - 2;
 
 	// Get the spawn location
-	float x = blockWidth * ((GRID_WIDTH - 4) / 2) + min.x;
-	float y = blockWidth * GRID_HEIGHT + min.y;
+	float x = blockWidth * targetX + min.x;
+	float y = blockWidth * targetY + min.y;
 	float z = min.z;
 
-	// Create the block
-	block.gameObject = new GameObject(type.mesh, type.material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
-	block.threeByThree = type.threeByThree;
+	// Set up the block
 	int size = block.threeByThree ? 9 : 16;
-	block.localGrid = new bool[size];
-	block.tempGrid = new bool[size];
-	copy(type.localGrid, block.localGrid, size);
-	copy(type.localGrid, block.tempGrid, size);
-
-	// Make it the active block
-	activeBlock = &block;
+	block.gameObject->position = XMFLOAT3(x, y, z);
+	block.gameObject->ClearRotation();
+	copy(block.grid, block.tempGrid, size);
+	copy(block.grid, block.localGrid, size);
 }
 
 // Tries to move the active block in the given direction
 void BlockManager::move(MoveDirection direction)
 {
 	// Cannot move if the game is not active
-	if (activeBlock == NULL) {
+	if (activeId == -1) {
 		return;
 	}
 
 	// Convert block position to grid position
-	float x = (activeBlock->gameObject->position.x / blockWidth) - min.x;
+	float x = (blocks[typeOrder[activeId]].gameObject->position.x / blockWidth) - min.x;
 
 	// Ignore it if it's still mid-movement
 	float dx = abs(x - targetX);
-	if (dx > SIDE_SPEED || !canMove(direction)) return;
+	if (dx > 0.1f || !canMove(direction)) return;
 
 	// Apply the move
 	switch (direction)
@@ -213,17 +247,17 @@ void BlockManager::move(MoveDirection direction)
 void BlockManager::rotate()
 {
 	// Cannot rotate if the game is not active
-	if (activeBlock == NULL) {
+	if (activeId == -1 || rotation > 0) {
 		return;
 	}
 
 	// Rotate the temp grid into the local grid
-	int size = activeBlock->threeByThree ? 3 : 4;
+	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
 		{
-			activeBlock->localGrid[i + j * size] = activeBlock->tempGrid[size - 1 - j + i * size];
+			blocks[typeOrder[activeId]].localGrid[i + j * size] = blocks[typeOrder[activeId]].tempGrid[(size - 1 - j) + i * size];
 		}
 	}
 
@@ -244,14 +278,14 @@ void BlockManager::rotate()
 		}
 
 		// Update the temp grid
-		rotation = 90.0f;
-		copy(activeBlock->localGrid, activeBlock->tempGrid, size);
+		rotation += PI / 2;
+		copy(blocks[typeOrder[activeId]].localGrid, blocks[typeOrder[activeId]].tempGrid, size * size);
 	}
 
 	// Restore the local grid if it cannot rotate
 	else
 	{
-		copy(activeBlock->tempGrid, activeBlock->localGrid, size);
+		copy(blocks[typeOrder[activeId]].tempGrid, blocks[typeOrder[activeId]].localGrid, size * size);
 	}
 }
 
@@ -260,17 +294,18 @@ void BlockManager::rotate()
 void BlockManager::holdBlock()
 {
 	// Cannot hold a block if the game is not active
-	if (activeBlock == NULL) {
+	if (activeId == -1) {
 		return;
 	}
 
 	if (canSwap)
 	{
-		Block* held = activeBlock;
 		canSwap = false;
+		int held = heldId;
+		heldId = activeId;
 
 		// If there is no held block, spawn a new one
-		if (heldBlock == NULL)
+		if (held == -1)
 		{
 			spawnFallingBlock();
 		}
@@ -278,14 +313,9 @@ void BlockManager::holdBlock()
 		// Otherwise grab the falling block
 		else
 		{
-			targetX = (GRID_WIDTH - 4) / 2;
-			targetY = GRID_HEIGHT;
-			heldBlock->gameObject->position = XMFLOAT3((targetX + min.x) * blockWidth, (targetY + min.y) * blockWidth, min.z * blockWidth);
-			activeBlock = heldBlock;
+			activeId = held;
+			resetActiveBlock();
 		}
-
-		// Hold the block
-		heldBlock = held;
 	}
 }
 
@@ -293,7 +323,7 @@ void BlockManager::holdBlock()
 void BlockManager::mergeBlock()
 {
 	// Cannot merge a block if the game is not active
-	if (activeBlock == NULL) {
+	if (activeId == -1) {
 		return;
 	}
 
@@ -301,17 +331,16 @@ void BlockManager::mergeBlock()
 
 	int minY = GRID_HEIGHT;
 	int maxY = 0;
-	int size = activeBlock->threeByThree ? 3 : 4;
+	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			if (activeBlock->localGrid[i + j * size]) 
+			if (blocks[typeOrder[activeId]].localGrid[i + j * size])
 			{
 				// Game over
-				if (targetY + j >= GRID_HEIGHT || gameGrid[i + j * size] != NULL)  
+				if (targetY + j >= GRID_HEIGHT || gameGrid[i + targetX + (j + targetY) * GRID_WIDTH] != NULL)  
 				{
 					gameOver = true;
-					delete activeBlock;
-					activeBlock = NULL;
+					activeId = -1;
 					return;
 				}
 
@@ -330,14 +359,11 @@ void BlockManager::mergeBlock()
 				float x = (targetX + i) * blockWidth + min.x;
 				float y = (targetY + j) * blockWidth + min.y;
 				float z = min.z;
-				block.gameObject = new GameObject(cube, activeBlock->gameObject->material, new XMFLOAT3(x, y, z), new XMFLOAT3(0, 0, 0));
-				gameGrid[targetX + i + (targetY + j) * size] = &block;
+				cubes[targetX + i + (targetY + j) * GRID_WIDTH].material = blocks[typeOrder[activeId]].gameObject->material;
+				gameGrid[targetX + i + (targetY + j) * GRID_WIDTH] = true;
 			}
 		}
 	}
-
-	// Delete the old active block
-	delete activeBlock;
 
 	// Check lines for completion
 	checkLines(minY, maxY);
@@ -366,8 +392,7 @@ void BlockManager::checkLines(int min, int max)
 			// Delete the game objects for now
 			for (int j = 0; j < GRID_WIDTH; j++)
 			{
-				delete gameGrid[j + i * GRID_WIDTH];
-				gameGrid[j + i * GRID_WIDTH] = NULL;
+				gameGrid[j + i * GRID_WIDTH] = false;
 			}
 
 			// Move down higher rows
@@ -377,11 +402,8 @@ void BlockManager::checkLines(int min, int max)
 				{
 					int index = k + j * GRID_WIDTH;
 					gameGrid[index] = gameGrid[index + GRID_WIDTH];
-					gameGrid[index + GRID_WIDTH] = NULL;
-					if (gameGrid[index] != NULL)
-					{
-						gameGrid[index]->gameObject->position.y -= 1;
-					}
+					gameGrid[index + GRID_WIDTH] = false;
+					cubes[index].material = cubes[index + GRID_WIDTH].material;
 				}
 			}
 		}
@@ -397,7 +419,10 @@ void BlockManager::copy(bool* src, bool* dest, int num) {
 
 // Shuffles the order of block types to spawn
 void BlockManager::shuffle() {
-	typeId = 0;
+	int held = -1;
+	if (heldId >= 0) {
+		held = typeOrder[heldId];
+	}
 	for (int i = 0; i < numBlocks; i++) {
 		typeOrder[i] = -1;
 	}
@@ -409,5 +434,8 @@ void BlockManager::shuffle() {
 		} 
 		while (typeOrder[index] != -1);
 		typeOrder[index] = i;
+		if (i == held) {
+			heldId = index;
+		}
 	}
 }

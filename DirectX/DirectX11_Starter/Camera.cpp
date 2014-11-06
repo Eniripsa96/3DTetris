@@ -1,14 +1,18 @@
 #include "Camera.h"
 
-#include <iostream>
+#include <iostream>;
 
 using namespace std;
 
 Camera::Camera()
 {
-	float zPos = -5.0f;
+	float xPos = -10.0f;
+	float xTar = 0.0f;
+	float yPos = 0.0f;
+	float yTar = 12.0f;
+	float zPos = -40.0f;
 	float zTar = 10.0f;
-
+	
 	// Set up view matrix (camera)
 	// In an actual game, update this when the camera moves (every frame)
 	position = XMFLOAT3(0.0f, 0.0f, zPos);

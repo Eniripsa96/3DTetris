@@ -17,6 +17,7 @@
 
 // For DirectX Math
 using namespace DirectX;
+using namespace std;
 
 enum GAME_STATE
 {
@@ -69,6 +70,9 @@ private:
 	Mesh* quadMesh;
 	Mesh* cubeMesh;
 	Material* shapeMaterial;
+	Block* blocks;
+	vector<GameObject> cubes;
+	bool canRotate = false;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;

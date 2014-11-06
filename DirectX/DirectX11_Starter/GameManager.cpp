@@ -24,6 +24,7 @@
 #include <Windows.h>
 #include <d3dcompiler.h>
 #include "GameManager.h"
+#include <vector>
 
 // Background color
 const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
@@ -102,25 +103,123 @@ bool GameManager::Init()
 	// Load shaders that we want
 	LoadShadersAndInputLayout();
 
-	// Test OBJ loader
-	
-	ObjLoader* loader = new ObjLoader();
-	ID3D11Buffer* vertexBuffer;
-	ID3D11Buffer* indexBuffer;
-	UINT i = loader->Load("cube.txt", device, &vertexBuffer, &indexBuffer);
-	delete loader;
-	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
-
-	// Create meshes
-	triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
-	quadMesh = new Mesh(device, deviceContext, QUAD);
-
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
 
+	// Prepare to load meshes
+	ObjLoader* loader = new ObjLoader();
+	
+	// Load basic cube
+	ID3D11Buffer* vertexBuffer;
+	ID3D11Buffer* indexBuffer;
+	UINT i = loader->Load("cube.txt", device, &vertexBuffer, &indexBuffer);
+	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
+
+	// Set up block types
+	blocks = new Block[7];
+
+	int size = loader->Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[0].threeByThree = true;
+	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[0].localGrid = new bool[9];
+	blocks[0].tempGrid = new bool[9];
+	blocks[0].grid = new bool[] {
+		true,  true,  true,
+		true,  false, false,
+		false, false, false
+	};
+
+	size = loader->Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[1].threeByThree = true;
+	blocks[1].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[1].localGrid = new bool[9];
+	blocks[1].tempGrid = new bool[9];
+	blocks[1].grid = new bool[] {
+		true,  true,  true,
+		false, false, true,
+		false, false, false
+	};
+
+	size = loader->Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[2].threeByThree = true;
+	blocks[2].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[2].localGrid = new bool[9];
+	blocks[2].tempGrid = new bool[9];
+	blocks[2].grid = new bool[] {
+		false, true,  true,
+		true,  true,  false,
+		false, false, false
+	};
+
+	size = loader->Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[3].threeByThree = false;
+	blocks[3].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[3].localGrid = new bool[16];
+	blocks[3].tempGrid = new bool[16];
+	blocks[3].grid = new bool[] {
+		false, false, false, false,
+		true,  true,  true,  true,
+		false, false, false, false,
+		false, false, false, false
+	};
+
+	size = loader->Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[4].threeByThree = true;
+	blocks[4].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[4].localGrid = new bool[9];
+	blocks[4].tempGrid = new bool[9];
+	blocks[4].grid = new bool[] {
+		true,  true,  false,
+		false, true,  true,
+		false, false, false
+	};
+
+	size = loader->Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[5].threeByThree = false;
+	blocks[5].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[5].localGrid = new bool[16];
+	blocks[5].tempGrid = new bool[16];
+	blocks[5].grid = new bool[] {
+		false, false, false, false,
+		false, true,  true,  false,
+		false, true,  true,  false,
+		false, false, false, false
+	};
+
+    size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
+	blocks[6].threeByThree = true;
+	blocks[6].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[6].localGrid = new bool[9];
+	blocks[6].tempGrid = new bool[9];
+	blocks[6].grid = new bool[] {
+		true,  true,  true,
+		false, true,  false,
+		false, false, false
+	};
+
+	// Load the frame
+	size = loader->Load("frame.txt", device, &vertexBuffer, &indexBuffer);
+	gameObjects.emplace_back(new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png"), new XMFLOAT3(-3.0f, -5.0f, 0.0f), new XMFLOAT3(0.0f, 0.0f, 0.0f)));
+
+	// Finished using the ObjLoader
+	delete loader;
+
+	// Set up block manager
+	for (int j = 0; j < GRID_HEIGHT; j++) {
+		for (int i = 0; i < GRID_WIDTH; i++) {
+			cubes.push_back(*new GameObject(cubeMesh, shapeMaterial, new XMFLOAT3(i - 4.5, j - 5, 0), new XMFLOAT3(0, 0, 0)));
+		}
+	}
+	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-8.25, 12.5, 0), 1);
+	blockManager->spawnFallingBlock();
+
+	// Create 2D meshes
+	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
+	//quadMesh = new Mesh(device, deviceContext, QUAD);
+
 	// Create the game objects we want
-	gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
-	gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
+	//gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
 
 	// Create the menu objects we want
 	menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
@@ -227,35 +326,25 @@ void GameManager::UpdateScene(float dt)
 	// Update the camera
 	camera->Update(dt);
 
+	// [UPDATE] Update constant buffer data
+	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
+	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
+
 	// Update each mesh
 	for (UINT i = 0; i < allObjects.size(); i++)
 	{
 		// [UPDATE] Update this object
 		allObjects[i]->Update(dt);
 
-		// [UPDATE] Update constant buffer data using this object
-		dataToSendToVSConstantBuffer.world = allObjects[i]->worldMatrix;
-		dataToSendToVSConstantBuffer.view = camera->viewMatrix;
-		dataToSendToVSConstantBuffer.projection = projectionMatrix;
-		dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
-
-		// [UPDATE] Update the constant buffer itself
-		deviceContext->UpdateSubresource(
-			vsConstantBuffer,
-			0,
-			NULL,
-			&dataToSendToVSConstantBuffer,
-			0,
-			0);
-
-		// [DRAW] Set the constant buffer in the device
-		deviceContext->VSSetConstantBuffers(
-			0,	// Corresponds to the constant buffer's register in the vertex shader
-			1,
-			&(vsConstantBuffer));
-
 		// [DRAW] Draw the object
-		allObjects[i]->Draw();
+		allObjects[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	}
+
+	// Update and draw the game if in game mode
+	if (gameState == GAME) {
+		blockManager->update(dt);
+		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
 	// Present the buffer
@@ -300,27 +389,79 @@ void GameManager::DrawScene()
 // Continuous while key pressed
 void GameManager::CheckKeyBoard(float dt)
 {	
-	// Strafing of camera
-	if (GetAsyncKeyState('A'))
-		camera->MoveHorizontal(-CAMERA_MOVE_FACTOR * dt);
-	else if (GetAsyncKeyState('D'))
-		camera->MoveHorizontal(CAMERA_MOVE_FACTOR * dt);
-	// Forward movement of camera
-	if (GetAsyncKeyState('W'))
-		camera->MoveDepth(CAMERA_MOVE_FACTOR * dt);
-	else if (GetAsyncKeyState('S'))
-		camera->MoveDepth(-CAMERA_MOVE_FACTOR * dt);
+	// Game controls
+	if (gameState == GAME) 
+	{
+		// Move left
+		if (GetAsyncKeyState('A')) 
+		{
+			blockManager->move(LEFT);
+		}
 
-	// Horizontal rotation of camera
-	if (GetAsyncKeyState('J'))
-		camera->RotateY(CAMERA_TURN_FACTOR * dt);
-	else if (GetAsyncKeyState('L'))
-		camera->RotateY(-CAMERA_TURN_FACTOR * dt);
-	// Vertical rotation of camera
-	if (GetAsyncKeyState('I'))
-		camera->Pitch(CAMERA_TURN_FACTOR * dt);
-	else if (GetAsyncKeyState('K'))
-		camera->Pitch(-CAMERA_TURN_FACTOR * dt);
+		// Move Right
+		if (GetAsyncKeyState('D'))
+		{
+			blockManager->move(RIGHT);
+		}
+
+		// Move down faster
+		if (GetAsyncKeyState('S'))
+		{
+			blockManager->fallSpeed = FAST_FALL_SPEED;
+		}
+		else 
+		{
+			blockManager->fallSpeed = SLOW_FALL_SPEED;
+		}
+
+		// Rotation
+		if (GetAsyncKeyState('W'))
+		{
+			if (canRotate)
+			{
+				blockManager->rotate();
+				canRotate = false;
+			}
+		}
+		else
+		{
+			canRotate = true;
+		}
+
+		// Holding blocks
+		if (GetAsyncKeyState('E'))
+		{
+			blockManager->holdBlock();
+		}
+	}
+
+	else
+	{
+
+		// Strafing of camera
+		if (GetAsyncKeyState('A'))
+			camera->Move(&XMFLOAT3(-CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		else if (GetAsyncKeyState('D'))
+			camera->Move(&XMFLOAT3(CAMERA_MOVE_FACTOR * dt, 0.0f, 0.0f));
+		// Forward movement of camera
+		if (GetAsyncKeyState('W'))
+			//camera->MoveDepth(1.0f);
+			camera->Move(&XMFLOAT3(0.0f, 0.0f, CAMERA_MOVE_FACTOR * dt));
+		else if (GetAsyncKeyState('S'))
+			//camera->MoveDepth(-1.0f);
+			camera->Move(&XMFLOAT3(0.0f, 0.0f, -CAMERA_MOVE_FACTOR * dt));
+
+		// Horizontal rotation of camera
+		if (GetAsyncKeyState('J'))
+			camera->RotateY(CAMERA_TURN_FACTOR * dt);
+		else if (GetAsyncKeyState('L'))
+			camera->RotateY(-CAMERA_TURN_FACTOR * dt);
+		// Vertical rotation of camera
+		if (GetAsyncKeyState('I'))
+			camera->Pitch(CAMERA_TURN_FACTOR * dt);
+		else if (GetAsyncKeyState('K'))
+			camera->Pitch(-CAMERA_TURN_FACTOR * dt);
+	}
 }
 
 // Once per key press
@@ -385,12 +526,6 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	if ((btnState & MK_LBUTTON) != 0)
-	{
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - prevMousePos.x));
-		camera->RotateY(-dx);
-	}
-
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 }
