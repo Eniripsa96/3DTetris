@@ -50,6 +50,8 @@ public:
 	// Shaders
 	ID3D11PixelShader* pixelShader;
 	ID3D11VertexShader* vertexShader;
+	ID3D11PixelShader* uiPixelShader;
+	ID3D11VertexShader* uiVertexShader;
 
 	// A few more odds and ends we'll need
 	ID3D11InputLayout* inputLayout;
@@ -70,6 +72,7 @@ private:
 	Mesh* quadMesh;
 	Mesh* cubeMesh;
 	Material* shapeMaterial;
+	Material* uiTestMaterial;
 	Block* blocks;
 	vector<GameObject> cubes;
 	bool canRotate = false;

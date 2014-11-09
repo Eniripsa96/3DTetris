@@ -10,7 +10,7 @@ struct VertexToPixel
 };
 
 
-float4 main(VertexToPixel input)
+float4 main(VertexToPixel input) : SV_TARGET
 {
-	return myTexture.Sample(mySampler, input.uv)
+	return myTexture.Sample(mySampler, input.uv);
 }

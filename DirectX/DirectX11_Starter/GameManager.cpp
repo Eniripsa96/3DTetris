@@ -105,6 +105,7 @@ bool GameManager::Init()
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
+	uiTestMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"image.png");
 
 	// Prepare to load meshes
 	ObjLoader* loader = new ObjLoader();
@@ -215,7 +216,10 @@ bool GameManager::Init()
 
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
-	//quadMesh = new Mesh(device, deviceContext, QUAD);
+	quadMesh = new Mesh(device, deviceContext, QUAD);
+	GameObject* obj = new GameObject(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0));
+	obj->Scale(&XMFLOAT3(1.0f, 0.5f, 1.0f));
+	menuObjects.emplace_back(obj);
 
 	// Create the game objects we want
 	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
@@ -250,12 +254,6 @@ void GameManager::LoadShadersAndInputLayout()
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	D3D11_INPUT_ELEMENT_DESC uiVertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Load Vertex Shader --------------------------------------
@@ -302,18 +300,23 @@ void GameManager::LoadShadersAndInputLayout()
 		vsBlob->GetBufferPointer(),
 		vsBlob->GetBufferSize(),
 		NULL,
-		&vertexShader));
-
-	// Before cleaning up the data, create the input layout
-	HR(device->CreateInputLayout(
-		uiVertexDesc,
-		ARRAYSIZE(uiVertexDesc),
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		&inputLayout));
+		&uiVertexShader));
 
 	// Clean up
 	ReleaseMacro(vsBlob);
+
+	// Load UI Pixel Shader -------------------------------------
+	D3DReadFileToBlob(L"uiPixelShader.cso", &psBlob);
+
+	// Create the shader on the device
+	HR(device->CreatePixelShader(
+		psBlob->GetBufferPointer(),
+		psBlob->GetBufferSize(),
+		NULL,
+		&uiPixelShader));
+
+	// Clean up
+	ReleaseMacro(psBlob);
 
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;

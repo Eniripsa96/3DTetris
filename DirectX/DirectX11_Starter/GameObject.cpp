@@ -8,6 +8,7 @@ GameObject::GameObject(Mesh* mesh, Material* mat, XMFLOAT3* pos, XMFLOAT3* vel)
 	material = mat;
 	velocity = *vel;
 	position = *pos;
+	scale = XMFLOAT3(1, 1, 1);
 	pivot = XMFLOAT3(0, 0, 0);
 }
 
@@ -19,6 +20,7 @@ GameObject::GameObject(Mesh* mesh, Material* mat, XMFLOAT3* pos, XMFLOAT3* vel, 
 	material = mat;
 	velocity = *vel;
 	position = *pos;
+	scale = XMFLOAT3(1, 1, 1);
 	pivot = *pPivot;
 }
 
@@ -32,11 +34,12 @@ void GameObject::Update(float dt)
 	
 	// Apply translation to world matrix
 	XMMATRIX translation = XMMatrixTranslation(position.x, position.y, position.z);
+	XMMATRIX scale = XMMatrixScaling(this->scale.x, this->scale.y, this->scale.z);
 	XMMATRIX rotate = XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
 	XMMATRIX pivotMatrix = XMMatrixTranslation(pivot.x, pivot.y, pivot.z);
 	XMMATRIX inversePivotMatrix = XMMatrixTranslation(-pivot.x, -pivot.y, -pivot.z);
 
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(inversePivotMatrix * rotate * pivotMatrix * translation /** scale */));
+	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(inversePivotMatrix * rotate * pivotMatrix * translation * scale));
 }
 
 void GameObject::Move(XMFLOAT3* move)
@@ -44,6 +47,13 @@ void GameObject::Move(XMFLOAT3* move)
 	position.x += move->x;
 	position.y += move->y;
 	position.z += move->z;
+}
+
+void GameObject::Scale(XMFLOAT3* scale)
+{
+	this->scale.x *= scale->x;
+	this->scale.y *= scale->y;
+	this->scale.z *= scale->z;
 }
 
 void GameObject::Rotate(XMFLOAT3* rotate)
