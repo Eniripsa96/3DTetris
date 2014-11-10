@@ -8,6 +8,8 @@
 #include "BlockManager.h"
 #include <vector>
 #include "ObjLoader.h"
+#include <SpriteFont.h>
+#include <SpriteBatch.h>
 
 // Include run-time memory checking in debug builds
 #if defined(DEBUG) || defined(_DEBUG)
@@ -67,6 +69,10 @@ private:
 	std::vector<GameObject*> gameObjects;
 	std::vector<GameObject*> menuObjects;
 	BlockManager* blockManager;
+
+	SpriteBatch* spriteBatch;
+	SpriteFont* spriteFont32;
+	SpriteFont* spriteFont72;
 
 	Mesh* triangleMesh;
 	Mesh* quadMesh;

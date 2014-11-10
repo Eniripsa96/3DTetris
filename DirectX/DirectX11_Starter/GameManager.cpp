@@ -105,7 +105,7 @@ bool GameManager::Init()
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
-	uiTestMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"image.png");
+	uiTestMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
 
 	// Prepare to load meshes
 	ObjLoader* loader = new ObjLoader();
@@ -198,6 +198,10 @@ bool GameManager::Init()
 		false, false, false
 	};
 
+	spriteBatch = new SpriteBatch(deviceContext);
+	spriteFont32 = new SpriteFont(device, L"jing32.spritefont");
+	spriteFont72 = new SpriteFont(device, L"jing72.spritefont");
+
 	// Load the frame
 	size = loader->Load("frame.txt", device, &vertexBuffer, &indexBuffer);
 	gameObjects.emplace_back(new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png"), new XMFLOAT3(-3.0f, -5.0f, 0.0f), new XMFLOAT3(0.0f, 0.0f, 0.0f)));
@@ -218,7 +222,7 @@ bool GameManager::Init()
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
 	GameObject* obj = new GameObject(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0));
-	obj->Scale(&XMFLOAT3(1.0f, 0.5f, 1.0f));
+	obj->Scale(&XMFLOAT3(1.0f, 0.3f, 1.0f));
 	menuObjects.emplace_back(obj);
 
 	// Create the game objects we want
@@ -226,7 +230,7 @@ bool GameManager::Init()
 	//gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
 
 	// Create the menu objects we want
-	menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
+	//menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
 	// Start out displaying the objects for the menu
 	allObjects = menuObjects;
@@ -253,7 +257,7 @@ void GameManager::LoadShadersAndInputLayout()
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Load Vertex Shader --------------------------------------
