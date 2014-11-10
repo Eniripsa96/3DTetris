@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include "DirectXGame.h"
 #include "GameObject.h"
+#include "Button.h"
 #include "Camera.h"
 #include "BlockManager.h"
 #include <vector>

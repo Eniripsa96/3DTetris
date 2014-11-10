@@ -221,7 +221,7 @@ bool GameManager::Init()
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-	GameObject* obj = new GameObject(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0));
+	Button* obj = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Play");
 	obj->Scale(&XMFLOAT3(1.0f, 0.3f, 1.0f));
 	menuObjects.emplace_back(obj);
 
@@ -364,8 +364,10 @@ void GameManager::UpdateScene(float dt)
 	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
+	//dataToSendToVSConstantBuffer.resolution = XMFLOAT2(windowWidth, windowHeight);
 
 	// Update each mesh
+	spriteBatch->Begin();
 	for (UINT i = 0; i < allObjects.size(); i++)
 	{
 		// [UPDATE] Update this object
@@ -374,6 +376,7 @@ void GameManager::UpdateScene(float dt)
 		// [DRAW] Draw the object
 		allObjects[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
+	spriteBatch->End();
 
 	// Update and draw the game if in game mode
 	if (gameState == GAME) {
