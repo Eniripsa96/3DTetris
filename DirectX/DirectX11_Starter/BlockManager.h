@@ -39,7 +39,7 @@ enum MoveDirection
 class BlockManager
 {
 public:
-	BlockManager(Block* blocks, int numBlocks, vector<GameObject> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
+	BlockManager(Block* blocks, int numBlocks, vector<GameObject*> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
 	~BlockManager();
 
 	void update(float dt);
@@ -62,7 +62,7 @@ public:
 private:
 	Block* blocks;
 	bool* gameGrid;
-	vector<GameObject> cubes;
+	vector<GameObject*> cubes;
 	int* typeOrder;
 	
 	XMFLOAT3 min;

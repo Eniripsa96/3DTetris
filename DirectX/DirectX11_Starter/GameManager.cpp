@@ -63,9 +63,10 @@ GameManager::GameManager(HINSTANCE hInstance) : DirectXGame(hInstance)
 	gameState = MENU;
 }
 
+// Clean up here
 GameManager::~GameManager()
 {
-	// Clean up here
+	// Clean up game objects
 	for (UINT i = 0; i < gameObjects.size(); i++)
 	{
 		delete gameObjects[i];
@@ -74,15 +75,49 @@ GameManager::~GameManager()
 	{
 		delete menuObjects[i];
 	}
+	for (UINT i = 0; i < cubes.size(); i++)
+	{
+		delete cubes[i];
+	}
 
+	// Clean up blocks
+	for (UINT i = 0; i < 7; i++)
+	{
+		delete blocks[i].gameObject;
+		delete[] blocks[i].localGrid;
+		delete[] blocks[i].tempGrid;
+		//delete[] blocks[i].grid;	// I think this is causing our 7 0byte memory leaks
+	}
+	delete[] blocks;
+	delete blockManager;
+
+	// Clean up meshes
 	delete triangleMesh;
 	delete quadMesh;
 	delete cubeMesh;
+	delete jBlockMesh;
+	delete lBlockMesh;
+	delete leftBlockMesh;
+	delete longBlockMesh;
+	delete rightBlockMesh;
+	delete squareBlockMesh;
+	delete stairsBlockMesh;
+	delete frameMesh;
 
+	// Clean up materials
 	delete shapeMaterial;
+	delete jBlockMaterial;
+	delete lBlockMaterial;
+	delete leftBlockMaterial;
+	delete longBlockMaterial;
+	delete rightBlockMaterial;
+	delete squareBlockMaterial;
+	delete stairsBlockMaterial;
+	delete frameMaterial;
 
 	delete camera;
 
+	// Release DX
 	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
@@ -105,22 +140,47 @@ bool GameManager::Init()
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
+	jBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png");
+	lBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png");
+	leftBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png");
+	longBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png");
+	rightBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png");
+	squareBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png");
+	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png");
+	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png");
 
 	// Prepare to load meshes
-	ObjLoader* loader = new ObjLoader();
+	ObjLoader loader = ObjLoader();
 	
 	// Load basic cube
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	UINT i = loader->Load("cube.txt", device, &vertexBuffer, &indexBuffer);
+	UINT i = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
 	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
+
+	// Load meshes
+	int size = loader.Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
+	jBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
+	lBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
+	leftBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
+	longBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
+	rightBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
+	squareBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
+	stairsBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("frame.txt", device, &vertexBuffer, &indexBuffer);
+	frameMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
 
 	// Set up block types
 	blocks = new Block[7];
 
-	int size = loader->Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[0].threeByThree = true;
-	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[0].gameObject = new GameObject(jBlockMesh, jBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[0].localGrid = new bool[9];
 	blocks[0].tempGrid = new bool[9];
 	blocks[0].grid = new bool[] {
@@ -129,9 +189,8 @@ bool GameManager::Init()
 		false, false, false
 	};
 
-	size = loader->Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[1].threeByThree = true;
-	blocks[1].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[1].gameObject = new GameObject(lBlockMesh, lBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[1].localGrid = new bool[9];
 	blocks[1].tempGrid = new bool[9];
 	blocks[1].grid = new bool[] {
@@ -140,9 +199,8 @@ bool GameManager::Init()
 		false, false, false
 	};
 
-	size = loader->Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[2].threeByThree = true;
-	blocks[2].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[2].gameObject = new GameObject(leftBlockMesh, leftBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[2].localGrid = new bool[9];
 	blocks[2].tempGrid = new bool[9];
 	blocks[2].grid = new bool[] {
@@ -151,9 +209,8 @@ bool GameManager::Init()
 		false, false, false
 	};
 
-	size = loader->Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[3].threeByThree = false;
-	blocks[3].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[3].gameObject = new GameObject(longBlockMesh, longBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
 	blocks[3].localGrid = new bool[16];
 	blocks[3].tempGrid = new bool[16];
 	blocks[3].grid = new bool[] {
@@ -163,9 +220,8 @@ bool GameManager::Init()
 		false, false, false, false
 	};
 
-	size = loader->Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[4].threeByThree = true;
-	blocks[4].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[4].gameObject = new GameObject(rightBlockMesh, rightBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[4].localGrid = new bool[9];
 	blocks[4].tempGrid = new bool[9];
 	blocks[4].grid = new bool[] {
@@ -174,9 +230,8 @@ bool GameManager::Init()
 		false, false, false
 	};
 
-	size = loader->Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[5].threeByThree = false;
-	blocks[5].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[5].gameObject = new GameObject(squareBlockMesh, squareBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
 	blocks[5].localGrid = new bool[16];
 	blocks[5].tempGrid = new bool[16];
 	blocks[5].grid = new bool[] {
@@ -186,9 +241,8 @@ bool GameManager::Init()
 		false, false, false, false
 	};
 
-    size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
 	blocks[6].threeByThree = true;
-	blocks[6].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[6].gameObject = new GameObject(stairsBlockMesh, stairsBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[6].localGrid = new bool[9];
 	blocks[6].tempGrid = new bool[9];
 	blocks[6].grid = new bool[] {
@@ -198,28 +252,16 @@ bool GameManager::Init()
 	};
 
 	// Load the frame
-	size = loader->Load("frame.txt", device, &vertexBuffer, &indexBuffer);
-	gameObjects.emplace_back(new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png"), new XMFLOAT3(-3.0f, -5.0f, 0.0f), new XMFLOAT3(0.0f, 0.0f, 0.0f)));
-
-	// Finished using the ObjLoader
-	delete loader;
+	gameObjects.emplace_back(new GameObject(frameMesh, frameMaterial, &XMFLOAT3(-3.0f, -5.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
 	// Set up block manager
 	for (int j = 0; j < GRID_HEIGHT; j++) {
 		for (int i = 0; i < GRID_WIDTH; i++) {
-			cubes.push_back(*new GameObject(cubeMesh, shapeMaterial, new XMFLOAT3(i - 4.5, j - 5, 0), new XMFLOAT3(0, 0, 0)));
+			cubes.push_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3((float)i - 4.5f, (float)j - 5.0f, 0), &XMFLOAT3(0, 0, 0)));
 		}
 	}
 	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-8.25, 12.5, 0), 1);
 	blockManager->spawnFallingBlock();
-
-	// Create 2D meshes
-	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
-	//quadMesh = new Mesh(device, deviceContext, QUAD);
-
-	// Create the game objects we want
-	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
-	//gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
 
 	// Create the menu objects we want
 	menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));

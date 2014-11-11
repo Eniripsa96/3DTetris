@@ -3,7 +3,7 @@
 // Initializes the BlockManager given 
 // the minimum coordinates for blocks, the hold position for blocks, 
 // and the width of each block
-BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject> pCubes, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
+BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> pCubes, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
 {
 	blocks = pBlocks;
 	numBlocks = pNumBlocks;
@@ -23,6 +23,8 @@ BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject> pC
 // Clears the pointers used by the block manager on deconstruct
 BlockManager::~BlockManager()
 {
+	delete[] gameGrid;
+	delete[] typeOrder;
 }
 
 // Updates the blocks in the game
@@ -94,8 +96,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		if (gameGrid[i]) {
 
 			// [UPDATE] Update constant buffer data using this object
-			cubes[i].Update(0);
-			cubes[i].Draw(deviceContext, cBuffer, cBufferData);
+			cubes[i]->Update(0);
+			cubes[i]->Draw(deviceContext, cBuffer, cBufferData);
 		}
 	}
 
@@ -359,7 +361,7 @@ void BlockManager::mergeBlock()
 				float x = (targetX + i) * blockWidth + min.x;
 				float y = (targetY + j) * blockWidth + min.y;
 				float z = min.z;
-				cubes[targetX + i + (targetY + j) * GRID_WIDTH].material = blocks[typeOrder[activeId]].gameObject->material;
+				cubes[targetX + i + (targetY + j) * GRID_WIDTH]->material = blocks[typeOrder[activeId]].gameObject->material;
 				gameGrid[targetX + i + (targetY + j) * GRID_WIDTH] = true;
 			}
 		}
@@ -403,7 +405,7 @@ void BlockManager::checkLines(int min, int max)
 					int index = k + j * GRID_WIDTH;
 					gameGrid[index] = gameGrid[index + GRID_WIDTH];
 					gameGrid[index + GRID_WIDTH] = false;
-					cubes[index].material = cubes[index + GRID_WIDTH].material;
+					cubes[index]->material = cubes[index + GRID_WIDTH]->material;
 				}
 			}
 		}

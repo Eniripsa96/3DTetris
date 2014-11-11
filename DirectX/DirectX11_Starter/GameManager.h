@@ -69,9 +69,27 @@ private:
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Mesh* cubeMesh;
+	Mesh* jBlockMesh;
+	Mesh* lBlockMesh;
+	Mesh* leftBlockMesh;
+	Mesh* longBlockMesh;
+	Mesh* rightBlockMesh;
+	Mesh* squareBlockMesh;
+	Mesh* stairsBlockMesh;
+	Mesh* frameMesh;
+
 	Material* shapeMaterial;
+	Material* jBlockMaterial;
+	Material* lBlockMaterial;
+	Material* leftBlockMaterial;
+	Material* longBlockMaterial;
+	Material* rightBlockMaterial;
+	Material* squareBlockMaterial;
+	Material* stairsBlockMaterial;
+	Material* frameMaterial;
+
 	Block* blocks;
-	vector<GameObject> cubes;
+	vector<GameObject*> cubes;
 	bool canRotate = false;
 
 	Camera* camera;
