@@ -35,6 +35,8 @@ public:
 	// Overrides for base level methods
 	bool Init();
 	void LoadShadersAndInputLayout();
+	void BuildBlockTypes();
+	void LoadMeshesAndMaterials();
 	void OnResize();
 	void UpdateScene(float dt);
 	void CheckKeyBoard(float dt);
