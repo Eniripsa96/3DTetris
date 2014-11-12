@@ -7,7 +7,6 @@ cbuffer perModel : register(b0)
 	matrix view;
 	matrix projection;
 	float4 lightDirection;
-	//float2 resolution;
 };
 
 // Defines what kind of data to expect as input
@@ -35,7 +34,8 @@ VertexToPixel main(VertexShaderInput input)
 	VertexToPixel output;
 
 	// Pass the position through
-	output.position = mul(float4(input.position, 1.0f), world);
+	matrix worldProjection = mul(world, projection);
+	output.position = mul(float4(input.position, 1.0f), worldProjection);
 	//output.position.x = output.position.x * 2 / resolution.x - 1;
 	//output.position.y = output.position.y * 2 / resolution.y - 1;
 

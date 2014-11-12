@@ -7,7 +7,7 @@ class Button : public GameObject
 {
 
 public:
-	Button(Mesh* mesh, Material* mat, XMFLOAT3* pos, SpriteBatch* batch, SpriteFont* font, wchar_t* text);
+	Button(Mesh* mesh, Material* mat, XMFLOAT3* pos, float width, float height, SpriteBatch* batch, SpriteFont* font, wchar_t* text);
 	~Button();
 
 	void Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData);
@@ -18,5 +18,7 @@ private:
 	wchar_t* text;
 	float textWidth;
 	float textHeight;
+	float width;
+	float height;
 };
 
