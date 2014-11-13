@@ -86,7 +86,7 @@ GameManager::~GameManager()
 		delete blocks[i].gameObject;
 		delete[] blocks[i].localGrid;
 		delete[] blocks[i].tempGrid;
-		//delete[] blocks[i].grid;	// I think this is causing our 7 0byte memory leaks
+		delete[] blocks[i].grid;	// I think this is causing our 7 0byte memory leaks
 	}
 	delete[] blocks;
 	delete blockManager;
@@ -286,7 +286,7 @@ void GameManager::BuildBlockTypes()
 	blocks[0].gameObject = new GameObject(jBlockMesh, jBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[0].localGrid = new bool[9];
 	blocks[0].tempGrid = new bool[9];
-	blocks[0].grid = new bool[] {
+	blocks[0].grid = new bool[9] {
 		true, true, true,
 			true, false, false,
 			false, false, false
@@ -296,7 +296,7 @@ void GameManager::BuildBlockTypes()
 	blocks[1].gameObject = new GameObject(lBlockMesh, lBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[1].localGrid = new bool[9];
 	blocks[1].tempGrid = new bool[9];
-	blocks[1].grid = new bool[] {
+	blocks[1].grid = new bool[9] {
 		true, true, true,
 			false, false, true,
 			false, false, false
@@ -306,7 +306,7 @@ void GameManager::BuildBlockTypes()
 	blocks[2].gameObject = new GameObject(leftBlockMesh, leftBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[2].localGrid = new bool[9];
 	blocks[2].tempGrid = new bool[9];
-	blocks[2].grid = new bool[] {
+	blocks[2].grid = new bool[9] {
 		false, true, true,
 			true, true, false,
 			false, false, false
@@ -316,7 +316,7 @@ void GameManager::BuildBlockTypes()
 	blocks[3].gameObject = new GameObject(longBlockMesh, longBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
 	blocks[3].localGrid = new bool[16];
 	blocks[3].tempGrid = new bool[16];
-	blocks[3].grid = new bool[] {
+	blocks[3].grid = new bool[16] {
 		false, false, false, false,
 			true, true, true, true,
 			false, false, false, false,
@@ -327,7 +327,7 @@ void GameManager::BuildBlockTypes()
 	blocks[4].gameObject = new GameObject(rightBlockMesh, rightBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[4].localGrid = new bool[9];
 	blocks[4].tempGrid = new bool[9];
-	blocks[4].grid = new bool[] {
+	blocks[4].grid = new bool[9] {
 		true, true, false,
 			false, true, true,
 			false, false, false
@@ -337,7 +337,7 @@ void GameManager::BuildBlockTypes()
 	blocks[5].gameObject = new GameObject(squareBlockMesh, squareBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
 	blocks[5].localGrid = new bool[16];
 	blocks[5].tempGrid = new bool[16];
-	blocks[5].grid = new bool[] {
+	blocks[5].grid = new bool[16] {
 		false, false, false, false,
 			false, true, true, false,
 			false, true, true, false,
@@ -348,7 +348,7 @@ void GameManager::BuildBlockTypes()
 	blocks[6].gameObject = new GameObject(stairsBlockMesh, stairsBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
 	blocks[6].localGrid = new bool[9];
 	blocks[6].tempGrid = new bool[9];
-	blocks[6].grid = new bool[] {
+	blocks[6].grid = new bool[9] {
 		true, true, true,
 			false, true, false,
 			false, false, false
