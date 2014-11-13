@@ -387,15 +387,8 @@ void GameManager::UpdateScene(float dt)
 		spriteBatch->Begin();
 		for (UINT i = 0; i < uiObjects->size(); i++)
 		{
-			ID3D11BlendState* blend;
-			FLOAT* factor = NULL;
-			UINT mask;
-			deviceContext->OMGetBlendState(&blend, factor, &mask);
-
 			// [DRAW] Draw the object
 			(*uiObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
-			
-			deviceContext->OMSetBlendState(blend, factor, mask);
 		}
 		spriteBatch->End();
 	}
