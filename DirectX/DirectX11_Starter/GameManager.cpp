@@ -221,7 +221,7 @@ bool GameManager::Init()
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-	Button* obj = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), 500, 150, spriteBatch, spriteFont32, L"Play");
+	Button* obj = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Play");
 	obj->Scale(&XMFLOAT3(1.0f, 0.3f, 1.0f));
 	menuObjects.emplace_back(obj);
 
@@ -366,12 +366,7 @@ void GameManager::UpdateScene(float dt)
 	//dataToSendToVSConstantBuffer.resolution = XMFLOAT2(windowWidth, windowHeight);
 
 	// Projection matrix
-	if (gameState == GAME) {
-		dataToSendToVSConstantBuffer.projection = projectionMatrix;
-	}
-	else {
-		dataToSendToVSConstantBuffer.projection = uiProjectionMatrix;
-	}
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	// Update each mesh
 	spriteBatch->Begin();
@@ -587,9 +582,5 @@ void GameManager::OnResize()
 	// TODO fix the fact that there is an if statement needed here
 	//if (camera)
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
-
-	XMMATRIX T = XMMatrixTranslation(-1, -1, 0);
-	XMMATRIX UP = XMMatrixScaling(2.0f / windowWidth, /*2.0f*/ 6.0f / windowHeight, 1);
-	XMStoreFloat4x4(&uiProjectionMatrix, UP); // * T);
 }
 #pragma endregion

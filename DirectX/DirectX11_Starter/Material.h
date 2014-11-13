@@ -17,6 +17,9 @@ public:
 
 	void Draw();
 
+	UINT getTexWidth();
+	UINT getTexHeight();
+
 	ID3D11ShaderResourceView* resourceView;
 	ID3D11SamplerState* samplerState;
 
@@ -25,6 +28,10 @@ public:
 	// Shaders
 	ID3D11PixelShader* pixelShader;
 	ID3D11VertexShader* vertexShader;
+
+private:
+	UINT texWidth;
+	UINT texHeight;
 };
 
 #endif
