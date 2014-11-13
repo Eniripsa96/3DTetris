@@ -59,6 +59,9 @@ public:
 	// A few more odds and ends we'll need
 	ID3D11InputLayout* inputLayout;
 
+	// Blend state
+	ID3D11BlendState* blendState;
+
 	// Constant buffer info
 	ID3D11Buffer* vsConstantBuffer;
 	VertexShaderConstantBufferLayout dataToSendToVSConstantBuffer;

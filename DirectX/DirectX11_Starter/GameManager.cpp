@@ -232,6 +232,8 @@ bool GameManager::Init()
 	// Create the menu objects we want
 	//menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
+	device->CreateBlendState(NULL, &blendState);
+
 	camera = new Camera();
 
 	// Set up the world matrix for each mesh
@@ -391,6 +393,9 @@ void GameManager::UpdateScene(float dt)
 			(*uiObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 		}
 		spriteBatch->End();
+
+		deviceContext->OMSetBlendState(blendState, NULL, 0xffffffff);
+		deviceContext->OMSetDepthStencilState(0, 0);
 	}
 
 	// Update and draw the game if in game mode

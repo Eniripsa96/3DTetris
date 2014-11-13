@@ -27,6 +27,14 @@ void Button::Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, Ver
 	font->DrawString(batch, text, XMLoadFloat2(&textPos));
 }
 
+void Button::Move(float x, float y) {
+	position.x += x;
+	position.y += y;
+
+	textPos.x += x;
+	textPos.y += y;
+}
+
 bool Button::IsOver(float x, float y) {
 	return x >= position.x && x <= position.x + material->getTexWidth() && y >= position.y && y <= position.y + material->getTexHeight();
 }
