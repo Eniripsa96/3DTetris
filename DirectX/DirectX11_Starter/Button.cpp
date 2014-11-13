@@ -23,7 +23,7 @@ Button::~Button()
 
 void Button::Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData) {
 	//GameObject::Draw(deviceContext, cBuffer, cBufferData);
-	//batch->Draw(material->resourceView, XMFLOAT2(position.x, position.y));
+	batch->Draw(material->resourceView, XMFLOAT2(position.x, position.y));
 	font->DrawString(batch, text, XMLoadFloat2(&textPos));
 }
 
