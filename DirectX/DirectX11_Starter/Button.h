@@ -11,6 +11,7 @@ public:
 	~Button();
 
 	void Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData);
+	bool IsOver(float x, float y);
 
 private:
 	SpriteBatch* batch;

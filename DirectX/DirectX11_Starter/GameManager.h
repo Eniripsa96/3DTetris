@@ -66,7 +66,6 @@ public:
 	GAME_STATE gameState;
 
 private:
-	std::vector<GameObject*> allObjects;
 	std::vector<GameObject*> gameObjects;
 	std::vector<GameObject*> menuObjects;
 	BlockManager* blockManager;
@@ -83,6 +82,8 @@ private:
 	Block* blocks;
 	vector<GameObject> cubes;
 	bool canRotate = false;
+
+	Button* playButton;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;

@@ -221,9 +221,9 @@ bool GameManager::Init()
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-	Button* obj = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Play");
-	obj->Scale(&XMFLOAT3(1.0f, 0.3f, 1.0f));
-	menuObjects.emplace_back(obj);
+	playButton = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Play");
+	playButton->Scale(&XMFLOAT3(1.0f, 0.3f, 1.0f));
+	menuObjects.emplace_back(playButton);
 
 	// Create the game objects we want
 	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
@@ -231,9 +231,6 @@ bool GameManager::Init()
 
 	// Create the menu objects we want
 	//menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
-
-	// Start out displaying the objects for the menu
-	allObjects = menuObjects;
 
 	camera = new Camera();
 
@@ -368,17 +365,40 @@ void GameManager::UpdateScene(float dt)
 	// Projection matrix
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
-	// Update each mesh
-	spriteBatch->Begin();
-	for (UINT i = 0; i < allObjects.size(); i++)
-	{
-		// [UPDATE] Update this object
-		allObjects[i]->Update(dt);
+	std::vector<GameObject*> *meshObjects = 0;
+	if (gameState == GAME) meshObjects = &gameObjects;
 
-		// [DRAW] Draw the object
-		allObjects[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	std::vector<GameObject*> *uiObjects = 0;
+	if (gameState == MENU) uiObjects = &menuObjects;
+
+	// Update each mesh
+	if (meshObjects) {
+		for (UINT i = 0; i < meshObjects->size(); i++)
+		{
+			// [UPDATE] Update this object
+			(*meshObjects)[i]->Update(dt);
+
+			// [DRAW] Draw the object
+			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		}
 	}
-	spriteBatch->End();
+
+	if (uiObjects) {
+		spriteBatch->Begin();
+		for (UINT i = 0; i < uiObjects->size(); i++)
+		{
+			ID3D11BlendState* blend;
+			FLOAT* factor = NULL;
+			UINT mask;
+			deviceContext->OMGetBlendState(&blend, factor, &mask);
+
+			// [DRAW] Draw the object
+			(*uiObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+			
+			deviceContext->OMSetBlendState(blend, factor, mask);
+		}
+		spriteBatch->End();
+	}
 
 	// Update and draw the game if in game mode
 	if (gameState == GAME) {
@@ -498,6 +518,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 			// Change state
+			/*
 		case VK_SPACE:
 			gameState = (gameState == MENU) ? GAME : MENU;
 
@@ -506,26 +527,27 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else if (gameState == GAME)
 				allObjects = gameObjects;
 			break;
+			*/
 
 			// Movement of game object
 		case VK_NUMPAD8:
-			allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
 			break;
 		case VK_NUMPAD5:
-			allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
 			break;
 		case VK_NUMPAD6:
-			allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
 			break;
 		case VK_NUMPAD4:
-			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
 			break;
 			// Rotation of game object
 		case VK_NUMPAD7:
-			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
+			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
 			break;
 		case VK_NUMPAD9:
-			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
+			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
 
 		}
@@ -547,6 +569,13 @@ void GameManager::OnMouseDown(WPARAM btnState, int x, int y)
 void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
+
+	// Main menu buttons
+	if (gameState == MENU) {
+		if (playButton->IsOver(x, y)) {
+			gameState = GAME;
+		}
+	}
 }
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
