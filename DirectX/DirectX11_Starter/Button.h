@@ -1,9 +1,9 @@
 #pragma once
 
-#include "GameObject.h"
+#include "UIObject.h"
 #include <SpriteFont.h>
 
-class Button : public GameObject
+class Button : public UIObject
 {
 
 public:
@@ -11,15 +11,5 @@ public:
 	~Button();
 
 	void Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData);
-	void Move(float x, float y);
-	bool IsOver(float x, float y);
-
-private:
-	SpriteBatch* batch;
-	SpriteFont* font;
-	XMFLOAT2 textPos;
-	wchar_t* text;
-	float textWidth;
-	float textHeight;
 };
 

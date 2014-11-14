@@ -87,6 +87,7 @@ private:
 	bool canRotate = false;
 
 	Button* playButton;
+	Button* quitButton;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;

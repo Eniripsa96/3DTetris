@@ -2,39 +2,13 @@
 
 
 Button::Button(Mesh* mesh, Material* mat, XMFLOAT3* pos, SpriteBatch* pBatch, SpriteFont* pFont, wchar_t* pText)
-: GameObject(mesh, mat, pos, new XMFLOAT3(0, 0, 0))
+: UIObject(mesh, mat, pos, pBatch, pFont, pText) { }
+
+Button::~Button() { }
+
+// Draws the button a different color when hovered over
+void Button::Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData) 
 {
-	batch = pBatch;
-	font = pFont;
-	text = pText;
-
-	XMVECTOR xmSize = font->MeasureString(text);
-	XMFLOAT2 size;
-	XMStoreFloat2(&size, xmSize);
-	textWidth = size.x;
-	textHeight = size.y;
-
-	textPos = XMFLOAT2(pos->x + (mat->getTexWidth() - size.x) / 2, pos->y + (mat->getTexHeight() - size.y) / 2);
-}
-
-Button::~Button()
-{
-}
-
-void Button::Draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData) {
-	//GameObject::Draw(deviceContext, cBuffer, cBufferData);
-	batch->Draw(material->resourceView, XMFLOAT2(position.x, position.y));
+	batch->Draw(material->resourceView, XMFLOAT2(position.x, position.y), XMLoadFloat4(&XMFLOAT4(hovered ? 0.5 : 1, 1, 1, 1)));
 	font->DrawString(batch, text, XMLoadFloat2(&textPos));
-}
-
-void Button::Move(float x, float y) {
-	position.x += x;
-	position.y += y;
-
-	textPos.x += x;
-	textPos.y += y;
-}
-
-bool Button::IsOver(float x, float y) {
-	return x >= position.x && x <= position.x + material->getTexWidth() && y >= position.y && y <= position.y + material->getTexHeight();
 }

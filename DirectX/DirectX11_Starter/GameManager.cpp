@@ -221,9 +221,10 @@ bool GameManager::Init()
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-	playButton = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Play");
-	playButton->Scale(&XMFLOAT3(1.0f, 0.3f, 1.0f));
+	playButton = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
+	quitButton = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
 	menuObjects.emplace_back(playButton);
+	menuObjects.emplace_back(quitButton);
 
 	// Create the game objects we want
 	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
@@ -573,6 +574,9 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 		if (playButton->IsOver(x, y)) {
 			gameState = GAME;
 		}
+		if (quitButton->IsOver(x, y)) {
+			PostQuitMessage(0);
+		}
 	}
 }
 
@@ -583,6 +587,9 @@ void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - prevMousePos.x));
 		camera->RotateY(-dx);
 	}
+
+	playButton->Update(x, y);
+	quitButton->Update(x, y);
 
 	prevMousePos.x = x;
 	prevMousePos.y = y;
