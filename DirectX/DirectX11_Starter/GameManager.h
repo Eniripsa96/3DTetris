@@ -22,7 +22,8 @@ using namespace std;
 enum GAME_STATE
 {
 	MENU,
-	GAME
+	GAME,
+	DEBUG
 };
 
 // Demo class which extends the base DirectXGame class

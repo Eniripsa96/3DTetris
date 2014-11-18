@@ -388,15 +388,17 @@ void GameManager::UpdateScene(float dt)
 	// Update each mesh
 	for (UINT i = 0; i < allObjects.size(); i++)
 	{
-		// [UPDATE] Update this object
-		allObjects[i]->Update(dt);
+		if (gameState != DEBUG)
+			// [UPDATE] Update this object
+			allObjects[i]->Update(dt);
 
 		// [DRAW] Draw the object
 		allObjects[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
 	// Update and draw the game if in game mode
-	if (gameState == GAME) {
+	if (gameState == GAME)
+	{
 		blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
@@ -489,7 +491,7 @@ void GameManager::CheckKeyBoard(float dt)
 		}
 	}
 
-	//else
+	if (gameState == DEBUG)
 	{
 		// Strafing of camera
 		if (GetAsyncKeyState(VK_LEFT))
@@ -542,7 +544,9 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case VK_NUMPAD9:
 			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
-
+		case VK_CAPITAL:
+			gameState = (gameState != DEBUG) ? DEBUG : GAME;
+			break;
 		}
 	}
 
@@ -566,10 +570,13 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	if ((btnState & MK_LBUTTON) != 0)
+	if (gameState == DEBUG && (btnState & MK_LBUTTON) != 0)
 	{
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - prevMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - prevMousePos.y));
+
 		camera->RotateY(-dx);
+		camera->Pitch(-dy);
 	}
 
 	prevMousePos.x = x;

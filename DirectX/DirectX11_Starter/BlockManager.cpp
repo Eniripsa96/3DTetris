@@ -94,7 +94,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
 		if (gameGrid[i]) {
-
+			
 			// [UPDATE] Update constant buffer data using this object
 			cubes[i]->Update(0);
 			cubes[i]->Draw(deviceContext, cBuffer, cBufferData);

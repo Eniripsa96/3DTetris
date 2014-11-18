@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BLOCKMANAGER_H
+#define BLOCKMANAGER_H
 
 #include "GameObject.h"
 #include <stdlib.h>
@@ -81,3 +82,4 @@ private:
 	void shuffle();
 };
 
+#endif
