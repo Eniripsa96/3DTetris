@@ -70,7 +70,8 @@ public:
 
 private:
 	std::vector<GameObject*> gameObjects;
-	std::vector<GameObject*> menuObjects;
+	std::vector<UIObject*> gameUIObjects;
+	std::vector<UIObject*> menuObjects;
 	BlockManager* blockManager;
 
 	SpriteBatch* spriteBatch;

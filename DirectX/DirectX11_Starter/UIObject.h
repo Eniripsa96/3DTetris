@@ -14,13 +14,13 @@ public:
 	void Update(int x, int y);
 	void Move(float x, float y);
 	bool IsOver(int x, int y);
-	void SetText(wchar_t* text);
+	void SetText(const wchar_t* text);
 
 protected:
 	SpriteBatch* batch;
 	SpriteFont* font;
 	XMFLOAT2 textPos;
-	wchar_t* text;
+	const wchar_t* text;
 	float textWidth;
 	float textHeight;
 	bool hovered = false;

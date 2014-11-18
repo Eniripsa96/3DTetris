@@ -34,7 +34,7 @@ bool UIObject::IsOver(int x, int y) {
 	return x >= position.x && x <= position.x + material->getTexWidth() && y >= position.y && y <= position.y + material->getTexHeight();
 }
 
-void UIObject::SetText(wchar_t* pText) {
+void UIObject::SetText(const wchar_t* pText) {
 	text = pText;
 
 	XMVECTOR xmSize = font->MeasureString(text);

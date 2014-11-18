@@ -225,20 +225,12 @@ bool GameManager::Init()
 	quadMesh = new Mesh(device, deviceContext, QUAD);
 	playButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
 	quitButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
-	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(20, 20, 0), spriteBatch, spriteFont32, L"Score:\n0");
+	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Score:\n0");
 	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, new XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
 	menuObjects.emplace_back(playButton);
 	menuObjects.emplace_back(quitButton);
-	//gameObjects.emplace_back(scoreLabel);
+	gameUIObjects.emplace_back(scoreLabel);
 	
-
-	// Create the game objects we want
-	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
-	//gameObjects.emplace_back(new GameObject(quadMesh,		shapeMaterial, &XMFLOAT3(-1.0f, 0.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
-
-	// Create the menu objects we want
-	//menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
-
 	device->CreateBlendState(NULL, &blendState);
 
 	camera = new Camera();
@@ -375,14 +367,15 @@ void GameManager::UpdateScene(float dt)
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	std::vector<GameObject*> *meshObjects = 0;
-	
-	std::vector<GameObject*> *uiObjects = 0;
+	if (gameState == GAME) meshObjects = &gameObjects;
+
+	std::vector<UIObject*> *uiObjects = 0;
 	if (gameState == MENU) uiObjects = &menuObjects;
-	if (gameState == GAME) uiObjects = &gameObjects;
+	if (gameState == GAME) uiObjects = &gameUIObjects;
 
 	// Update each mesh
 	if (meshObjects) {
-		
+
 		for (UINT i = 0; i < meshObjects->size(); i++)
 		{
 			// [UPDATE] Update this object
@@ -393,6 +386,19 @@ void GameManager::UpdateScene(float dt)
 		}
 	}
 
+	// Update and draw the game if in game mode
+	if (gameState == GAME) {
+		blockManager->update(dt);
+		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+
+		int score = blockManager->getScore();
+		std::wstringstream wss;
+		wss << "Score\n";
+		wss << score;
+		scoreLabel->SetText(wss.str().c_str());
+	}
+
+	// Draw UI Elements
 	if (uiObjects) {
 		spriteBatch->Begin();
 		for (UINT i = 0; i < uiObjects->size(); i++)
@@ -404,12 +410,6 @@ void GameManager::UpdateScene(float dt)
 
 		deviceContext->OMSetBlendState(blendState, NULL, 0xffffffff);
 		deviceContext->OMSetDepthStencilState(0, 0);
-	}
-
-	// Update and draw the game if in game mode
-	if (gameState == GAME) {
-		blockManager->update(dt);
-		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
 	// Present the buffer
