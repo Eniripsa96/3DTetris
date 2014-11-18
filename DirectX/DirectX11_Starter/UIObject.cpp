@@ -6,15 +6,7 @@ UIObject::UIObject(Mesh* mesh, Material* mat, XMFLOAT3* pos, SpriteBatch* pBatch
 {
 	batch = pBatch;
 	font = pFont;
-	text = pText;
-
-	XMVECTOR xmSize = font->MeasureString(text);
-	XMFLOAT2 size;
-	XMStoreFloat2(&size, xmSize);
-	textWidth = size.x;
-	textHeight = size.y;
-
-	textPos = XMFLOAT2(pos->x + (mat->getTexWidth() - size.x) / 2, pos->y + (mat->getTexHeight() - size.y) / 2);
+	SetText(pText);
 }
 
 UIObject::~UIObject()
@@ -40,4 +32,16 @@ void UIObject::Update(int x, int y) {
 
 bool UIObject::IsOver(int x, int y) {
 	return x >= position.x && x <= position.x + material->getTexWidth() && y >= position.y && y <= position.y + material->getTexHeight();
+}
+
+void UIObject::SetText(wchar_t* pText) {
+	text = pText;
+
+	XMVECTOR xmSize = font->MeasureString(text);
+	XMFLOAT2 size;
+	XMStoreFloat2(&size, xmSize);
+	textWidth = size.x;
+	textHeight = size.y;
+
+	textPos = XMFLOAT2(position.x + (material->getTexWidth() - size.x) / 2, position.y + (material->getTexHeight() - size.y) / 2);
 }

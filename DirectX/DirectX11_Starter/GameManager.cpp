@@ -105,7 +105,9 @@ bool GameManager::Init()
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
-	uiTestMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
+	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
+	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"title.png");
+	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"label.png");
 
 	// Prepare to load meshes
 	ObjLoader* loader = new ObjLoader();
@@ -221,10 +223,14 @@ bool GameManager::Init()
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-	playButton = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
-	quitButton = new Button(quadMesh, uiTestMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
+	playButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
+	quitButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
+	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(20, 20, 0), spriteBatch, spriteFont32, L"Score:\n0");
+	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, new XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
 	menuObjects.emplace_back(playButton);
 	menuObjects.emplace_back(quitButton);
+	//gameObjects.emplace_back(scoreLabel);
+	
 
 	// Create the game objects we want
 	//gameObjects.emplace_back(new GameObject(triangleMesh,	shapeMaterial, &XMFLOAT3(0.0f, -1.0f, 0.0f), &XMFLOAT3(0.1f, 0.0f, 0.0f)));
@@ -369,13 +375,14 @@ void GameManager::UpdateScene(float dt)
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	std::vector<GameObject*> *meshObjects = 0;
-	if (gameState == GAME) meshObjects = &gameObjects;
-
+	
 	std::vector<GameObject*> *uiObjects = 0;
 	if (gameState == MENU) uiObjects = &menuObjects;
+	if (gameState == GAME) uiObjects = &gameObjects;
 
 	// Update each mesh
 	if (meshObjects) {
+		
 		for (UINT i = 0; i < meshObjects->size(); i++)
 		{
 			// [UPDATE] Update this object

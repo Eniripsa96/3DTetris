@@ -81,13 +81,16 @@ private:
 	Mesh* quadMesh;
 	Mesh* cubeMesh;
 	Material* shapeMaterial;
-	Material* uiTestMaterial;
+	Material* buttonMaterial;
+	Material* titleMaterial;
+	Material* labelMaterial;
 	Block* blocks;
 	vector<GameObject> cubes;
 	bool canRotate = false;
 
 	Button* playButton;
 	Button* quitButton;
+	UIObject* scoreLabel;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;
