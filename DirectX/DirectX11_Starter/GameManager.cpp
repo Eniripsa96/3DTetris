@@ -397,9 +397,10 @@ void GameManager::UpdateScene(float dt)
 	}
 
 	// Update and draw the game if in game mode
-	if (gameState == GAME)
+	if (gameState == GAME || gameState == DEBUG)
 	{
-		blockManager->update(dt);
+		if (gameState != DEBUG)
+			blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
@@ -490,19 +491,22 @@ void GameManager::CheckKeyBoard(float dt)
 			blockManager->holdBlock();
 		}
 	}
-
-	if (gameState == DEBUG)
+	else if (gameState == DEBUG)
 	{
 		// Strafing of camera
-		if (GetAsyncKeyState(VK_LEFT))
+		if (GetAsyncKeyState('A'))
 			camera->MoveHorizontal(-CAMERA_MOVE_FACTOR * dt);
-		else if (GetAsyncKeyState(VK_RIGHT))
+		else if (GetAsyncKeyState('D'))
 			camera->MoveHorizontal(CAMERA_MOVE_FACTOR * dt);
 		// Forward movement of camera
-		if (GetAsyncKeyState(VK_UP))
+		if (GetAsyncKeyState('W'))
 			camera->MoveDepth(CAMERA_MOVE_FACTOR * dt);
-		else if (GetAsyncKeyState(VK_DOWN))
+		else if (GetAsyncKeyState('S'))
 			camera->MoveDepth(-CAMERA_MOVE_FACTOR * dt);
+		if (GetAsyncKeyState('Q'))
+			camera->MoveVertical(CAMERA_MOVE_FACTOR * dt);
+		else if (GetAsyncKeyState('E'))
+			camera->MoveVertical(-CAMERA_MOVE_FACTOR * dt);
 	}
 }
 
