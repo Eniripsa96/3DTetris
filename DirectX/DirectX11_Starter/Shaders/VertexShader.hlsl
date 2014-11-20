@@ -44,7 +44,7 @@ VertexToPixel main( VertexShaderInput input )
 
 	// Pass the normal through - will be interpolated per-pixel by the rasterizer
 	output.normal = normalize(input.normal);
-	//output.normal = normalize(mul((input.normal), (float3x3)worldjViewProj));
+	//output.normal = normalize(mul((input.normal), (float3x3)world));
 
 	// Constant data
 	output.lightDir = lightDirection;

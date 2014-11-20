@@ -93,6 +93,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		blocks[typeOrder[activeId]].gameObject->Update(0);
 		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
 
+		cBufferData->color.w = 0.5;
+
 		// Draw the ghost block
 		XMFLOAT3 prev = blocks[typeOrder[activeId]].gameObject->position;
 		blocks[typeOrder[activeId]].gameObject->position = XMFLOAT3(prev.x, getGhostPos().y, prev.z);
@@ -101,6 +103,8 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		blocks[typeOrder[activeId]].gameObject->Update(0);
 		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
 		blocks[typeOrder[activeId]].gameObject->position = prev;
+
+		cBufferData->color.w = 1;
 	}
 
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
