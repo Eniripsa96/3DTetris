@@ -107,7 +107,7 @@ UINT ObjLoader::Load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertex
 						int type = 0;		
 
 						//Parse this set
-						for (int j = 0; j < vertexData.length(); ++j)
+						for (UINT j = 0; j < vertexData.length(); ++j)
 						{
 							if (vertexData[j] != '/')
 							{
@@ -206,7 +206,7 @@ UINT ObjLoader::Load(char* fileName, ID3D11Device* device, ID3D11Buffer** vertex
 	vector<Vertex> vertices;
 	vector<UINT> indices;
 	Vertex temp;
-	for (int i = 0; i < posIndices.size(); i++)
+	for (UINT i = 0; i < posIndices.size(); i++)
 	{
 		temp.Position = positions[posIndices[i]];
 		temp.Normal = normals[normalIndices[i]];
