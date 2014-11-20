@@ -75,6 +75,7 @@ private:
 	BlockManager* blockManager;
 
 	SpriteBatch* spriteBatch;
+	SpriteFont* spriteFont24;
 	SpriteFont* spriteFont32;
 	SpriteFont* spriteFont72;
 

@@ -201,6 +201,7 @@ bool GameManager::Init()
 	};
 
 	spriteBatch = new SpriteBatch(deviceContext);
+	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
 	spriteFont32 = new SpriteFont(device, L"jing32.spritefont");
 	spriteFont72 = new SpriteFont(device, L"jing72.spritefont");
 
@@ -225,7 +226,7 @@ bool GameManager::Init()
 	quadMesh = new Mesh(device, deviceContext, QUAD);
 	playButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
 	quitButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
-	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont32, L"Score:\n0");
+	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont24, L"Score:\n0");
 	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, new XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
 	menuObjects.emplace_back(playButton);
 	menuObjects.emplace_back(quitButton);
@@ -390,13 +391,11 @@ void GameManager::UpdateScene(float dt)
 	if (gameState == GAME) {
 		blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
-
-		int score = blockManager->getScore();
-		std::wstringstream wss;
-		wss << "Score\n";
-		wss << score;
-		scoreLabel->SetText(wss.str().c_str());
 	}
+	int score = blockManager->getScore();
+	std::wstring s = std::wstring(L"Score\n") + std::to_wstring(score);
+	const wchar_t* result = s.c_str();
+	scoreLabel->SetText(result);
 
 	// Draw UI Elements
 	if (uiObjects) {
