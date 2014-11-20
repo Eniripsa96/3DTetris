@@ -8,6 +8,7 @@ cbuffer perModel : register(b0)
 	matrix view;
 	matrix projection;
 	float4 lightDirection;
+	float4 color;
 };
 
 // Defines what kind of data to expect as input
@@ -27,7 +28,8 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;	// System Value Position - Has specific meaning to the pipeline!
 	float3 normal		: NORMAL;
 	float2 uv			: TEXCOORD0;
-	float4 lightDir     : float4;
+	float4 lightDir     : LIGHT;
+	float4 color        : COLOR;
 };
 
 // The entry point for our vertex shader
@@ -44,10 +46,12 @@ VertexToPixel main( VertexShaderInput input )
 	output.normal = normalize(input.normal);
 	//output.normal = normalize(mul((input.normal), (float3x3)worldjViewProj));
 
+	// Constant data
 	output.lightDir = lightDirection;
+	output.color = color;
 
 	// Pass the UV coordinates
 	output.uv = input.uv;
-
+	
 	return output;
 }

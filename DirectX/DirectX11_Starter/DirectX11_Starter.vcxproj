@@ -99,12 +99,6 @@
     <FxCompile Include="Shaders\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="Shaders\uiPixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Shaders\uiVertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-    </FxCompile>
     <FxCompile Include="Shaders\VertexShader.hlsl">
       <DeploymentContent>false</DeploymentContent>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

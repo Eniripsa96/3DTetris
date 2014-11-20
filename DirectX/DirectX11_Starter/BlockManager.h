@@ -57,7 +57,8 @@ public:
 	void holdBlock();
 	void mergeBlock();
 	void checkLines(int min, int max);
-	bool isGameOver() { return gameOver; };
+	XMFLOAT3 getGhostPos();
+	bool isGameOver() { return gameOver; }
 	int getScore() { return score; }
 
 	float fallSpeed = SLOW_FALL_SPEED;

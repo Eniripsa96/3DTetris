@@ -29,6 +29,8 @@ enum GAME_STATE
 	DEBUG
 };
 
+struct BLEND_DESC : public D3D11_BLEND_DESC {};
+
 // Demo class which extends the base DirectXGame class
 class GameManager : public DirectXGame
 {

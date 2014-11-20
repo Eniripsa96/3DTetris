@@ -91,6 +91,15 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		// [UPDATE] Update constant buffer data using this object
 		blocks[typeOrder[activeId]].gameObject->Update(0);
 		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
+
+		// Draw the ghost block
+		XMFLOAT3 prev = blocks[typeOrder[activeId]].gameObject->position;
+		blocks[typeOrder[activeId]].gameObject->position = XMFLOAT3(prev.x, getGhostPos().y, prev.z);
+
+		// [UPDATE] Update constant buffer data using this object
+		blocks[typeOrder[activeId]].gameObject->Update(0);
+		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
+		blocks[typeOrder[activeId]].gameObject->position = prev;
 	}
 
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
@@ -106,7 +115,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 	{
 		XMFLOAT3 prev = blocks[typeOrder[heldId]].gameObject->position;
 		float halfSize = blocks[typeOrder[heldId]].threeByThree ? 1.5f : 2.0f;
-		blocks[typeOrder[heldId]].gameObject->position = XMFLOAT3(holdPos.x - halfSize, holdPos.y - halfSize, 0);
+		blocks[typeOrder[heldId]].gameObject->position = XMFLOAT3(holdPos.x - halfSize, holdPos.y - halfSize, min.z);
 		float rotation = blocks[typeOrder[heldId]].gameObject->rotation.z;
 		blocks[typeOrder[heldId]].gameObject->rotation.z = 0;
 
@@ -420,6 +429,17 @@ void BlockManager::checkLines(int min, int max)
 	{
 		score += scores[cleared - 1];
 	}
+}
+
+// Retrieves the position of the ghost block
+XMFLOAT3 BlockManager::getGhostPos() {
+	int tx = targetX;
+	int ty = targetY;
+	
+	while (canOccupy(tx, --ty));
+	ty++;
+
+	return XMFLOAT3(tx * blockWidth + min.x, ty * blockWidth + min.y, min.z);
 }
 
 // Copies the elements from the source array to the target array

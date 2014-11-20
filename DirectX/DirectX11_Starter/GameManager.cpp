@@ -171,7 +171,16 @@ bool GameManager::Init()
 	menuObjects.emplace_back(quitButton);
 	gameUIObjects.emplace_back(scoreLabel);
 	
-	device->CreateBlendState(NULL, &blendState);
+	BLEND_DESC blendDesc;
+	blendDesc.RenderTarget[0].BlendEnable = true;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blendDesc, &blendState);
 
 	camera = new Camera();
 
@@ -234,32 +243,6 @@ void GameManager::LoadShadersAndInputLayout()
 	// Clean up
 	ReleaseMacro(psBlob);
 	
-	// Load UI Vertex Shader -----------------------------------
-	D3DReadFileToBlob(L"uiVertexShader.cso", &vsBlob);
-
-	// Create the shader on the device
-	HR(device->CreateVertexShader(
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		NULL,
-		&uiVertexShader));
-
-	// Clean up
-	ReleaseMacro(vsBlob);
-
-	// Load UI Pixel Shader -------------------------------------
-	D3DReadFileToBlob(L"uiPixelShader.cso", &psBlob);
-
-	// Create the shader on the device
-	HR(device->CreatePixelShader(
-		psBlob->GetBufferPointer(),
-		psBlob->GetBufferSize(),
-		NULL,
-		&uiPixelShader));
-
-	// Clean up
-	ReleaseMacro(psBlob);
-
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;
 	cBufferDesc.ByteWidth = sizeof(dataToSendToVSConstantBuffer);
@@ -424,6 +407,7 @@ void GameManager::UpdateScene(float dt)
 	// [UPDATE] Update constant buffer data
 	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
+	dataToSendToVSConstantBuffer.color = XMFLOAT4(1, 1, 1, 0.5);
 	//dataToSendToVSConstantBuffer.resolution = XMFLOAT2(windowWidth, windowHeight);
 
 	// Projection matrix
