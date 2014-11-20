@@ -143,6 +143,11 @@ bool GameManager::Init()
 	// Set up block types
 	BuildBlockTypes();
 
+	spriteBatch = new SpriteBatch(deviceContext);
+	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
+	spriteFont32 = new SpriteFont(device, L"jing32.spritefont");
+	spriteFont72 = new SpriteFont(device, L"jing72.spritefont");
+
 	// Load the frame
 	gameObjects.emplace_back(new GameObject(frameMesh, frameMaterial, &XMFLOAT3(-3.0f, -5.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
@@ -155,11 +160,18 @@ bool GameManager::Init()
 	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-8.25, 12.5, 0), 1);
 	blockManager->spawnFallingBlock();
 
-	// Create the menu objects we want
-	menuObjects.emplace_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3(0.0f, -0.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
-
-	// Start out displaying the objects for the menu
-	allObjects = menuObjects;
+	// Create 2D meshes
+	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
+	quadMesh = new Mesh(device, deviceContext, QUAD);
+	playButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
+	quitButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
+	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont24, L"Score:\n0");
+	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, new XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
+	menuObjects.emplace_back(playButton);
+	menuObjects.emplace_back(quitButton);
+	gameUIObjects.emplace_back(scoreLabel);
+	
+	device->CreateBlendState(NULL, &blendState);
 
 	camera = new Camera();
 
@@ -183,7 +195,7 @@ void GameManager::LoadShadersAndInputLayout()
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Load Vertex Shader --------------------------------------
@@ -221,6 +233,32 @@ void GameManager::LoadShadersAndInputLayout()
 
 	// Clean up
 	ReleaseMacro(psBlob);
+	
+	// Load UI Vertex Shader -----------------------------------
+	D3DReadFileToBlob(L"uiVertexShader.cso", &vsBlob);
+
+	// Create the shader on the device
+	HR(device->CreateVertexShader(
+		vsBlob->GetBufferPointer(),
+		vsBlob->GetBufferSize(),
+		NULL,
+		&uiVertexShader));
+
+	// Clean up
+	ReleaseMacro(vsBlob);
+
+	// Load UI Pixel Shader -------------------------------------
+	D3DReadFileToBlob(L"uiPixelShader.cso", &psBlob);
+
+	// Create the shader on the device
+	HR(device->CreatePixelShader(
+		psBlob->GetBufferPointer(),
+		psBlob->GetBufferSize(),
+		NULL,
+		&uiPixelShader));
+
+	// Clean up
+	ReleaseMacro(psBlob);
 
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;
@@ -247,6 +285,9 @@ void GameManager::LoadMeshesAndMaterials()
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
+	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
+	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"title.png");
+	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"label.png");
 	jBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png");
 	lBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png");
 	leftBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png");
@@ -382,18 +423,31 @@ void GameManager::UpdateScene(float dt)
 
 	// [UPDATE] Update constant buffer data
 	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
-	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
+	//dataToSendToVSConstantBuffer.resolution = XMFLOAT2(windowWidth, windowHeight);
+
+	// Projection matrix
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
+
+	std::vector<GameObject*> *meshObjects = 0;
+	if (gameState == GAME || gameState == DEBUG) meshObjects = &gameObjects;
+
+	std::vector<UIObject*> *uiObjects = 0;
+	if (gameState == MENU) uiObjects = &menuObjects;
+	if (gameState == GAME || gameState == DEBUG) uiObjects = &gameUIObjects;
 
 	// Update each mesh
-	for (UINT i = 0; i < allObjects.size(); i++)
-	{
-		if (gameState != DEBUG)
-			// [UPDATE] Update this object
-			allObjects[i]->Update(dt);
+	if (meshObjects) {
 
-		// [DRAW] Draw the object
-		allObjects[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		for (UINT i = 0; i < meshObjects->size(); i++)
+		{
+			// [UPDATE] Update this object
+			if (gameState != DEBUG)
+				(*meshObjects)[i]->Update(dt);
+
+			// [DRAW] Draw the object
+			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		}
 	}
 
 	// Update and draw the game if in game mode
@@ -402,6 +456,24 @@ void GameManager::UpdateScene(float dt)
 		if (gameState != DEBUG)
 			blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	}
+	int score = blockManager->getScore();
+	std::wstring s = std::wstring(L"Score\n") + std::to_wstring(score);
+	const wchar_t* result = s.c_str();
+	scoreLabel->SetText(result);
+
+	// Draw UI Elements
+	if (uiObjects) {
+		spriteBatch->Begin();
+		for (UINT i = 0; i < uiObjects->size(); i++)
+		{
+			// [DRAW] Draw the object
+			(*uiObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		}
+		spriteBatch->End();
+
+		deviceContext->OMSetBlendState(blendState, NULL, 0xffffffff);
+		deviceContext->OMSetDepthStencilState(0, 0);
 	}
 
 	// Present the buffer
@@ -519,6 +591,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 			// Change state
+			/*
 		case VK_SPACE:
 			gameState = (gameState == MENU) ? GAME : MENU;
 
@@ -527,26 +600,27 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else if (gameState == GAME)
 				allObjects = gameObjects;
 			break;
+			*/
 
 			// Movement of game object
 		case VK_NUMPAD8:
-			allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
 			break;
 		case VK_NUMPAD5:
-			allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
 			break;
 		case VK_NUMPAD6:
-			allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
 			break;
 		case VK_NUMPAD4:
-			allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
+			//allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
 			break;
 			// Rotation of game object
 		case VK_NUMPAD7:
-			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
+			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
 			break;
 		case VK_NUMPAD9:
-			allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
+			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
 		case VK_CAPITAL:
 			gameState = (gameState != DEBUG) ? DEBUG : GAME;
@@ -570,6 +644,16 @@ void GameManager::OnMouseDown(WPARAM btnState, int x, int y)
 void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
+
+	// Main menu buttons
+	if (gameState == MENU) {
+		if (playButton->IsOver(x, y)) {
+			gameState = GAME;
+		}
+		if (quitButton->IsOver(x, y)) {
+			PostQuitMessage(0);
+		}
+	}
 }
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
@@ -582,6 +666,9 @@ void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 		camera->RotateY(-dx);
 		camera->Pitch(-dy);
 	}
+
+	playButton->Update(x, y);
+	quitButton->Update(x, y);
 
 	prevMousePos.x = x;
 	prevMousePos.y = y;
@@ -607,6 +694,6 @@ void GameManager::OnResize()
 
 	// TODO fix the fact that there is an if statement needed here
 	//if (camera)
-		XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
 }
 #pragma endregion

@@ -1,5 +1,6 @@
 #ifndef BLOCKMANAGER_H
 #define BLOCKMANAGER_H
+#endif
 
 #include "GameObject.h"
 #include <stdlib.h>
@@ -57,6 +58,7 @@ public:
 	void mergeBlock();
 	void checkLines(int min, int max);
 	bool isGameOver() { return gameOver; };
+	int getScore() { return score; }
 
 	float fallSpeed = SLOW_FALL_SPEED;
 
@@ -65,6 +67,8 @@ private:
 	bool* gameGrid;
 	vector<GameObject*> cubes;
 	int* typeOrder;
+	int* scores;
+	int score = 0;
 	
 	XMFLOAT3 min;
 	XMFLOAT3 holdPos;
@@ -82,4 +86,3 @@ private:
 	void shuffle();
 };
 
-#endif

@@ -4,10 +4,13 @@
 #include <DirectXMath.h>
 #include "DirectXGame.h"
 #include "GameObject.h"
+#include "Button.h"
 #include "Camera.h"
 #include "BlockManager.h"
 #include <vector>
 #include "ObjLoader.h"
+#include <SpriteFont.h>
+#include <SpriteBatch.h>
 
 // Include run-time memory checking in debug builds
 #if defined(DEBUG) || defined(_DEBUG)
@@ -53,9 +56,14 @@ public:
 	// Shaders
 	ID3D11PixelShader* pixelShader;
 	ID3D11VertexShader* vertexShader;
+	ID3D11PixelShader* uiPixelShader;
+	ID3D11VertexShader* uiVertexShader;
 
 	// A few more odds and ends we'll need
 	ID3D11InputLayout* inputLayout;
+
+	// Blend state
+	ID3D11BlendState* blendState;
 
 	// Constant buffer info
 	ID3D11Buffer* vsConstantBuffer;
@@ -64,10 +72,15 @@ public:
 	GAME_STATE gameState;
 
 private:
-	std::vector<GameObject*> allObjects;
 	std::vector<GameObject*> gameObjects;
-	std::vector<GameObject*> menuObjects;
+	std::vector<UIObject*> gameUIObjects;
+	std::vector<UIObject*> menuObjects;
 	BlockManager* blockManager;
+
+	SpriteBatch* spriteBatch;
+	SpriteFont* spriteFont24;
+	SpriteFont* spriteFont32;
+	SpriteFont* spriteFont72;
 
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
@@ -82,6 +95,9 @@ private:
 	Mesh* frameMesh;
 
 	Material* shapeMaterial;
+	Material* buttonMaterial;
+	Material* titleMaterial;
+	Material* labelMaterial;
 	Material* jBlockMaterial;
 	Material* lBlockMaterial;
 	Material* leftBlockMaterial;
@@ -94,6 +110,10 @@ private:
 	Block* blocks;
 	vector<GameObject*> cubes;
 	bool canRotate = false;
+
+	Button* playButton;
+	Button* quitButton;
+	UIObject* scoreLabel;
 
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;

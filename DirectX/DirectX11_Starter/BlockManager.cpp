@@ -17,6 +17,7 @@ BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> p
 		gameGrid[i] = NULL;
 	}
 	typeOrder = new int[numBlocks];
+	scores = new int[4] { 40, 100, 300, 1200 };
 	shuffle();
 }
 
@@ -377,6 +378,7 @@ void BlockManager::mergeBlock()
 // Checks the game grid for cleared lines
 void BlockManager::checkLines(int min, int max)
 {
+	int cleared = 0;
 	for (int i = max; i >= min; i--)
 	{
 		// Check each individual line for completion
@@ -389,6 +391,8 @@ void BlockManager::checkLines(int min, int max)
 		// Clear the line and move down above lines if complete
 		if (complete)
 		{
+			cleared++;
+
 			// TODO change our gameobjects to an effect if desired
 
 			// Delete the game objects for now
@@ -409,6 +413,12 @@ void BlockManager::checkLines(int min, int max)
 				}
 			}
 		}
+	}
+
+	// Reward points for cleared lines
+	if (cleared > 0) 
+	{
+		score += scores[cleared - 1];
 	}
 }
 
