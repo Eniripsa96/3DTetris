@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BLOCKMANAGER_H
+#define BLOCKMANAGER_H
+#endif
 
 #include "GameObject.h"
 #include <stdlib.h>
@@ -39,7 +41,7 @@ enum MoveDirection
 class BlockManager
 {
 public:
-	BlockManager(Block* blocks, int numBlocks, vector<GameObject> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
+	BlockManager(Block* blocks, int numBlocks, vector<GameObject*> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
 	~BlockManager();
 
 	void update(float dt);
@@ -63,7 +65,7 @@ public:
 private:
 	Block* blocks;
 	bool* gameGrid;
-	vector<GameObject> cubes;
+	vector<GameObject*> cubes;
 	int* typeOrder;
 	int* scores;
 	int score = 0;

@@ -63,9 +63,10 @@ GameManager::GameManager(HINSTANCE hInstance) : DirectXGame(hInstance)
 	gameState = MENU;
 }
 
+// Clean up here
 GameManager::~GameManager()
 {
-	// Clean up here
+	// Clean up game objects
 	for (UINT i = 0; i < gameObjects.size(); i++)
 	{
 		delete gameObjects[i];
@@ -74,15 +75,49 @@ GameManager::~GameManager()
 	{
 		delete menuObjects[i];
 	}
+	for (UINT i = 0; i < cubes.size(); i++)
+	{
+		delete cubes[i];
+	}
 
+	// Clean up blocks
+	for (UINT i = 0; i < 7; i++)
+	{
+		delete blocks[i].gameObject;
+		delete[] blocks[i].localGrid;
+		delete[] blocks[i].tempGrid;
+		delete[] blocks[i].grid;	// I think this is causing our 7 0byte memory leaks
+	}
+	delete[] blocks;
+	delete blockManager;
+
+	// Clean up meshes
 	delete triangleMesh;
 	delete quadMesh;
 	delete cubeMesh;
+	delete jBlockMesh;
+	delete lBlockMesh;
+	delete leftBlockMesh;
+	delete longBlockMesh;
+	delete rightBlockMesh;
+	delete squareBlockMesh;
+	delete stairsBlockMesh;
+	delete frameMesh;
 
+	// Clean up materials
 	delete shapeMaterial;
+	delete jBlockMaterial;
+	delete lBlockMaterial;
+	delete leftBlockMaterial;
+	delete longBlockMaterial;
+	delete rightBlockMaterial;
+	delete squareBlockMaterial;
+	delete stairsBlockMaterial;
+	delete frameMaterial;
 
 	delete camera;
 
+	// Release DX
 	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
@@ -103,102 +138,10 @@ bool GameManager::Init()
 	// Load shaders that we want
 	LoadShadersAndInputLayout();
 
-	// Create materials
-	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
-	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
-	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"title.png");
-	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"label.png");
-
-	// Prepare to load meshes
-	ObjLoader* loader = new ObjLoader();
-	
-	// Load basic cube
-	ID3D11Buffer* vertexBuffer;
-	ID3D11Buffer* indexBuffer;
-	UINT i = loader->Load("cube.txt", device, &vertexBuffer, &indexBuffer);
-	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, i);
+	LoadMeshesAndMaterials();
 
 	// Set up block types
-	blocks = new Block[7];
-
-	int size = loader->Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[0].threeByThree = true;
-	blocks[0].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
-	blocks[0].localGrid = new bool[9];
-	blocks[0].tempGrid = new bool[9];
-	blocks[0].grid = new bool[] {
-		true,  true,  true,
-		true,  false, false,
-		false, false, false
-	};
-
-	size = loader->Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[1].threeByThree = true;
-	blocks[1].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
-	blocks[1].localGrid = new bool[9];
-	blocks[1].tempGrid = new bool[9];
-	blocks[1].grid = new bool[] {
-		true,  true,  true,
-		false, false, true,
-		false, false, false
-	};
-
-	size = loader->Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[2].threeByThree = true;
-	blocks[2].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
-	blocks[2].localGrid = new bool[9];
-	blocks[2].tempGrid = new bool[9];
-	blocks[2].grid = new bool[] {
-		false, true,  true,
-		true,  true,  false,
-		false, false, false
-	};
-
-	size = loader->Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[3].threeByThree = false;
-	blocks[3].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
-	blocks[3].localGrid = new bool[16];
-	blocks[3].tempGrid = new bool[16];
-	blocks[3].grid = new bool[] {
-		false, false, false, false,
-		true,  true,  true,  true,
-		false, false, false, false,
-		false, false, false, false
-	};
-
-	size = loader->Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[4].threeByThree = true;
-	blocks[4].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
-	blocks[4].localGrid = new bool[9];
-	blocks[4].tempGrid = new bool[9];
-	blocks[4].grid = new bool[] {
-		true,  true,  false,
-		false, true,  true,
-		false, false, false
-	};
-
-	size = loader->Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[5].threeByThree = false;
-	blocks[5].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(2.0f, 2.0f, 0.0f));
-	blocks[5].localGrid = new bool[16];
-	blocks[5].tempGrid = new bool[16];
-	blocks[5].grid = new bool[] {
-		false, false, false, false,
-		false, true,  true,  false,
-		false, true,  true,  false,
-		false, false, false, false
-	};
-
-    size = loader->Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
-	blocks[6].threeByThree = true;
-	blocks[6].gameObject = new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png"), new XMFLOAT3(0, 0, 0), new XMFLOAT3(0, 0, 0), new XMFLOAT3(1.5f, 1.5f, 0.0f));
-	blocks[6].localGrid = new bool[9];
-	blocks[6].tempGrid = new bool[9];
-	blocks[6].grid = new bool[] {
-		true,  true,  true,
-		false, true,  false,
-		false, false, false
-	};
+	BuildBlockTypes();
 
 	spriteBatch = new SpriteBatch(deviceContext);
 	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
@@ -206,16 +149,12 @@ bool GameManager::Init()
 	spriteFont72 = new SpriteFont(device, L"jing72.spritefont");
 
 	// Load the frame
-	size = loader->Load("frame.txt", device, &vertexBuffer, &indexBuffer);
-	gameObjects.emplace_back(new GameObject(new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size), new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png"), new XMFLOAT3(-3.0f, -5.0f, 0.0f), new XMFLOAT3(0.0f, 0.0f, 0.0f)));
-
-	// Finished using the ObjLoader
-	delete loader;
+	gameObjects.emplace_back(new GameObject(frameMesh, frameMaterial, &XMFLOAT3(-3.0f, -5.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 
 	// Set up block manager
 	for (int j = 0; j < GRID_HEIGHT; j++) {
 		for (int i = 0; i < GRID_WIDTH; i++) {
-			cubes.push_back(*new GameObject(cubeMesh, shapeMaterial, new XMFLOAT3(i - 4.5, j - 5, 0), new XMFLOAT3(0, 0, 0)));
+			cubes.push_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3((float)i - 4.5f, (float)j - 5.0f, 0), &XMFLOAT3(0, 0, 0)));
 		}
 	}
 	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-8.25, 12.5, 0), 1);
@@ -334,6 +273,129 @@ void GameManager::LoadShadersAndInputLayout()
 		NULL,
 		&vsConstantBuffer));
 }
+
+// Load each of the game's meshes and materials
+void GameManager::LoadMeshesAndMaterials()
+{
+	// Prepare some variables
+	ObjLoader loader = ObjLoader();
+	ID3D11Buffer* vertexBuffer;
+	ID3D11Buffer* indexBuffer;
+	int size;
+
+	// Create materials
+	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
+	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
+	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"title.png");
+	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"label.png");
+	jBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png");
+	lBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png");
+	leftBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png");
+	longBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png");
+	rightBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png");
+	squareBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png");
+	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png");
+	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png");
+
+	// Load meshes
+	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
+	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
+	jBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("lBlock.txt", device, &vertexBuffer, &indexBuffer);
+	lBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("leftBlock.txt", device, &vertexBuffer, &indexBuffer);
+	leftBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("longBlock.txt", device, &vertexBuffer, &indexBuffer);
+	longBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("rightBlock.txt", device, &vertexBuffer, &indexBuffer);
+	rightBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("squareBlock.txt", device, &vertexBuffer, &indexBuffer);
+	squareBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("stairsBlock.txt", device, &vertexBuffer, &indexBuffer);
+	stairsBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("frame.txt", device, &vertexBuffer, &indexBuffer);
+	frameMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+}
+
+// Create the structs of the different block types
+void GameManager::BuildBlockTypes()
+{
+	blocks = new Block[7];
+
+	blocks[0].threeByThree = true;
+	blocks[0].gameObject = new GameObject(jBlockMesh, jBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[0].localGrid = new bool[9];
+	blocks[0].tempGrid = new bool[9];
+	blocks[0].grid = new bool[9] {
+		true, true, true,
+			true, false, false,
+			false, false, false
+	};
+
+	blocks[1].threeByThree = true;
+	blocks[1].gameObject = new GameObject(lBlockMesh, lBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[1].localGrid = new bool[9];
+	blocks[1].tempGrid = new bool[9];
+	blocks[1].grid = new bool[9] {
+		true, true, true,
+			false, false, true,
+			false, false, false
+	};
+
+	blocks[2].threeByThree = true;
+	blocks[2].gameObject = new GameObject(leftBlockMesh, leftBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[2].localGrid = new bool[9];
+	blocks[2].tempGrid = new bool[9];
+	blocks[2].grid = new bool[9] {
+		false, true, true,
+			true, true, false,
+			false, false, false
+	};
+
+	blocks[3].threeByThree = false;
+	blocks[3].gameObject = new GameObject(longBlockMesh, longBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[3].localGrid = new bool[16];
+	blocks[3].tempGrid = new bool[16];
+	blocks[3].grid = new bool[16] {
+		false, false, false, false,
+			true, true, true, true,
+			false, false, false, false,
+			false, false, false, false
+	};
+
+	blocks[4].threeByThree = true;
+	blocks[4].gameObject = new GameObject(rightBlockMesh, rightBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[4].localGrid = new bool[9];
+	blocks[4].tempGrid = new bool[9];
+	blocks[4].grid = new bool[9] {
+		true, true, false,
+			false, true, true,
+			false, false, false
+	};
+
+	blocks[5].threeByThree = false;
+	blocks[5].gameObject = new GameObject(squareBlockMesh, squareBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[5].localGrid = new bool[16];
+	blocks[5].tempGrid = new bool[16];
+	blocks[5].grid = new bool[16] {
+		false, false, false, false,
+			false, true, true, false,
+			false, true, true, false,
+			false, false, false, false
+	};
+
+	blocks[6].threeByThree = true;
+	blocks[6].gameObject = new GameObject(stairsBlockMesh, stairsBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[6].localGrid = new bool[9];
+	blocks[6].tempGrid = new bool[9];
+	blocks[6].grid = new bool[9] {
+		true, true, true,
+			false, true, false,
+			false, false, false
+	};
+}
+
 #pragma endregion
 
 #pragma region Game Loop
@@ -368,11 +430,11 @@ void GameManager::UpdateScene(float dt)
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	std::vector<GameObject*> *meshObjects = 0;
-	if (gameState == GAME) meshObjects = &gameObjects;
+	if (gameState == GAME || gameState == DEBUG) meshObjects = &gameObjects;
 
 	std::vector<UIObject*> *uiObjects = 0;
 	if (gameState == MENU) uiObjects = &menuObjects;
-	if (gameState == GAME) uiObjects = &gameUIObjects;
+	if (gameState == GAME || gameState == DEBUG) uiObjects = &gameUIObjects;
 
 	// Update each mesh
 	if (meshObjects) {
@@ -380,7 +442,8 @@ void GameManager::UpdateScene(float dt)
 		for (UINT i = 0; i < meshObjects->size(); i++)
 		{
 			// [UPDATE] Update this object
-			(*meshObjects)[i]->Update(dt);
+			if (gameState != DEBUG)
+				(*meshObjects)[i]->Update(dt);
 
 			// [DRAW] Draw the object
 			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
@@ -388,8 +451,10 @@ void GameManager::UpdateScene(float dt)
 	}
 
 	// Update and draw the game if in game mode
-	if (gameState == GAME) {
-		blockManager->update(dt);
+	if (gameState == GAME || gameState == DEBUG)
+	{
+		if (gameState != DEBUG)
+			blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 	int score = blockManager->getScore();
@@ -498,19 +563,22 @@ void GameManager::CheckKeyBoard(float dt)
 			blockManager->holdBlock();
 		}
 	}
-
-	//else
+	else if (gameState == DEBUG)
 	{
 		// Strafing of camera
-		if (GetAsyncKeyState(VK_LEFT))
+		if (GetAsyncKeyState('A'))
 			camera->MoveHorizontal(-CAMERA_MOVE_FACTOR * dt);
-		else if (GetAsyncKeyState(VK_RIGHT))
+		else if (GetAsyncKeyState('D'))
 			camera->MoveHorizontal(CAMERA_MOVE_FACTOR * dt);
 		// Forward movement of camera
-		if (GetAsyncKeyState(VK_UP))
+		if (GetAsyncKeyState('W'))
 			camera->MoveDepth(CAMERA_MOVE_FACTOR * dt);
-		else if (GetAsyncKeyState(VK_DOWN))
+		else if (GetAsyncKeyState('S'))
 			camera->MoveDepth(-CAMERA_MOVE_FACTOR * dt);
+		if (GetAsyncKeyState('Q'))
+			camera->MoveVertical(CAMERA_MOVE_FACTOR * dt);
+		else if (GetAsyncKeyState('E'))
+			camera->MoveVertical(-CAMERA_MOVE_FACTOR * dt);
 	}
 }
 
@@ -554,7 +622,9 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case VK_NUMPAD9:
 			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
 			break;
-
+		case VK_CAPITAL:
+			gameState = (gameState != DEBUG) ? DEBUG : GAME;
+			break;
 		}
 	}
 
@@ -588,10 +658,13 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 
 void GameManager::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	if ((btnState & MK_LBUTTON) != 0)
+	if (gameState == DEBUG && (btnState & MK_LBUTTON) != 0)
 	{
 		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - prevMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - prevMousePos.y));
+
 		camera->RotateY(-dx);
+		camera->Pitch(-dy);
 	}
 
 	playButton->Update(x, y);

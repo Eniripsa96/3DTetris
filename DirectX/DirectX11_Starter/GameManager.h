@@ -25,7 +25,8 @@ using namespace std;
 enum GAME_STATE
 {
 	MENU,
-	GAME
+	GAME,
+	DEBUG
 };
 
 // Demo class which extends the base DirectXGame class
@@ -38,6 +39,8 @@ public:
 	// Overrides for base level methods
 	bool Init();
 	void LoadShadersAndInputLayout();
+	void BuildBlockTypes();
+	void LoadMeshesAndMaterials();
 	void OnResize();
 	void UpdateScene(float dt);
 	void CheckKeyBoard(float dt);
@@ -82,12 +85,30 @@ private:
 	Mesh* triangleMesh;
 	Mesh* quadMesh;
 	Mesh* cubeMesh;
+	Mesh* jBlockMesh;
+	Mesh* lBlockMesh;
+	Mesh* leftBlockMesh;
+	Mesh* longBlockMesh;
+	Mesh* rightBlockMesh;
+	Mesh* squareBlockMesh;
+	Mesh* stairsBlockMesh;
+	Mesh* frameMesh;
+
 	Material* shapeMaterial;
 	Material* buttonMaterial;
 	Material* titleMaterial;
 	Material* labelMaterial;
+	Material* jBlockMaterial;
+	Material* lBlockMaterial;
+	Material* leftBlockMaterial;
+	Material* longBlockMaterial;
+	Material* rightBlockMaterial;
+	Material* squareBlockMaterial;
+	Material* stairsBlockMaterial;
+	Material* frameMaterial;
+
 	Block* blocks;
-	vector<GameObject> cubes;
+	vector<GameObject*> cubes;
 	bool canRotate = false;
 
 	Button* playButton;
