@@ -178,10 +178,10 @@ bool GameManager::Init()
 	// Create 2D meshes
 	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
 	quadMesh = new Mesh(device, deviceContext, QUAD);
-	playButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
-	quitButton = new Button(quadMesh, buttonMaterial, new XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
-	scoreLabel = new UIObject(quadMesh, labelMaterial, new XMFLOAT3(0, 0, 0), spriteBatch, spriteFont24, L"Score:\n0");
-	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, new XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
+	playButton = new Button(quadMesh, buttonMaterial, &XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
+	quitButton = new Button(quadMesh, buttonMaterial, &XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
+	scoreLabel = new UIObject(quadMesh, labelMaterial, &XMFLOAT3(0, 0, 0), spriteBatch, spriteFont24, L"Score:\n0");
+	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, &XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
 	menuObjects.emplace_back(playButton);
 	menuObjects.emplace_back(quitButton);
 	gameUIObjects.emplace_back(scoreLabel);
