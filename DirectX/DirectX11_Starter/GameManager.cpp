@@ -175,7 +175,7 @@ bool GameManager::Init()
 			cubes.push_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3((float)i - 4.5f, (float)j - 5.0f, 0), &XMFLOAT3(0, 0, 0)));
 		}
 	}
-	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-5, -5, 0), XMFLOAT3(-8.5, 12.5, 0), 1);
+	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-4.5, -5, 0), XMFLOAT3(-8.5, 12.5, 0), 1);
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes
@@ -326,7 +326,7 @@ void GameManager::BuildBlockTypes()
 	blocks = new Block[7];
 
 	blocks[0].threeByThree = true;
-	blocks[0].gameObject = new GameObject(jBlockMesh, jBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[0].gameObject = new GameObject(jBlockMesh, jBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.0f, 1.5f, 0.0f));
 	blocks[0].localGrid = new bool[9];
 	blocks[0].tempGrid = new bool[9];
 	blocks[0].grid = new bool[9] {
@@ -336,7 +336,7 @@ void GameManager::BuildBlockTypes()
 	};
 
 	blocks[1].threeByThree = true;
-	blocks[1].gameObject = new GameObject(lBlockMesh, lBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[1].gameObject = new GameObject(lBlockMesh, lBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.0f, 1.5f, 0.0f));
 	blocks[1].localGrid = new bool[9];
 	blocks[1].tempGrid = new bool[9];
 	blocks[1].grid = new bool[9] {
@@ -346,7 +346,7 @@ void GameManager::BuildBlockTypes()
 	};
 
 	blocks[2].threeByThree = true;
-	blocks[2].gameObject = new GameObject(leftBlockMesh, leftBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[2].gameObject = new GameObject(leftBlockMesh, leftBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.0f, 1.5f, 0.0f));
 	blocks[2].localGrid = new bool[9];
 	blocks[2].tempGrid = new bool[9];
 	blocks[2].grid = new bool[9] {
@@ -356,7 +356,7 @@ void GameManager::BuildBlockTypes()
 	};
 
 	blocks[3].threeByThree = false;
-	blocks[3].gameObject = new GameObject(longBlockMesh, longBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[3].gameObject = new GameObject(longBlockMesh, longBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 2.0f, 0.0f));
 	blocks[3].localGrid = new bool[16];
 	blocks[3].tempGrid = new bool[16];
 	blocks[3].grid = new bool[16] {
@@ -367,7 +367,7 @@ void GameManager::BuildBlockTypes()
 	};
 
 	blocks[4].threeByThree = true;
-	blocks[4].gameObject = new GameObject(rightBlockMesh, rightBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[4].gameObject = new GameObject(rightBlockMesh, rightBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.0f, 1.5f, 0.0f));
 	blocks[4].localGrid = new bool[9];
 	blocks[4].tempGrid = new bool[9];
 	blocks[4].grid = new bool[9] {
@@ -377,7 +377,7 @@ void GameManager::BuildBlockTypes()
 	};
 
 	blocks[5].threeByThree = false;
-	blocks[5].gameObject = new GameObject(squareBlockMesh, squareBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(2.0f, 2.0f, 0.0f));
+	blocks[5].gameObject = new GameObject(squareBlockMesh, squareBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 2.0f, 0.0f));
 	blocks[5].localGrid = new bool[16];
 	blocks[5].tempGrid = new bool[16];
 	blocks[5].grid = new bool[16] {
@@ -388,7 +388,7 @@ void GameManager::BuildBlockTypes()
 	};
 
 	blocks[6].threeByThree = true;
-	blocks[6].gameObject = new GameObject(stairsBlockMesh, stairsBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.5f, 1.5f, 0.0f));
+	blocks[6].gameObject = new GameObject(stairsBlockMesh, stairsBlockMaterial, &XMFLOAT3(0, 0, 0), &XMFLOAT3(0, 0, 0), &XMFLOAT3(1.0f, 1.5f, 0.0f));
 	blocks[6].localGrid = new bool[9];
 	blocks[6].tempGrid = new bool[9];
 	blocks[6].grid = new bool[9] {
