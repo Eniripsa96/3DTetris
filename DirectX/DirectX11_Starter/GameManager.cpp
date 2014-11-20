@@ -137,6 +137,9 @@ GameManager::~GameManager()
 	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
 	ReleaseMacro(pixelShader);
+	ReleaseMacro(uiVertexShader);
+	ReleaseMacro(uiPixelShader);
+	ReleaseMacro(blendState);
 }
 
 #pragma endregion
