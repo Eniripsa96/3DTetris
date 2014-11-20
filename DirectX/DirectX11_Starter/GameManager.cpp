@@ -66,7 +66,7 @@ GameManager::GameManager(HINSTANCE hInstance) : DirectXGame(hInstance)
 // Clean up here
 GameManager::~GameManager()
 {
-	// Clean up game objects
+	// Clean up objects
 	for (UINT i = 0; i < gameObjects.size(); i++)
 	{
 		delete gameObjects[i];
@@ -79,6 +79,14 @@ GameManager::~GameManager()
 	{
 		delete cubes[i];
 	}
+	for (UINT i = 0; i < gameUIObjects.size(); i++)
+	{
+		delete gameUIObjects[i];
+	}
+	gameObjects.clear();
+	menuObjects.clear();
+	gameUIObjects.clear();
+	cubes.clear();
 
 	// Clean up blocks
 	for (UINT i = 0; i < 7; i++)
@@ -86,7 +94,7 @@ GameManager::~GameManager()
 		delete blocks[i].gameObject;
 		delete[] blocks[i].localGrid;
 		delete[] blocks[i].tempGrid;
-		delete[] blocks[i].grid;	// I think this is causing our 7 0byte memory leaks
+		delete[] blocks[i].grid;
 	}
 	delete[] blocks;
 	delete blockManager;
@@ -106,6 +114,9 @@ GameManager::~GameManager()
 
 	// Clean up materials
 	delete shapeMaterial;
+	delete buttonMaterial;
+	delete titleMaterial;
+	delete labelMaterial;
 	delete jBlockMaterial;
 	delete lBlockMaterial;
 	delete leftBlockMaterial;
@@ -116,6 +127,10 @@ GameManager::~GameManager()
 	delete frameMaterial;
 
 	delete camera;
+	delete spriteBatch;
+	delete spriteFont24;
+	delete spriteFont32;
+	delete spriteFont72;
 
 	// Release DX
 	ReleaseMacro(vsConstantBuffer);

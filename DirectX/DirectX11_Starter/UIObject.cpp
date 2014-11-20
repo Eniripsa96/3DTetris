@@ -2,7 +2,7 @@
 
 
 UIObject::UIObject(Mesh* mesh, Material* mat, XMFLOAT3* pos, SpriteBatch* pBatch, SpriteFont* pFont, wchar_t* pText)
-: GameObject(mesh, mat, pos, new XMFLOAT3(0, 0, 0))
+: GameObject(mesh, mat, pos, &XMFLOAT3(0.0f, 0.0f, 0.0f))
 {
 	batch = pBatch;
 	font = pFont;

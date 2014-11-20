@@ -26,6 +26,7 @@ BlockManager::~BlockManager()
 {
 	delete[] gameGrid;
 	delete[] typeOrder;
+	delete[] scores;
 }
 
 // Updates the blocks in the game
@@ -367,7 +368,6 @@ void BlockManager::mergeBlock()
 				}
 
 				// Merge the cell
-				Block block;
 				float x = (targetX + i) * blockWidth + min.x;
 				float y = (targetY + j) * blockWidth + min.y;
 				float z = min.z;
