@@ -87,35 +87,23 @@ void BlockManager::update(float dt)
 // Draws the blocks in the game
 void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
+	cBufferData->color.w = 0.6;
+
+	// Active block
 	if (activeId != -1) {
-
-		// [UPDATE] Update constant buffer data using this object
 		blocks[typeOrder[activeId]].gameObject->Update(0);
 		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
-
-		cBufferData->color.w = 0.5;
-
-		// Draw the ghost block
-		XMFLOAT3 prev = blocks[typeOrder[activeId]].gameObject->position;
-		blocks[typeOrder[activeId]].gameObject->position = XMFLOAT3(prev.x, getGhostPos().y, prev.z);
-
-		// [UPDATE] Update constant buffer data using this object
-		blocks[typeOrder[activeId]].gameObject->Update(0);
-		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
-		blocks[typeOrder[activeId]].gameObject->position = prev;
-
-		cBufferData->color.w = 1;
 	}
 
+	// Grid cubes
 	for (int i = 0; i < GRID_HEIGHT * GRID_WIDTH; i++) {
 		if (gameGrid[i]) {
-			
-			// [UPDATE] Update constant buffer data using this object
 			cubes[i]->Update(0);
 			cubes[i]->Draw(deviceContext, cBuffer, cBufferData);
 		}
 	}
 
+	// Held block
 	if (heldId != -1)
 	{
 		XMFLOAT3 prev = blocks[typeOrder[heldId]].gameObject->position;
@@ -124,12 +112,26 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 		float rotation = blocks[typeOrder[heldId]].gameObject->rotation.z;
 		blocks[typeOrder[heldId]].gameObject->rotation.z = 0;
 
-		// [UPDATE] Update constant buffer data using this object
 		blocks[typeOrder[heldId]].gameObject->Update(0);
 		blocks[typeOrder[heldId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
 		blocks[typeOrder[heldId]].gameObject->position = prev;
 		blocks[typeOrder[heldId]].gameObject->rotation.z = rotation;
 	}
+
+	// Ghost block
+	if (activeId != -1) 
+	{
+		cBufferData->color.w = 0.3;
+
+		XMFLOAT3 prev = blocks[typeOrder[activeId]].gameObject->position;
+		blocks[typeOrder[activeId]].gameObject->position = XMFLOAT3(prev.x, getGhostPos().y, prev.z);
+		blocks[typeOrder[activeId]].gameObject->Update(0);
+		blocks[typeOrder[activeId]].gameObject->Draw(deviceContext, cBuffer, cBufferData);
+		blocks[typeOrder[activeId]].gameObject->position = prev;
+	}
+
+	// Restore the transparency
+	cBufferData->color.w = 1;
 }
 
 // Checks whether or not a move in the given direction can be made
