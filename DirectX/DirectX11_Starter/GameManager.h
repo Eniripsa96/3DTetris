@@ -111,6 +111,9 @@ private:
 	Material* frameMaterial;
 	Material* tileMaterial;
 
+	ID3D11SamplerState* linearSampler;
+	ID3D11SamplerState* anisotropicSampler;
+
 	Block* blocks;
 	vector<GameObject*> cubes;
 	bool canRotate = false;

@@ -111,6 +111,7 @@ GameManager::~GameManager()
 	delete squareBlockMesh;
 	delete stairsBlockMesh;
 	delete frameMesh;
+	delete environmentMesh;
 
 	// Clean up materials
 	delete shapeMaterial;
@@ -125,6 +126,7 @@ GameManager::~GameManager()
 	delete squareBlockMaterial;
 	delete stairsBlockMaterial;
 	delete frameMaterial;
+	delete tileMaterial;
 
 	delete camera;
 	delete spriteBatch;
@@ -140,6 +142,8 @@ GameManager::~GameManager()
 	ReleaseMacro(uiVertexShader);
 	ReleaseMacro(uiPixelShader);
 	ReleaseMacro(blendState);
+	ReleaseMacro(linearSampler);
+	ReleaseMacro(anisotropicSampler);
 }
 
 #pragma endregion
@@ -190,6 +194,7 @@ bool GameManager::Init()
 	menuObjects.emplace_back(quitButton);
 	gameUIObjects.emplace_back(scoreLabel);
 	
+	// Blend state - enabling alpha blending
 	BLEND_DESC blendDesc;
 	ZeroMemory(&blendDesc, sizeof(BLEND_DESC));
 	blendDesc.RenderTarget[0].BlendEnable = true;
@@ -201,6 +206,26 @@ bool GameManager::Init()
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	device->CreateBlendState(&blendDesc, &blendState);
+
+	// Sample state - linear wrap filtering
+	D3D11_SAMPLER_DESC* linearSampleState = new D3D11_SAMPLER_DESC();
+	linearSampleState->Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR; 
+	linearSampleState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	linearSampleState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	linearSampleState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	device->CreateSamplerState(linearSampleState, &linearSampler);
+	delete linearSampleState;
+
+	// Sample state - anisotropic wrap filtering
+	D3D11_SAMPLER_DESC* anisotropicState = new D3D11_SAMPLER_DESC();
+	anisotropicState->Filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+	anisotropicState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	anisotropicState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	anisotropicState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	anisotropicState->MaxAnisotropy = 7;
+	device->CreateSamplerState(anisotropicState, &anisotropicSampler);
+	delete anisotropicState;
+	anisotropicSampler = linearSampler;
 
 	camera = new Camera();
 
@@ -287,19 +312,19 @@ void GameManager::LoadMeshesAndMaterials()
 	int size;
 
 	// Create materials
-	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"image.png");
-	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"button.png");
-	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"title.png");
-	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, L"label.png");
-	jBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texJBlock.png");
-	lBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLBlock.png");
-	leftBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLeftBlock.png");
-	longBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texLongBlock.png");
-	rightBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texRightBlock.png");
-	squareBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png");
-	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png");
-	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png");
-	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"tile.png");
+	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"image.png");
+	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, linearSampler, L"button.png");
+	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, linearSampler, L"title.png");
+	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, linearSampler, L"label.png");
+	jBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texJBlock.png");
+	lBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texLBlock.png");
+	leftBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texLeftBlock.png");
+	longBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texLongBlock.png");
+	rightBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texRightBlock.png");
+	squareBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texSquareBlock.png");
+	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texStairsBlock.png");
+	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texFrame.png");
+	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, anisotropicSampler, L"tile.png");
 
 	// Load meshes
 	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
