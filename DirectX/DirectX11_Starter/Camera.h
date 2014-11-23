@@ -20,6 +20,7 @@ public:
 	void MoveDepth(float);
 	void RotateY(float);
 	void Pitch(float);
+	void Reset();
 
 	// Accessors
 	XMVECTOR GetForwardXM() const;

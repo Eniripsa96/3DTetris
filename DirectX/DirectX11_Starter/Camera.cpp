@@ -5,25 +5,13 @@ using namespace std;
 
 Camera::Camera()
 {
-	float xPos = -10.0f;
-	float xTar = 0.0f;
-	float yPos = 0.0f;
-	float yTar = 12.0f;
-	float zPos = -40.0f;
-	float zTar = 10.0f;
-	
-	// Set up view matrix (camera)
-	// In an actual game, update this when the camera moves (every frame)
-	position = XMFLOAT3(0.0f, 0.0f, zPos);
-	target = XMFLOAT3(0.0f, 0.0f, zTar);
-	XMMATRIX V = XMMatrixLookAtLH(XMLoadFloat3(&position), XMLoadFloat3(&target), GetUpXM());
-	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
-
 	forward = XMFLOAT3(0.0f, 0.0f, 1.0f);
 	up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	right = XMFLOAT3(1.0f, 0.0f, 0.0f);
 
 	projectionMatrix = XMFLOAT4X4();
+
+	Reset();
 }
 
 Camera::~Camera()
@@ -163,6 +151,22 @@ void Camera::Update(float dt)
 	// Recreate view matrix
 	//XMMATRIX V = XMMatrixLookAtLH(XMLoadFloat3(&position), XMLoadFloat3(&target), GetUpXM());
 	//XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
+}
+
+void Camera::Reset() {
+	float xPos = -10.0f;
+	float xTar = 100.0f;
+	float yPos = 6.0f;
+	float yTar = 12.0f;
+	float zPos = -30.0f;
+	float zTar = 10.0f;
+
+	// Set up view matrix (camera)
+	// In an actual game, update this when the camera moves (every frame)
+	position = XMFLOAT3(xPos, yPos, zPos);
+	target = XMFLOAT3(xTar, yTar, zTar);
+	XMMATRIX V = XMMatrixLookAtLH(XMLoadFloat3(&position), XMLoadFloat3(&target), GetUpXM());
+	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
 }
 
 #pragma region Accessors

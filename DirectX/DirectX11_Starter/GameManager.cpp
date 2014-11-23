@@ -168,6 +168,7 @@ bool GameManager::Init()
 
 	// Load the frame
 	gameObjects.emplace_back(new GameObject(frameMesh, frameMaterial, &XMFLOAT3(-3.0f, -5.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
+	gameObjects.emplace_back(new GameObject(environmentMesh, tileMaterial, &XMFLOAT3(-50.0f, -5.0f, -75.0f), &XMFLOAT3(0, 0, 0)));
 
 	// Set up block manager
 	for (int j = 0; j < GRID_HEIGHT; j++) {
@@ -298,6 +299,7 @@ void GameManager::LoadMeshesAndMaterials()
 	squareBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texSquareBlock.png");
 	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texStairsBlock.png");
 	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png");
+	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"tile.png");
 
 	// Load meshes
 	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
@@ -318,6 +320,8 @@ void GameManager::LoadMeshesAndMaterials()
 	stairsBlockMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
 	size = loader.Load("frame.txt", device, &vertexBuffer, &indexBuffer);
 	frameMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	size = loader.Load("environment.txt", device, &vertexBuffer, &indexBuffer);
+	environmentMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
 }
 
 // Create the structs of the different block types
