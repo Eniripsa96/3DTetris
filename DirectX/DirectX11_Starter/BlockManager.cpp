@@ -87,6 +87,7 @@ void BlockManager::update(float dt)
 // Draws the blocks in the game
 void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
+	cBufferData->lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.25f);
 	cBufferData->color.w = 0.6;
 
 	// Active block

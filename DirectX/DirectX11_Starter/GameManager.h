@@ -95,6 +95,7 @@ private:
 	Mesh* squareBlockMesh;
 	Mesh* stairsBlockMesh;
 	Mesh* frameMesh;
+	Mesh* environmentMesh;
 
 	Material* shapeMaterial;
 	Material* buttonMaterial;
@@ -108,6 +109,7 @@ private:
 	Material* squareBlockMaterial;
 	Material* stairsBlockMaterial;
 	Material* frameMaterial;
+	Material* tileMaterial;
 
 	Block* blocks;
 	vector<GameObject*> cubes;
