@@ -177,16 +177,14 @@ bool GameManager::Init()
 	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-4.5, -5, 0), XMFLOAT3(-8.5, 12.5, 0), 1);
 	blockManager->spawnFallingBlock();
 
-	// Create 2D meshes
-	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
-	quadMesh = new Mesh(device, deviceContext, QUAD);
-	playButton = new Button(quadMesh, buttonMaterial, &XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
-	quitButton = new Button(quadMesh, buttonMaterial, &XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
-	scoreLabel = new UIObject(quadMesh, labelMaterial, &XMFLOAT3(0, 0, 0), spriteBatch, spriteFont24, L"Score:\n0");
+	// Add 2D objects
 	menuObjects.emplace_back(new UIObject(quadMesh, titleMaterial, &XMFLOAT3(100, 50, 0), spriteBatch, spriteFont72, L"Tetris"));
 	menuObjects.emplace_back(playButton);
 	menuObjects.emplace_back(quitButton);
 	gameUIObjects.emplace_back(scoreLabel);
+
+	// Create particle emitter
+	//ParticleEmitter* emitter = new ParticleEmitter(quadMesh);
 	
 	BLEND_DESC blendDesc;
 	ZeroMemory(&blendDesc, sizeof(BLEND_DESC));
@@ -306,7 +304,7 @@ void GameManager::LoadMeshesAndMaterials()
 	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"texFrame.png");
 	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, L"tile.png");
 
-	// Load meshes
+	// Load 3D meshes
 	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
 	cubeMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
 	size = loader.Load("jBlock.txt", device, &vertexBuffer, &indexBuffer);
@@ -327,6 +325,13 @@ void GameManager::LoadMeshesAndMaterials()
 	frameMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
 	size = loader.Load("environment.txt", device, &vertexBuffer, &indexBuffer);
 	environmentMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+
+	// Load 2D meshes
+	//triangleMesh = new Mesh(device, deviceContext, TRIANGLE);
+	quadMesh = new Mesh(device, deviceContext, PARTICLE);
+	playButton = new Button(quadMesh, buttonMaterial, &XMFLOAT3(200, 250, 0), spriteBatch, spriteFont32, L"Play");
+	quitButton = new Button(quadMesh, buttonMaterial, &XMFLOAT3(200, 400, 0), spriteBatch, spriteFont32, L"Quit");
+	scoreLabel = new UIObject(quadMesh, labelMaterial, &XMFLOAT3(0, 0, 0), spriteBatch, spriteFont24, L"Score:\n0");
 }
 
 // Create the structs of the different block types
