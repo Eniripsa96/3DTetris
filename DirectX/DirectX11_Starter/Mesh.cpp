@@ -12,7 +12,9 @@ Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
 	if (shapeType == TRIANGLE)
 		CreateTrianglePoints();
 	else if (shapeType == QUAD)
-		CreateQuadPoints();
+		CreateQuadPoints(false);
+	else if (shapeType == PARTICLE)
+		CreateQuadPoints(true);
 }
 
 Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer, UINT iBufferSize)
@@ -41,10 +43,11 @@ void Mesh::CreateTrianglePoints()
 		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(1.0f, 1.0f) },
 	};
 
-	CreateGeometryBuffers(vertices);
+	CreateGeometryBuffers(vertices, false);
 }
 
-void Mesh::CreateQuadPoints()
+// Create the points for a quad. Particle=true means this quad is for a particle system
+void Mesh::CreateQuadPoints(bool particle)
 {
 	// Set up the vertices for a quad
 	Vertex vertices[] =
@@ -56,20 +59,31 @@ void Mesh::CreateQuadPoints()
 		{ XMFLOAT3(1, 0, 0), NORMALS_2D, XMFLOAT2(1.0f, 1.0f) },	// Bottom right
 	};
 
-	CreateGeometryBuffers(vertices);
+	CreateGeometryBuffers(vertices, particle);
 }
 
-// Creates the vertex and index buffers for a single triangle
-void Mesh::CreateGeometryBuffers(Vertex vertices[])
+// Creates the vertex and index buffers for a single triangle. Dynamic=true means a dynamic vertex buffer
+void Mesh::CreateGeometryBuffers(Vertex vertices[], bool dynamic)
 {
-	// Create the vertex buffer
+	// Create a dynamic vertex buffer
 	D3D11_BUFFER_DESC vbd;
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.ByteWidth = sizeof(Vertex) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
+
+	// Set the vertex buffer as static or dynamic as necessary
+	if (!dynamic)
+	{
+		vbd.Usage = D3D11_USAGE_IMMUTABLE;
+		vbd.CPUAccessFlags = 0;
+	}
+	else
+	{
+		vbd.Usage = D3D11_USAGE_DYNAMIC;
+		vbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	}
+
 	D3D11_SUBRESOURCE_DATA initialVertexData;
 	initialVertexData.pSysMem = vertices;
 	HR(device->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer));
@@ -88,11 +102,6 @@ void Mesh::CreateGeometryBuffers(Vertex vertices[])
 	D3D11_SUBRESOURCE_DATA initialIndexData;
 	initialIndexData.pSysMem = indices;
 	HR(device->CreateBuffer(&ibd, &initialIndexData, &indexBuffer));
-}
-
-void Mesh::Update()
-{
-
 }
 
 void Mesh::Draw()
