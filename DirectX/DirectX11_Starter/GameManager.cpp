@@ -209,7 +209,7 @@ bool GameManager::Init()
 
 	// Sample state - linear wrap filtering
 	D3D11_SAMPLER_DESC* linearSampleState = new D3D11_SAMPLER_DESC();
-	linearSampleState->Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR; 
+	linearSampleState->Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; 
 	linearSampleState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	linearSampleState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	linearSampleState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -218,11 +218,11 @@ bool GameManager::Init()
 
 	// Sample state - anisotropic wrap filtering
 	D3D11_SAMPLER_DESC* anisotropicState = new D3D11_SAMPLER_DESC();
-	anisotropicState->Filter = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+	anisotropicState->Filter = D3D11_FILTER_ANISOTROPIC;
 	anisotropicState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	anisotropicState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	anisotropicState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->MaxAnisotropy = 7;
+	anisotropicState->MaxAnisotropy = 8;
 	device->CreateSamplerState(anisotropicState, &anisotropicSampler);
 	delete anisotropicState;
 	anisotropicSampler = linearSampler;
