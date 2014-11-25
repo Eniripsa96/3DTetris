@@ -96,6 +96,18 @@
     <ClInclude Include="ObjLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="GrayscalePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="InversePixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="SepiaPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="Shaders\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
     </FxCompile>
