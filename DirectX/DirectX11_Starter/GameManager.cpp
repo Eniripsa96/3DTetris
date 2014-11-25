@@ -157,6 +157,26 @@ bool GameManager::Init()
 	if( !DirectXGame::Init() )
 		return false;
 
+	// Sample state - linear wrap filtering
+	D3D11_SAMPLER_DESC* linearSampleState = new D3D11_SAMPLER_DESC();
+	linearSampleState->Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	linearSampleState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	linearSampleState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	linearSampleState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	device->CreateSamplerState(linearSampleState, &linearSampler);
+	delete linearSampleState;
+
+	// Sample state - anisotropic wrap filtering
+	D3D11_SAMPLER_DESC* anisotropicState = new D3D11_SAMPLER_DESC();
+	anisotropicState->Filter = D3D11_FILTER_ANISOTROPIC;
+	anisotropicState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	anisotropicState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	anisotropicState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	anisotropicState->MaxAnisotropy = 1;
+	device->CreateSamplerState(anisotropicState, &anisotropicSampler);
+	delete anisotropicState;
+	anisotropicSampler = linearSampler;
+
 	// Load shaders that we want
 	LoadShadersAndInputLayout();
 
@@ -206,26 +226,6 @@ bool GameManager::Init()
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	device->CreateBlendState(&blendDesc, &blendState);
-
-	// Sample state - linear wrap filtering
-	D3D11_SAMPLER_DESC* linearSampleState = new D3D11_SAMPLER_DESC();
-	linearSampleState->Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; 
-	linearSampleState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	linearSampleState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	linearSampleState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	device->CreateSamplerState(linearSampleState, &linearSampler);
-	delete linearSampleState;
-
-	// Sample state - anisotropic wrap filtering
-	D3D11_SAMPLER_DESC* anisotropicState = new D3D11_SAMPLER_DESC();
-	anisotropicState->Filter = D3D11_FILTER_ANISOTROPIC;
-	anisotropicState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->MaxAnisotropy = 8;
-	device->CreateSamplerState(anisotropicState, &anisotropicSampler);
-	delete anisotropicState;
-	anisotropicSampler = linearSampler;
 
 	camera = new Camera();
 
