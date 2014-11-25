@@ -41,6 +41,7 @@ public:
 	// Overrides for base level methods
 	bool Init();
 	void LoadShadersAndInputLayout();
+	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
 	void OnResize();
@@ -57,10 +58,11 @@ public:
 
 	// Shaders
 	ID3D11PixelShader* pixelShader;
+	ID3D11PixelShader* grayscaleShader;
+	ID3D11PixelShader* sepiaShader;
+	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
-	ID3D11PixelShader* uiPixelShader;
-	ID3D11VertexShader* uiVertexShader;
-
+	
 	// A few more odds and ends we'll need
 	ID3D11InputLayout* inputLayout;
 
