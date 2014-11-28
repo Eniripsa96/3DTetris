@@ -40,6 +40,7 @@ public:
 
 	// Overrides for base level methods
 	bool Init();
+	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
