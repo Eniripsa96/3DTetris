@@ -12,7 +12,7 @@ using namespace DirectX;
 class Material
 {
 public:
-	Material(ID3D11Device*, ID3D11DeviceContext*, ID3D11VertexShader*, ID3D11PixelShader*, const wchar_t*);
+	Material(ID3D11Device*, ID3D11DeviceContext*, ID3D11VertexShader*, ID3D11PixelShader*, ID3D11SamplerState*, const wchar_t*);
 	~Material();
 
 	void Draw();

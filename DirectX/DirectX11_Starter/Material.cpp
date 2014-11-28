@@ -1,22 +1,15 @@
 #include "Material.h"
 
-Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, const wchar_t* texPath)
+Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, ID3D11SamplerState* pSampler, const wchar_t* texPath)
 {
 	// Set dx11 variables
 	deviceContext = context;
 	vertexShader = vShader;
 	pixelShader = pShader;
+	samplerState = pSampler;
 
 	// Create SRV
 	//HRESULT result1 = device->CreateShaderResourceView(NULL , NULL, &resourceView);	// Error from having a NULL resource is intentional
-
-	// Create sampler description
-	D3D11_SAMPLER_DESC* samplerDesc = new D3D11_SAMPLER_DESC();
-	samplerDesc->Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	HRESULT result1 = device->CreateSamplerState(samplerDesc, &samplerState);
 
 	// Create texture
 	HRESULT result2 = CreateWICTextureFromFile(device, context, texPath, 0, &resourceView);
@@ -31,9 +24,7 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 	texWidth = desc.Width;
 	texHeight = desc.Height;
 	ReleaseMacro(res);
-	ReleaseMacro(tex)
-
-	delete samplerDesc;
+	ReleaseMacro(tex);
 }
 
 Material::~Material()
