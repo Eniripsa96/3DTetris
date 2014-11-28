@@ -139,8 +139,6 @@ GameManager::~GameManager()
 	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
 	ReleaseMacro(pixelShader);
-	ReleaseMacro(uiVertexShader);
-	ReleaseMacro(uiPixelShader);
 	ReleaseMacro(blendState);
 	ReleaseMacro(linearSampler);
 	ReleaseMacro(anisotropicSampler);
@@ -281,19 +279,11 @@ void GameManager::LoadShadersAndInputLayout()
 	// Clean up
 	ReleaseMacro(vsBlob);
 
-	// Load Pixel Shader ---------------------------------------
-	ID3DBlob* psBlob;
-	D3DReadFileToBlob(L"PixelShader.cso", &psBlob);
-
-	// Create the shader on the device
-	HR(device->CreatePixelShader(
-		psBlob->GetBufferPointer(),
-		psBlob->GetBufferSize(),
-		NULL,
-		&pixelShader));
-
-	// Clean up
-	ReleaseMacro(psBlob);
+	// Load Pixel Shaders ---------------------------------------
+	LoadPixelShader(L"PixelShader.cso", &pixelShader);
+	LoadPixelShader(L"GrayscalePixelShader.cso", &grayscaleShader);
+	LoadPixelShader(L"SepiaPixelShader.cso", &sepiaShader);
+	LoadPixelShader(L"InversePixelShader.cso", &inverseShader);
 	
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;
@@ -309,6 +299,21 @@ void GameManager::LoadShadersAndInputLayout()
 		&vsConstantBuffer));
 }
 
+void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader) {
+	ID3DBlob* psBlob;
+	D3DReadFileToBlob(file, &psBlob);
+
+	// Create the shader on the device
+	HR(device->CreatePixelShader(
+		psBlob->GetBufferPointer(),
+		psBlob->GetBufferSize(),
+		NULL,
+		shader));
+
+	// Clean up
+	ReleaseMacro(psBlob);
+}
+
 // Load each of the game's meshes and materials
 void GameManager::LoadMeshesAndMaterials()
 {
@@ -320,9 +325,9 @@ void GameManager::LoadMeshesAndMaterials()
 
 	// Create materials
 	shapeMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"image.png");
-	buttonMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, linearSampler, L"button.png");
-	titleMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, linearSampler, L"title.png");
-	labelMaterial = new Material(device, deviceContext, uiVertexShader, uiPixelShader, linearSampler, L"label.png");
+	buttonMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"button.png");
+	titleMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"title.png");
+	labelMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"label.png");
 	jBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texJBlock.png");
 	lBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texLBlock.png");
 	leftBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texLeftBlock.png");

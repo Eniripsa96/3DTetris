@@ -9,7 +9,8 @@ enum SHAPE
 {
 	NONE = 0,
 	TRIANGLE = 1,
-	QUAD = 2
+	QUAD = 2,
+	PARTICLE = 2
 };
 
 // Vertex struct for triangles
@@ -41,9 +42,8 @@ public:
 	~Mesh();
 
 	void CreateTrianglePoints();
-	void CreateQuadPoints();
-	void CreateGeometryBuffers(Vertex[]);
-	void Update();
+	void CreateQuadPoints(bool);
+	void CreateGeometryBuffers(Vertex[], bool);
 	void Draw();
 
 	// Buffers to hold actual geometry
