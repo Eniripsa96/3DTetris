@@ -43,8 +43,10 @@ public:
 	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
+	void LoadVertexShader(wchar_t* file, D3D11_INPUT_ELEMENT_DESC* vertexDesc, int size, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout);
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
+	void CreateShadowMapResources();
 	void OnResize();
 	void UpdateScene(float dt);
 	void CheckKeyBoard(float dt);
@@ -134,6 +136,12 @@ private:
 
 	const float CAMERA_MOVE_FACTOR = 10.0f;
 	const float CAMERA_TURN_FACTOR = 1.0f;
+
+	ID3D11Texture2D* shadowTex;
+	ID3D11ShaderResourceView* shadowSRV;
+	ID3D11DepthStencilView* shadowDSV;
+	ID3D11VertexShader* shadowVS;
+	ID3D11InputLayout* shadowIL;
 };
 
 #endif

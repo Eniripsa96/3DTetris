@@ -155,16 +155,11 @@ bool GameManager::Init()
 	if( !DirectXGame::Init() )
 		return false;
 
-	// Create samplers
 	CreateSamplers();
-
-	// Load shaders that we want
 	LoadShadersAndInputLayout();
-
 	LoadMeshesAndMaterials();
-
-	// Set up block types
 	BuildBlockTypes();
+	CreateShadowMapResources();
 
 	spriteBatch = new SpriteBatch(deviceContext);
 	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
@@ -247,9 +242,7 @@ void GameManager::CreateSamplers() {
 // vertex data to the device
 void GameManager::LoadShadersAndInputLayout()
 {
-	// Set up the vertex layout description
-	// This has to match the vertex input layout in the vertex shader
-	// We can't set up the input layout yet since we need the actual vert shader
+	// Main vertex description
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -257,27 +250,15 @@ void GameManager::LoadShadersAndInputLayout()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	// Load Vertex Shader --------------------------------------
-	ID3DBlob* vsBlob;
-	D3DReadFileToBlob(L"VertexShader.cso", &vsBlob);
+	// Shadow vertex description
+	D3D11_INPUT_ELEMENT_DESC shadowDesc[] = 
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
 
-	// Create the shader on the device
-	HR(device->CreateVertexShader(
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		NULL,
-		&vertexShader));
-
-	// Before cleaning up the data, create the input layout
-	HR(device->CreateInputLayout(
-		vertexDesc,
-		ARRAYSIZE(vertexDesc),
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		&inputLayout));
-
-	// Clean up
-	ReleaseMacro(vsBlob);
+	// Load Vertex Shaders --------------------------------------
+	LoadVertexShader(L"VertexShader.cso", vertexDesc, ARRAYSIZE(vertexDesc), &vertexShader, &inputLayout);
+	LoadVertexShader(L"ShadowVertexShader.cso", shadowDesc, ARRAYSIZE(shadowDesc), &shadowVS, &shadowIL);
 
 	// Load Pixel Shaders ---------------------------------------
 	LoadPixelShader(L"PixelShader.cso", &pixelShader);
@@ -312,6 +293,30 @@ void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader) {
 
 	// Clean up
 	ReleaseMacro(psBlob);
+}
+
+void GameManager::LoadVertexShader(wchar_t* file, D3D11_INPUT_ELEMENT_DESC* vertexDesc, int size, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout) 
+{
+	ID3DBlob* vsBlob;
+	D3DReadFileToBlob(file, &vsBlob);
+
+	// Create the shader on the device
+	HR(device->CreateVertexShader(
+		vsBlob->GetBufferPointer(),
+		vsBlob->GetBufferSize(),
+		NULL,
+		shader));
+
+	// Before cleaning up the data, create the input layout
+	HR(device->CreateInputLayout(
+		vertexDesc,
+		size,
+		vsBlob->GetBufferPointer(),
+		vsBlob->GetBufferSize(),
+		inputLayout));
+
+	// Clean up
+	ReleaseMacro(vsBlob);
 }
 
 // Load each of the game's meshes and materials
@@ -439,6 +444,36 @@ void GameManager::BuildBlockTypes()
 	};
 }
 
+void GameManager::CreateShadowMapResources() 
+{
+	// Texture
+	D3D11_TEXTURE2D_DESC texDesc;
+	texDesc.Width = windowWidth;
+	texDesc.Height = windowHeight;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	HR(device->CreateTexture2D(&texDesc, 0, &shadowTex));
+
+	// Depth Stencil
+	HR(device->CreateDepthStencilView(shadowTex, 0, &shadowDSV));
+
+	//// Resource View
+	//D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	//ZeroMemory(&srvDesc, sizeof(srvDesc));
+	//srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	//srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	//srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+	//srvDesc.Texture2D.MostDetailedMip = 0;
+	//HR(device->CreateShaderResourceView(shadowTex, &srvDesc, &shadowSRV));
+}
+
 #pragma endregion
 
 #pragma region Game Loop
@@ -449,7 +484,14 @@ void GameManager::UpdateScene(float dt)
 {
 	CheckKeyBoard(dt);
 
+	//// Shadow map
+	//deviceContext->OMSetRenderTargets(0, 0, shadowDSV);
+	//deviceContext->ClearDepthStencilView(shadowDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	//deviceContext->VSSetShader(shadowVS, 0, 0);
+	//deviceContext->PSSetShader(0, 0, 0);
+
 	// Clear the buffer
+	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 	deviceContext->ClearRenderTargetView(renderTargetView, color);
 	deviceContext->ClearDepthStencilView(
 		depthStencilView,
