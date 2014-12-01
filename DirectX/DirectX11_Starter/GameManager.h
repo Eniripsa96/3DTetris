@@ -11,6 +11,7 @@
 #include "ObjLoader.h"
 #include <SpriteFont.h>
 #include <SpriteBatch.h>
+#include "InputLayouts.h"
 
 // Include run-time memory checking in debug builds
 #if defined(DEBUG) || defined(_DEBUG)
@@ -65,9 +66,6 @@ public:
 	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
 	ID3D11GeometryShader* geometryShader;
-
-	// A few more odds and ends we'll need
-	ID3D11InputLayout* inputLayout;
 
 	// Blend state
 	ID3D11BlendState* blendState;

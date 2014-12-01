@@ -136,7 +136,6 @@ GameManager::~GameManager()
 
 	// Release DX
 	ReleaseMacro(vsConstantBuffer);
-	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
 	ReleaseMacro(pixelShader);
 	ReleaseMacro(blendState);
@@ -247,16 +246,6 @@ void GameManager::CreateSamplers() {
 // vertex data to the device
 void GameManager::LoadShadersAndInputLayout()
 {
-	// Set up the vertex layout description
-	// This has to match the vertex input layout in the vertex shader
-	// We can't set up the input layout yet since we need the actual vert shader
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
 	// Set up the geometry layout description
 	// [Particle System]
 	D3D11_SO_DECLARATION_ENTRY soDesc[] =
@@ -278,13 +267,8 @@ void GameManager::LoadShadersAndInputLayout()
 		NULL,
 		&vertexShader));
 
-	// Before cleaning up the data, create the input layout
-	HR(device->CreateInputLayout(
-		vertexDesc,
-		ARRAYSIZE(vertexDesc),
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		&inputLayout));
+	InputLayouts::InitializeVertexLayout(device, vsBlob);
+	InputLayouts::InitializeParticleLayout(device, vsBlob);
 
 	// Clean up
 	ReleaseMacro(vsBlob);
@@ -511,7 +495,7 @@ void GameManager::UpdateScene(float dt)
 		0);
 
 	// [DRAW] Set up the input assembler for objects
-	deviceContext->IASetInputLayout(inputLayout);
+	deviceContext->IASetInputLayout(InputLayouts::Vertex);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Update the camera
