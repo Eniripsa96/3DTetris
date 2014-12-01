@@ -40,6 +40,7 @@ public:
 
 	// Overrides for base level methods
 	bool Init();
+	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
 	void BuildBlockTypes();
@@ -112,6 +113,9 @@ private:
 	Material* stairsBlockMaterial;
 	Material* frameMaterial;
 	Material* tileMaterial;
+
+	ID3D11SamplerState* linearSampler;
+	ID3D11SamplerState* anisotropicSampler;
 
 	Block* blocks;
 	vector<GameObject*> cubes;
