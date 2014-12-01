@@ -43,6 +43,7 @@ public:
 	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
+	void LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shader);
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
 	void OnResize();
@@ -63,7 +64,8 @@ public:
 	ID3D11PixelShader* sepiaShader;
 	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
-	
+	ID3D11GeometryShader* geometryShader;
+
 	// A few more odds and ends we'll need
 	ID3D11InputLayout* inputLayout;
 
