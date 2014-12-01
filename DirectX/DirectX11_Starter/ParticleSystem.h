@@ -6,8 +6,18 @@
 #include <utility>
 
 #include "Camera.h"
+#include "InputLayouts.h"
 
 using namespace DirectX;
+
+struct Particle
+{
+	XMFLOAT3 initialPos;
+	XMFLOAT3 initialVel;
+	XMFLOAT2 size;
+	float age;
+	unsigned int type;
+};
 
 class ParticleSystem
 {
@@ -27,6 +37,8 @@ public:
 	void Reset();
 	void Update(float dt, float gameTime);
 	void Draw(ID3D11DeviceContext* dc, const Camera& cam);
+
+	ID3D11InputLayout* inputLayout;
 
 private:
 	void BuildVB(ID3D11Device* device);

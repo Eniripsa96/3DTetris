@@ -22,6 +22,7 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 	// Grab the current view-projection
 	XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));
 
+#pragma region Update and send to stream-out
 	// What is the FX business? Look up this class in the book
 	// Set constants
 	/*fx->SetViewProj(VP);
@@ -34,14 +35,13 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 	fx->SetRandomTex(randomTexSRV);*/
 
 	// Set IA stage
-	//dc->IASetInputLayout(InputLayouts::Particle);	// Need to create this layout
+	dc->IASetInputLayout(InputLayouts::Particle);
 	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-	UINT stride = 0;
-	//UINT stride = sizeof(Vertex::Particle);	// need to create this particle struct
+	UINT stride = sizeof(Particle);
 	UINT offset = 0;
 
-	// On the first pass, une the initialization VB. Otherwise, us the VB that contains the current particle list
+	// On the first pass, use the initialization VB. Otherwise, use the VB that contains the current particle list
 	if (firstRun)
 		dc->IASetVertexBuffers(0, 1, &initVB, &stride, &offset);
 	else
@@ -71,7 +71,9 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 
 	// Ping-pong the vertex buffers
 	std::swap(drawVB, streamOutVB);
+#pragma endregion
 
+#pragma region Draw updated particles
 	// Draw the updated particle system we just streamed-out
 	dc->IASetVertexBuffers(0, 1, &drawVB, &stride, &offset);
 
@@ -82,7 +84,7 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 
 		dc->DrawAuto();
 	}
-	
+#pragma endregion
 }
 
 // TODO
