@@ -452,7 +452,8 @@ void GameManager::CreateShadowMapResources()
 	texDesc.Height = windowHeight;
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
-	texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	//texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	texDesc.CPUAccessFlags = 0;
