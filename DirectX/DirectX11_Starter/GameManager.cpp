@@ -208,6 +208,7 @@ bool GameManager::Init()
 	device->CreateBlendState(&blendDesc, &blendState);
 
 	camera = new Camera();
+	particleSystem = new ParticleSystem();
 
 	// Set up the world matrix for each mesh
 	XMMATRIX W = XMMatrixIdentity();
@@ -268,7 +269,18 @@ void GameManager::LoadShadersAndInputLayout()
 		&vertexShader));
 
 	InputLayouts::InitializeVertexLayout(device, vsBlob);
-	InputLayouts::InitializeParticleLayout(device, vsBlob);
+
+	// Create the particle vertex shader on the device
+	ID3DBlob* pvsBlob;
+	D3DReadFileToBlob(L"ParticleVertexShader.cso", &pvsBlob);
+	// Create the shader on the device
+	HR(device->CreateVertexShader(
+		pvsBlob->GetBufferPointer(),
+		pvsBlob->GetBufferSize(),
+		NULL,
+		&particleVertexShader));
+
+	InputLayouts::InitializeParticleLayout(device, pvsBlob);
 
 	// Clean up
 	ReleaseMacro(vsBlob);
@@ -537,6 +549,7 @@ void GameManager::UpdateScene(float dt)
 		if (gameState != DEBUG)
 			blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		//particleSystem->Draw(deviceContext, *camera);
 	}
 	int score = blockManager->getScore();
 	std::wstring s = std::wstring(L"Score\n") + std::to_wstring(score);

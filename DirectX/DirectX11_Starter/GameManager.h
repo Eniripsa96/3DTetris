@@ -67,6 +67,7 @@ public:
 	ID3D11PixelShader* sepiaShader;
 	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
+	ID3D11VertexShader* particleVertexShader;
 	ID3D11GeometryShader* geometryShader;
 
 	// Blend state
@@ -127,6 +128,7 @@ private:
 	Button* quitButton;
 	UIObject* scoreLabel;
 
+	ParticleSystem* particleSystem;
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;
 
