@@ -239,7 +239,6 @@ void GameManager::CreateSamplers() {
 	anisotropicState->MaxAnisotropy = 1;
 	device->CreateSamplerState(anisotropicState, &anisotropicSampler);
 	delete anisotropicState;
-	anisotropicSampler = linearSampler;
 }
 
 // Loads shaders from compiled shader object (.cso) files, and uses the
