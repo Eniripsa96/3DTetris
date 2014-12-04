@@ -102,6 +102,7 @@ private:
 	Mesh* stairsBlockMesh;
 	Mesh* frameMesh;
 	Mesh* environmentMesh;
+	Mesh* particleMesh;
 
 	Material* shapeMaterial;
 	Material* buttonMaterial;
@@ -116,6 +117,7 @@ private:
 	Material* stairsBlockMaterial;
 	Material* frameMaterial;
 	Material* tileMaterial;
+	Material* particleMaterial;
 
 	ID3D11SamplerState* linearSampler;
 	ID3D11SamplerState* anisotropicSampler;

@@ -247,16 +247,6 @@ void GameManager::CreateSamplers() {
 // vertex data to the device
 void GameManager::LoadShadersAndInputLayout()
 {
-	// Set up the geometry layout description
-	// [Particle System]
-	D3D11_SO_DECLARATION_ENTRY soDesc[] =
-	{
-		// stream number, semantic name, semantic index, start component, component count, output slot
-		{ 0, "SV_POSITION", 0, 0, 4, 0 },   // output all components of position
-		{ 0, "NORMAL", 0, 0, 3, 0 },     // output the first 3 of the normal
-		{ 0, "TEXCOORD0", 0, 0, 2, 0 },     // output the first 2 texture coordinates
-	};
-
 	// Load Vertex Shader --------------------------------------
 	ID3DBlob* vsBlob;
 	D3DReadFileToBlob(L"VertexShader.cso", &vsBlob);
@@ -307,27 +297,6 @@ void GameManager::LoadShadersAndInputLayout()
 		&cBufferDesc,
 		NULL,
 		&vsConstantBuffer));
-
-	// Set the Ouput Targets -----------------------------------
-	// [Particle System]
-	ID3D11Buffer* soBuffer;
-	int bufferSize = 1000000;
-	D3D11_BUFFER_DESC soBufferDesc =
-	{
-		bufferSize,
-		D3D11_USAGE_DEFAULT,
-		D3D11_BIND_STREAM_OUTPUT,	// Flag indicates buffer resource to be updated frequently by CPU
-		0,
-		0,
-		0
-	};
-	HR(device->CreateBuffer(
-		&soBufferDesc,
-		NULL,
-		&soBuffer));
-	// Set stream buffer to current device
-	UINT offset[1] = { 0 };
-	deviceContext->SOSetTargets(1, &soBuffer, offset);	// num buffers, pointer to buffers, array of offsets
 }
 
 void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader) {

@@ -22,69 +22,13 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 	// Grab the current view-projection
 	XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));
 
-#pragma region Update and send to stream-out
-	// What is the FX business? Look up this class in the book
-	// Set constants
-	/*fx->SetViewProj(VP);
-	fx->SetGameTime(gameTime);
-	fx->SetTimeStep(timeStep);
-	fx->SetEyePosW(eyePosW);
-	fx->SetEmitPosW(emitPosW);
-	fx->SetEmitDirW(emitDirW);
-	fx->SetTexArray(texArraySRV);
-	fx->SetRandomTex(randomTexSRV);*/
+	// Update constant buffer with camera info
 
-	// Set IA stage
-	dc->IASetInputLayout(InputLayouts::Particle);
-	dc->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+	// Set necessary settings for drawing
 
-	UINT stride = sizeof(Particle);
-	UINT offset = 0;
-
-	// On the first pass, use the initialization VB. Otherwise, use the VB that contains the current particle list
-	if (firstRun)
-		dc->IASetVertexBuffers(0, 1, &initVB, &stride, &offset);
-	else
-		dc->IASetVertexBuffers(0, 1, &drawVB, &stride, &offset);
-
-	// Draw the current particle list using stream-out only to update them. The updated vertices are streamed-out to the target VB.
-	dc->SOSetTargets(1, &streamOutVB, &offset);
-	//fx->StreamOutTech->GetDesc(&techDesc);
-	//for (UINT p = 0; p < techDesc.Passes; ++p)
-	{
-		//fx->StreamOutTech->GetPassByIndex(p)->Apply(0, dc);
-
-		if (firstRun)
-		{
-			dc->Draw(1, 0);
-			firstRun = false;
-		}
-		else
-		{
-			dc->DrawAuto();
-		}
-	}
-
-	// Done streaming-out--unbind the vertex buffer
-	ID3D11Buffer* bufferArray[1] = { 0 };
-	dc->SOSetTargets(1, bufferArray, &offset);
-
-	// Ping-pong the vertex buffers
-	std::swap(drawVB, streamOutVB);
-#pragma endregion
-
-#pragma region Draw updated particles
-	// Draw the updated particle system we just streamed-out
-	dc->IASetVertexBuffers(0, 1, &drawVB, &stride, &offset);
-
-	//fx->DrawTech->GetDesc(&techDesc);
-	//for (UINT p = 0; p < techDesc.Passes; ++p)
-	{
-	//	fx->DrawTech->GetPassByIndex(p)->Apply(0, dc);
-
-		dc->DrawAuto();
-	}
-#pragma endregion
+	// Draw mesh
+		// This makes the vertex shader do its thing
+		// Then the geometry shader will do its thing following that and spit out to PS
 }
 
 // TODO
