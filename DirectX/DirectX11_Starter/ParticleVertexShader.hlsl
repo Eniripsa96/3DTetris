@@ -3,7 +3,7 @@
 //	return pos;
 //}
 
-struct ParticleInput
+struct VertexInput
 {
 	float3 initialPos	: POSITION;
 	float3 initialVel	: VELOCITY;
@@ -12,23 +12,23 @@ struct ParticleInput
 	unsigned int type	: TYPE;
 };
 
-struct ParticleOutput
+struct VertexOutput
 {
 	float4 initialPos	: SV_POSITION;
-	float3 initialVel	: VELOCITY;
-	float2 size			: SIZE;
-	float age : AGE;
-	unsigned int type : TYPE;
+	//float3 initialVel	: VELOCITY;
+	//float2 size			: SIZE;
+	//float age : AGE;
+	//unsigned int type : TYPE;
 };
 
-ParticleOutput main(ParticleInput input)
+VertexOutput main(VertexInput input)
 {
-	ParticleOutput output;
+	VertexOutput output;
 	output.initialPos = float4(input.initialPos, 1.0f);
-	output.initialVel = input.initialPos;
-	output.size = input.size;
-	output.age = input.age;
-	output.type = input.type;
+	//output.initialVel = input.initialPos;
+	//output.size = input.size;
+	//output.age = input.age;
+	//output.type = input.type;
 
 	return output;
 }
