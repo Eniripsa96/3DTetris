@@ -7,6 +7,10 @@ cbuffer perModel : register(b0)
 	matrix world;
 	matrix view;
 	matrix projection;
+	matrix lightView;
+	matrix lightProjection;
+	float4 lightDirection;
+	float4 color;
 };
 
 // Defines what kind of data to expect as input
@@ -28,8 +32,14 @@ struct Output
 Output main(VertexShaderInput input)
 {
 	Output output;
+
+	// Calculate output position
 	matrix worldViewProj = mul(mul(world, view), projection);
 	output.position = mul(float4(input.position, 1.0f), worldViewProj);
-	output.lightPos = output.position;
+
+	// Caclulate lighting position
+	matrix lightWorldViewProj = mul(mul(world, lightView), lightProjection);
+	output.lightPos = mul(float4(input.position, 1.0f), lightWorldViewProj);
+
 	return output;
 }

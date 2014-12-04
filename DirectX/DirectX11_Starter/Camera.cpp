@@ -31,6 +31,17 @@ void Camera::Move(XMFLOAT3* move)
 	target.z += move->z / 10.0f;
 }
 
+void Camera::MoveTo(XMFLOAT3* pos)
+{
+	target.x += pos->x - position.x;
+	target.y += pos->y - position.y;
+	target.z += pos->z - position.z;
+
+	position.x = pos->x;
+	position.y = pos->y;
+	position.z = pos->z;
+}
+
 void Camera::MoveVertical(float move)
 {
 	// Translate camera along up vector
@@ -63,6 +74,16 @@ void Camera::MoveDepth(float move)
 
 	XMStoreFloat3(&position, XMVectorMultiplyAdd(s, f, p));
 	XMStoreFloat3(&target, XMVectorMultiplyAdd(s, f, t));
+}
+
+void Camera::LookAt(XMFLOAT3* pos)
+{
+	target.x = pos->x;
+	target.y = pos->y;
+	target.z = pos->z;
+
+	XMMATRIX V = XMMatrixLookAtLH(XMLoadFloat3(&position), XMLoadFloat3(&target), GetUpXM());
+	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
 }
 
 void Camera::Pitch(float angle)

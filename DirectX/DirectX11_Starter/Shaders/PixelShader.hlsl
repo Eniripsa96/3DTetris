@@ -11,6 +11,7 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;
 	float3 normal		: NORMAL;
 	float2 uv			: TEXCOORD0;
+	float4 lightPos     : TEXCOORD1;
 	float4 lightDir     : LIGHT;
 	float4 color        : COLOR;
 };
@@ -18,7 +19,21 @@ struct VertexToPixel
 // Entry point for this pixel shader
 float4 main(VertexToPixel input) : SV_TARGET
 {
+	input.lightPos.xyz /= input.lightPos.w;
+	float shade = 1.0f;
+	if (input.lightPos.x >= -1.0f && input.lightPos.x <= 1.0f
+			&& input.lightPos.y >= -1.0f && input.lightPos.y <= 1.0f
+			&& input.lightPos.z >= -1.0f && input.lightPos.z <= 1.0f) {
+
+		input.lightPos.xy = input.lightPos.xy / 2 + 0.5f;
+
+		float depth = shadowMap.Sample(shadowSampler, input.lightPos.xy).r;
+		if (depth < input.lightPos.z) {
+			shade = 0.0f;
+		}
+	}
+
 	// Return color sampled from texture
 	float nDotL = dot(normalize(input.normal), -normalize((float3)input.lightDir));
-	return float4(myTexture.Sample(mySampler, input.uv).xyz * (1 - input.lightDir.w + input.lightDir.w * nDotL) * input.color.xyz, input.color.w);
+	return float4(myTexture.Sample(mySampler, input.uv).xyz * (1 - input.lightDir.w + shade * input.lightDir.w * nDotL) * input.color.xyz, input.color.w);
 }

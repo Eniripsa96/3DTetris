@@ -138,7 +138,12 @@ GameManager::~GameManager()
 	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(inputLayout);
 	ReleaseMacro(vertexShader);
+	ReleaseMacro(shadowVS);
+	ReleaseMacro(grayscaleShader);
+	ReleaseMacro(sepiaShader);
+	ReleaseMacro(inverseShader);
 	ReleaseMacro(pixelShader);
+	ReleaseMacro(shadowPS);
 	ReleaseMacro(blendState);
 	ReleaseMacro(linearSampler);
 	ReleaseMacro(anisotropicSampler);
@@ -160,6 +165,11 @@ bool GameManager::Init()
 	LoadMeshesAndMaterials();
 	BuildBlockTypes();
 	//CreateShadowMapResources();
+
+	shadowCam = new Camera();
+	shadowCam->MoveTo(&XMFLOAT3(-20, 30, -10));
+	shadowCam->LookAt(&XMFLOAT3(0, 0, 0));
+	shadowCam->Move(&XMFLOAT3(0, -5, 0));
 
 	spriteBatch = new SpriteBatch(deviceContext);
 	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
@@ -447,6 +457,7 @@ void GameManager::CreateShadowMapResources()
 {
 	ReleaseMacro(shadowTex);
 	ReleaseMacro(shadowDSV);
+	ReleaseMacro(shadowSRV);
 
 	// Texture
 	D3D11_TEXTURE2D_DESC texDesc;
@@ -454,7 +465,6 @@ void GameManager::CreateShadowMapResources()
 	texDesc.Height = windowHeight;
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
-	//texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
@@ -501,31 +511,61 @@ void GameManager::UpdateScene(float dt)
 	if (gameState == MENU) uiObjects = &menuObjects;
 	if (gameState == GAME || gameState == DEBUG) uiObjects = &gameUIObjects;
 
-	////// Shadow map
-	//deviceContext->OMSetRenderTargets(0, 0, shadowDSV);
-	//deviceContext->ClearDepthStencilView(shadowDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	//deviceContext->VSSetShader(shadowVS, 0, 0);
-	//deviceContext->PSSetShader(0, 0, 0);
+	// [DRAW] Set up the input assembler for objects
+	deviceContext->IASetInputLayout(inputLayout);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//// Update each mesh
-	//if (meshObjects) {
+	// Update each mesh
+	if (meshObjects) {
+		for (UINT i = 0; i < meshObjects->size(); i++) {
+			if (gameState != DEBUG) (*meshObjects)[i]->Update(dt);
+		}
+	}
 
-	//	for (UINT i = 0; i < meshObjects->size(); i++)
-	//	{
-	//		// [UPDATE] Update this object
-	//		if (gameState != DEBUG)
-	//			(*meshObjects)[i]->Update(dt);
+	// --------- Shadow Map Generation ------------------------------------------------------------------
+	
+	// Update shadow camera
+	//shadowCam->Update(dt);
 
-	//		// [DRAW] Draw the object
-	//		(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
-	//	}
-	//}
+	// [UPDATE] Update constant buffer data
+	dataToSendToVSConstantBuffer.view = shadowCam->viewMatrix;
+	dataToSendToVSConstantBuffer.projection = shadowProjection;
+	dataToSendToVSConstantBuffer.lightView = shadowCam->viewMatrix;
+	dataToSendToVSConstantBuffer.lightProjection = shadowProjection;
+	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.95f);
+	dataToSendToVSConstantBuffer.color = XMFLOAT4(1, 1, 1, 1);
 
-	//// Update and draw the game if in game mode
-	//if (gameState == GAME || gameState == DEBUG)
-	//{
-	//	blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
-	//}
+	// Shadow map
+	deviceContext->OMSetRenderTargets(0, 0, shadowDSV);
+	//deviceContext->OMSetRenderTargets(1, &renderTargetView, shadowDSV);
+	deviceContext->ClearDepthStencilView(shadowDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	deviceContext->VSSetShader(shadowVS, 0, 0);
+	deviceContext->PSSetShader(0, 0, 0);
+	//deviceContext->PSSetShader(shadowPS, 0, 0);
+
+	// Draw mesh objects that can cast shadows
+	if (meshObjects) {
+		for (UINT i = 0; i < meshObjects->size(); i++) {
+			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		}
+	}
+
+	// Draw the game if in game mode
+	if (gameState == GAME || gameState == DEBUG)
+	{
+		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	}
+
+	//return;
+
+	// ----------- Normal Rendering --------------------------------------------------------
+
+	// Update the camera
+	camera->Update(dt);
+
+	// [UPDATE] Update constant buffer data
+	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	// Clear the buffer
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -536,6 +576,10 @@ void GameManager::UpdateScene(float dt)
 		1.0f,
 		0);
 
+	// Bind shadow map
+	deviceContext->PSSetShaderResources(1, 1, &shadowSRV);
+	deviceContext->PSSetSamplers(1, 1, &pointSampler);
+
 	// Set the shaders
 	deviceContext->VSSetShader(vertexShader, 0, 0);
 	deviceContext->PSSetShader(pixelShader, 0, 0);
@@ -544,37 +588,14 @@ void GameManager::UpdateScene(float dt)
 	deviceContext->PSSetShaderResources(1, 1, &shadowSRV);
 	deviceContext->PSSetSamplers(1, 1, &pointSampler);
 	
-	// [DRAW] Set up the input assembler for objects
-	deviceContext->IASetInputLayout(inputLayout);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Update the camera
-	camera->Update(dt);
-
-	// [UPDATE] Update constant buffer data
-	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
-	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
-	dataToSendToVSConstantBuffer.color = XMFLOAT4(1, 1, 1, 1);
-	//dataToSendToVSConstantBuffer.resolution = XMFLOAT2(windowWidth, windowHeight);
-
-	// Projection matrix
-	dataToSendToVSConstantBuffer.projection = projectionMatrix;
-
-	// Update each mesh
+	// Draw each mesh
 	if (meshObjects) {
-
-		for (UINT i = 0; i < meshObjects->size(); i++)
-		{
-			// [UPDATE] Update this object
-			if (gameState != DEBUG)
-				(*meshObjects)[i]->Update(dt);
-
-			// [DRAW] Draw the object
+		for (UINT i = 0; i < meshObjects->size(); i++) {
 			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 		}
 	}
 
-	// Update and draw the game if in game mode
+	// Draw the game if in game mode
 	if (gameState == GAME || gameState == DEBUG)
 	{
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
@@ -809,8 +830,16 @@ void GameManager::OnResize()
 	// Handle base-level DX resize stuff
 	DirectXGame::OnResize();
 
-	// Update our projection matrix since the window size changed
+	// Shadow map projection
 	XMMATRIX P = XMMatrixPerspectiveFovLH(
+		0.5f * 3.1415926535f,
+		AspectRatio(),
+		0.1f,
+		100.0f);
+	XMStoreFloat4x4(&shadowProjection, XMMatrixTranspose(P));
+
+	// Update our projection matrix since the window size changed
+	P = XMMatrixPerspectiveFovLH(
 		0.25f * 3.1415926535f,
 		AspectRatio(),
 		0.1f,

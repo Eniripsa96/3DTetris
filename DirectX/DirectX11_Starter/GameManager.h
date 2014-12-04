@@ -138,6 +138,8 @@ private:
 	const float CAMERA_MOVE_FACTOR = 10.0f;
 	const float CAMERA_TURN_FACTOR = 1.0f;
 
+	Camera* shadowCam;
+	XMFLOAT4X4 shadowProjection;
 	ID3D11Texture2D* shadowTex;
 	ID3D11ShaderResourceView* shadowSRV;
 	ID3D11DepthStencilView* shadowDSV;

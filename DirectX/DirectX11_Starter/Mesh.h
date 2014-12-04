@@ -29,9 +29,10 @@ struct VertexShaderConstantBufferLayout
 	XMFLOAT4X4 world;
 	XMFLOAT4X4 view;
 	XMFLOAT4X4 projection;
+	XMFLOAT4X4 lightView;
+	XMFLOAT4X4 lightProjection;
 	XMFLOAT4 lightDirection;
 	XMFLOAT4 color;
-	//XMFLOAT2 resolution;
 };
 
 class Mesh
