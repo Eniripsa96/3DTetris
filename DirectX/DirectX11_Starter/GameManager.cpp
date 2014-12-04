@@ -464,19 +464,20 @@ void GameManager::CreateShadowMapResources()
 	texDesc.SampleDesc.Quality = 0;
 	HR(device->CreateTexture2D(&texDesc, 0, &shadowTex));
 
-	// Still not working, trying to base it off this:
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/bb205074%28v=vs.85%29.aspx
-	// Under "Reading the Depth-Stencil Buffer as a Texture"
-
 	// Depth Stencil
-	HR(device->CreateDepthStencilView(shadowTex, 0, &shadowDSV));
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	ZeroMemory(&descDSV, sizeof(descDSV));
+	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+	HR(device->CreateDepthStencilView(shadowTex, &descDSV, &shadowDSV));
 
 	// Resource View
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 	ZeroMemory(&srvDesc, sizeof(srvDesc));
 	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MipLevels = 0;
+	srvDesc.Texture2D.MipLevels = 1;
 	HR(device->CreateShaderResourceView(shadowTex, &srvDesc, &shadowSRV));
 }
 
