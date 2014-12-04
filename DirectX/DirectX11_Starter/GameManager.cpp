@@ -159,7 +159,7 @@ bool GameManager::Init()
 	LoadShadersAndInputLayout();
 	LoadMeshesAndMaterials();
 	BuildBlockTypes();
-	CreateShadowMapResources();
+	//CreateShadowMapResources();
 
 	spriteBatch = new SpriteBatch(deviceContext);
 	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
@@ -217,24 +217,22 @@ bool GameManager::Init()
 void GameManager::CreateSamplers() {
 
 	// Sample state - linear wrap filtering
-	D3D11_SAMPLER_DESC* linearSampleState = new D3D11_SAMPLER_DESC();
-	linearSampleState->Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	linearSampleState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	linearSampleState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	linearSampleState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	device->CreateSamplerState(linearSampleState, &linearSampler);
-	delete linearSampleState;
+	D3D11_SAMPLER_DESC* desc = new D3D11_SAMPLER_DESC();
+	desc->Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	desc->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	device->CreateSamplerState(desc, &linearSampler);
+
+	// Sample state - point wrap filtering
+	desc->Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	device->CreateSamplerState(desc, &pointSampler);
 
 	// Sample state - anisotropic wrap filtering
-	D3D11_SAMPLER_DESC* anisotropicState = new D3D11_SAMPLER_DESC();
-	anisotropicState->Filter = D3D11_FILTER_ANISOTROPIC;
-	anisotropicState->AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	anisotropicState->MaxAnisotropy = 1;
-	device->CreateSamplerState(anisotropicState, &anisotropicSampler);
-	delete anisotropicState;
-	anisotropicSampler = linearSampler;
+	desc->Filter = D3D11_FILTER_ANISOTROPIC;
+	desc->MaxAnisotropy = 16;
+	device->CreateSamplerState(desc, &anisotropicSampler);
+	delete desc;
 }
 
 // Loads shaders from compiled shader object (.cso) files, and uses the
@@ -265,6 +263,7 @@ void GameManager::LoadShadersAndInputLayout()
 	LoadPixelShader(L"GrayscalePixelShader.cso", &grayscaleShader);
 	LoadPixelShader(L"SepiaPixelShader.cso", &sepiaShader);
 	LoadPixelShader(L"InversePixelShader.cso", &inverseShader);
+	LoadPixelShader(L"ShadowPixelShader.cso", &shadowPS);
 	
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;
@@ -446,33 +445,39 @@ void GameManager::BuildBlockTypes()
 
 void GameManager::CreateShadowMapResources() 
 {
+	ReleaseMacro(shadowTex);
+	ReleaseMacro(shadowDSV);
+
 	// Texture
 	D3D11_TEXTURE2D_DESC texDesc;
 	texDesc.Width = windowWidth;
 	texDesc.Height = windowHeight;
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
-	//texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-	texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	//texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = 0;
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	HR(device->CreateTexture2D(&texDesc, 0, &shadowTex));
 
+	// Still not working, trying to base it off this:
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/bb205074%28v=vs.85%29.aspx
+	// Under "Reading the Depth-Stencil Buffer as a Texture"
+
 	// Depth Stencil
 	HR(device->CreateDepthStencilView(shadowTex, 0, &shadowDSV));
 
-	//// Resource View
-	//D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	//ZeroMemory(&srvDesc, sizeof(srvDesc));
-	//srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-	//srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	//srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
-	//srvDesc.Texture2D.MostDetailedMip = 0;
-	//HR(device->CreateShaderResourceView(shadowTex, &srvDesc, &shadowSRV));
+	// Resource View
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	ZeroMemory(&srvDesc, sizeof(srvDesc));
+	srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = 0;
+	HR(device->CreateShaderResourceView(shadowTex, &srvDesc, &shadowSRV));
 }
 
 #pragma endregion
@@ -485,11 +490,41 @@ void GameManager::UpdateScene(float dt)
 {
 	CheckKeyBoard(dt);
 
-	//// Shadow map
+	// Active mesh list
+	std::vector<GameObject*> *meshObjects = 0;
+	if (gameState == GAME || gameState == DEBUG) meshObjects = &gameObjects;
+	if (gameState == GAME) blockManager->update(dt);
+
+	// Active UI list
+	std::vector<UIObject*> *uiObjects = 0;
+	if (gameState == MENU) uiObjects = &menuObjects;
+	if (gameState == GAME || gameState == DEBUG) uiObjects = &gameUIObjects;
+
+	////// Shadow map
 	//deviceContext->OMSetRenderTargets(0, 0, shadowDSV);
-	//deviceContext->ClearDepthStencilView(shadowDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	//deviceContext->ClearDepthStencilView(shadowDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	//deviceContext->VSSetShader(shadowVS, 0, 0);
 	//deviceContext->PSSetShader(0, 0, 0);
+
+	//// Update each mesh
+	//if (meshObjects) {
+
+	//	for (UINT i = 0; i < meshObjects->size(); i++)
+	//	{
+	//		// [UPDATE] Update this object
+	//		if (gameState != DEBUG)
+	//			(*meshObjects)[i]->Update(dt);
+
+	//		// [DRAW] Draw the object
+	//		(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	//	}
+	//}
+
+	//// Update and draw the game if in game mode
+	//if (gameState == GAME || gameState == DEBUG)
+	//{
+	//	blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	//}
 
 	// Clear the buffer
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -500,6 +535,14 @@ void GameManager::UpdateScene(float dt)
 		1.0f,
 		0);
 
+	// Set the shaders
+	deviceContext->VSSetShader(vertexShader, 0, 0);
+	deviceContext->PSSetShader(pixelShader, 0, 0);
+
+	//bind shadow map texture
+	deviceContext->PSSetShaderResources(1, 1, &shadowSRV);
+	deviceContext->PSSetSamplers(1, 1, &pointSampler);
+	
 	// [DRAW] Set up the input assembler for objects
 	deviceContext->IASetInputLayout(inputLayout);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -515,13 +558,6 @@ void GameManager::UpdateScene(float dt)
 
 	// Projection matrix
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
-
-	std::vector<GameObject*> *meshObjects = 0;
-	if (gameState == GAME || gameState == DEBUG) meshObjects = &gameObjects;
-
-	std::vector<UIObject*> *uiObjects = 0;
-	if (gameState == MENU) uiObjects = &menuObjects;
-	if (gameState == GAME || gameState == DEBUG) uiObjects = &gameUIObjects;
 
 	// Update each mesh
 	if (meshObjects) {
@@ -540,17 +576,17 @@ void GameManager::UpdateScene(float dt)
 	// Update and draw the game if in game mode
 	if (gameState == GAME || gameState == DEBUG)
 	{
-		if (gameState != DEBUG)
-			blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
-	int score = blockManager->getScore();
-	std::wstring s = std::wstring(L"Score\n") + std::to_wstring(score);
-	const wchar_t* result = s.c_str();
-	scoreLabel->SetText(result);
-
+	
 	// Draw UI Elements
 	if (uiObjects) {
+
+		int score = blockManager->getScore();
+		std::wstring s = std::wstring(L"Score\n") + std::to_wstring(score);
+		const wchar_t* result = s.c_str();
+		scoreLabel->SetText(result);
+
 		spriteBatch->Begin();
 		for (UINT i = 0; i < uiObjects->size(); i++)
 		{
@@ -782,5 +818,7 @@ void GameManager::OnResize()
 	// TODO fix the fact that there is an if statement needed here
 	//if (camera)
 	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P));
+
+	CreateShadowMapResources();
 }
 #pragma endregion

@@ -1,6 +1,8 @@
 
 Texture2D myTexture : register(t0);
-SamplerState mySampler: register(s0);
+Texture2D shadowMap : register(t1);
+SamplerState mySampler : register(s0);
+SamplerState shadowSampler : register(s1);
 
 // Defines the input to this pixel shader
 // - Should match the output of our corresponding vertex shader

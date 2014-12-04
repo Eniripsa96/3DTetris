@@ -117,6 +117,7 @@ private:
 	Material* tileMaterial;
 
 	ID3D11SamplerState* linearSampler;
+	ID3D11SamplerState* pointSampler;
 	ID3D11SamplerState* anisotropicSampler;
 
 	Block* blocks;
@@ -141,6 +142,7 @@ private:
 	ID3D11ShaderResourceView* shadowSRV;
 	ID3D11DepthStencilView* shadowDSV;
 	ID3D11VertexShader* shadowVS;
+	ID3D11PixelShader* shadowPS;
 	ID3D11InputLayout* shadowIL;
 };
 

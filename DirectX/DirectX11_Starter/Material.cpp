@@ -37,8 +37,8 @@ Material::~Material()
 void Material::Draw()
 {
 	// Set the current vertex and pixel shaders
-	deviceContext->VSSetShader(vertexShader, NULL, 0);
-	deviceContext->PSSetShader(pixelShader, NULL, 0);
+	//deviceContext->VSSetShader(vertexShader, NULL, 0);
+	//deviceContext->PSSetShader(pixelShader, NULL, 0);
 
 	deviceContext->PSSetShaderResources(0, 1, &resourceView); // Pass in the entity’s material’s shader resource view (the texture)
 	

@@ -21,6 +21,7 @@ struct VertexShaderInput
 struct Output
 {
 	float4 position		: SV_POSITION;
+	float4 lightPos     : TEXCOORD0;
 };
 
 // The entry point for our vertex shader
@@ -29,5 +30,6 @@ Output main(VertexShaderInput input)
 	Output output;
 	matrix worldViewProj = mul(mul(world, view), projection);
 	output.position = mul(float4(input.position, 1.0f), worldViewProj);
+	output.lightPos = output.position;
 	return output;
 }
