@@ -9,7 +9,7 @@ struct VertexInput
 	float3 initialVel	: VELOCITY;
 	float2 size			: SIZE;
 	float age			: AGE;
-	unsigned int type	: TYPE;
+	//unsigned int type	: TYPE;
 };
 
 struct VertexOutput

@@ -68,7 +68,7 @@ public:
 	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
 	ID3D11VertexShader* particleVertexShader;
-	ID3D11GeometryShader* geometryShader;
+	ID3D11GeometryShader* particleGeometryShader;
 
 	// Blend state
 	ID3D11BlendState* blendState;

@@ -10,10 +10,10 @@ struct VertexOutput
 struct GSOutput
 {
 	float4 position		: SV_POSITION;
-	float2 uv			: TEXCOORD0;	
-	float3 normal		: NORMAL;	// Not used
-	float4 lightDir     : LIGHT;	// Not used
-	float4 color        : COLOR;	// Not used
+	float3 normal		: NORMAL;		// Not used
+	float2 uv			: TEXCOORD0;
+	float4 lightDir     : LIGHT;		// Not used
+	float4 color        : COLOR;		// Not used
 };
 
 [maxvertexcount(4)]

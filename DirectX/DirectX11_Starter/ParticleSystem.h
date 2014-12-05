@@ -7,6 +7,8 @@
 
 #include "Camera.h"
 #include "InputLayouts.h"
+#include "Mesh.h"
+#include "Material.h"
 
 using namespace DirectX;
 
@@ -22,7 +24,7 @@ struct Particle
 class ParticleSystem
 {
 public:
-	ParticleSystem();
+	ParticleSystem(Mesh*, Material*);
 	~ParticleSystem();
 
 	// Time elapsed since the systm was reset
@@ -66,6 +68,9 @@ private:
 
 	ID3D11ShaderResourceView* texArraySRV;
 	ID3D11ShaderResourceView* randomTexSRV;
+
+	Mesh* mesh;
+	Material* material;
 };
 
 #endif

@@ -112,6 +112,7 @@ GameManager::~GameManager()
 	delete stairsBlockMesh;
 	delete frameMesh;
 	delete environmentMesh;
+	delete particleMesh;
 
 	// Clean up materials
 	delete shapeMaterial;
@@ -127,6 +128,7 @@ GameManager::~GameManager()
 	delete stairsBlockMaterial;
 	delete frameMaterial;
 	delete tileMaterial;
+	delete particleMaterial;
 
 	delete camera;
 	delete spriteBatch;
@@ -208,7 +210,7 @@ bool GameManager::Init()
 	device->CreateBlendState(&blendDesc, &blendState);
 
 	camera = new Camera();
-	particleSystem = new ParticleSystem();
+	particleSystem = new ParticleSystem(particleMesh, particleMaterial);
 
 	// Set up the world matrix for each mesh
 	XMMATRIX W = XMMatrixIdentity();
@@ -277,7 +279,7 @@ void GameManager::LoadShadersAndInputLayout()
 
 	// Load Geometry Shader -------------------------------------
 	// [Particle System]
-	LoadGeometryShader(L"GeometryShader.cso", &geometryShader);
+	LoadGeometryShader(L"GeometryShader.cso", &particleGeometryShader);
 
 	// Load Pixel Shaders ---------------------------------------
 	LoadPixelShader(L"PixelShader.cso", &pixelShader);
@@ -324,7 +326,7 @@ void GameManager::LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shade
 		gsBlob->GetBufferPointer(),
 		gsBlob->GetBufferSize(),
 		NULL,
-		&geometryShader));
+		&particleGeometryShader));
 	// Result: S_OK
 	// Original: D3D11Device->CreateGeometryShaderWithStreamOut( pShaderBytecode, ShaderBytecodesize, pDecl, sizeof(pDecl), NULL, 0, 0, NULL, &pStreamOutGS );
 
@@ -355,6 +357,7 @@ void GameManager::LoadMeshesAndMaterials()
 	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texStairsBlock.png");
 	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texFrame.png");
 	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, anisotropicSampler, L"tile.png");
+	particleMaterial = new Material(device, deviceContext, particleVertexShader, pixelShader, linearSampler, L"image.png", particleGeometryShader);
 
 	// Load meshes
 	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
@@ -377,6 +380,7 @@ void GameManager::LoadMeshesAndMaterials()
 	frameMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
 	size = loader.Load("environment.txt", device, &vertexBuffer, &indexBuffer);
 	environmentMesh = new Mesh(device, deviceContext, vertexBuffer, indexBuffer, size);
+	particleMesh = new Mesh(device, deviceContext, PARTICLE);
 }
 
 // Create the structs of the different block types
@@ -504,11 +508,13 @@ void GameManager::UpdateScene(float dt)
 		for (UINT i = 0; i < meshObjects->size(); i++)
 		{
 			// [UPDATE] Update this object
-			if (gameState != DEBUG)
-				(*meshObjects)[i]->Update(dt);
+		//	if (gameState != DEBUG)
+			//	(*meshObjects)[i]->Update(dt);
+
+			particleSystem->Draw(deviceContext, *camera);
 
 			// [DRAW] Draw the object
-			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+			//(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 		}
 	}
 
