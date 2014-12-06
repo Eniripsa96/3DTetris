@@ -166,10 +166,13 @@ bool GameManager::Init()
 	BuildBlockTypes();
 	//CreateShadowMapResources();
 
-	shadowCam = new Camera();
+	Camera* shadowCam = new Camera();
+	shadowCam->RotateY(-1.10715f);
+	shadowCam->Pitch(-0.930264f);
 	shadowCam->MoveTo(&XMFLOAT3(-20, 30, -10));
-	shadowCam->LookAt(&XMFLOAT3(0, 0, 0));
-	shadowCam->Move(&XMFLOAT3(0, -5, 0));
+	shadowCam->Update(0);
+	shadowView = shadowCam->viewMatrix;
+	delete shadowCam;
 
 	spriteBatch = new SpriteBatch(deviceContext);
 	spriteFont24 = new SpriteFont(device, L"jing24.spritefont");
@@ -461,6 +464,8 @@ void GameManager::CreateShadowMapResources()
 
 	// Texture
 	D3D11_TEXTURE2D_DESC texDesc;
+	//texDesc.Width = 2048;
+	//texDesc.Height = 2048;
 	texDesc.Width = windowWidth;
 	texDesc.Height = windowHeight;
 	texDesc.MipLevels = 1;
@@ -528,9 +533,11 @@ void GameManager::UpdateScene(float dt)
 	//shadowCam->Update(dt);
 
 	// [UPDATE] Update constant buffer data
-	dataToSendToVSConstantBuffer.view = shadowCam->viewMatrix;
+	//dataToSendToVSConstantBuffer.view = camera->viewMatrix;
+	//dataToSendToVSConstantBuffer.projection = projectionMatrix;
+	dataToSendToVSConstantBuffer.view = shadowView;
 	dataToSendToVSConstantBuffer.projection = shadowProjection;
-	dataToSendToVSConstantBuffer.lightView = shadowCam->viewMatrix;
+	dataToSendToVSConstantBuffer.lightView = shadowView;
 	dataToSendToVSConstantBuffer.lightProjection = shadowProjection;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.95f);
 	dataToSendToVSConstantBuffer.color = XMFLOAT4(1, 1, 1, 1);
@@ -562,10 +569,6 @@ void GameManager::UpdateScene(float dt)
 
 	// Update the camera
 	camera->Update(dt);
-
-	// [UPDATE] Update constant buffer data
-	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
-	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	// Clear the buffer
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -833,6 +836,7 @@ void GameManager::OnResize()
 	// Shadow map projection
 	XMMATRIX P = XMMatrixPerspectiveFovLH(
 		0.5f * 3.1415926535f,
+		//1,
 		AspectRatio(),
 		0.1f,
 		100.0f);

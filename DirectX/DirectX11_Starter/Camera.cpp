@@ -76,16 +76,6 @@ void Camera::MoveDepth(float move)
 	XMStoreFloat3(&target, XMVectorMultiplyAdd(s, f, t));
 }
 
-void Camera::LookAt(XMFLOAT3* pos)
-{
-	target.x = pos->x;
-	target.y = pos->y;
-	target.z = pos->z;
-
-	XMMATRIX V = XMMatrixLookAtLH(XMLoadFloat3(&position), XMLoadFloat3(&target), GetUpXM());
-	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V));
-}
-
 void Camera::Pitch(float angle)
 {
 	// Get rotation about right vector

@@ -19,7 +19,6 @@ public:
 	void MoveVertical(float);
 	void MoveHorizontal(float);
 	void MoveDepth(float);
-	void LookAt(XMFLOAT3*);
 	void RotateY(float);
 	void Pitch(float);
 	void Reset();
