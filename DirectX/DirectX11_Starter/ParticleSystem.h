@@ -40,8 +40,6 @@ public:
 	void Update(float dt, float gameTime);
 	void Draw(ID3D11DeviceContext* dc, const Camera& cam);
 
-	ID3D11InputLayout* inputLayout;
-
 private:
 	void BuildVB(ID3D11Device* device);
 
@@ -62,12 +60,13 @@ private:
 
 	float fx;	// shader???
 
-	ID3D11Buffer* initVB;
+	// Used by stream???
+	/*ID3D11Buffer* initVB;
 	ID3D11Buffer* drawVB;
 	ID3D11Buffer* streamOutVB;
 
 	ID3D11ShaderResourceView* texArraySRV;
-	ID3D11ShaderResourceView* randomTexSRV;
+	ID3D11ShaderResourceView* randomTexSRV;*/
 
 	Mesh* mesh;
 	Material* material;

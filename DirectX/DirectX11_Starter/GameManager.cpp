@@ -131,6 +131,8 @@ GameManager::~GameManager()
 	delete particleMaterial;
 
 	delete camera;
+	delete particleSystem;
+
 	delete spriteBatch;
 	delete spriteFont24;
 	delete spriteFont32;
@@ -143,6 +145,8 @@ GameManager::~GameManager()
 	ReleaseMacro(blendState);
 	ReleaseMacro(linearSampler);
 	ReleaseMacro(anisotropicSampler);
+	ReleaseMacro(InputLayouts::Vertex);
+	ReleaseMacro(InputLayouts::Particle);
 }
 
 #pragma endregion
@@ -511,8 +515,6 @@ void GameManager::UpdateScene(float dt)
 		//	if (gameState != DEBUG)
 			//	(*meshObjects)[i]->Update(dt);
 
-			particleSystem->Draw(deviceContext, *camera);
-
 			// [DRAW] Draw the object
 			//(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 		}
@@ -524,7 +526,6 @@ void GameManager::UpdateScene(float dt)
 		if (gameState != DEBUG)
 			blockManager->update(dt);
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
-		//particleSystem->Draw(deviceContext, *camera);
 	}
 	int score = blockManager->getScore();
 	std::wstring s = std::wstring(L"Score\n") + std::to_wstring(score);
@@ -543,6 +544,15 @@ void GameManager::UpdateScene(float dt)
 
 		deviceContext->OMSetBlendState(blendState, NULL, 0xffffffff);
 		deviceContext->OMSetDepthStencilState(0, 0);
+	}
+	
+	// Draw the particle system
+	if (gameState == GAME || gameState == DEBUG)
+	{
+		// [DRAW] Set up the input assembler for particle system
+		deviceContext->IASetInputLayout(InputLayouts::Particle);
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		particleSystem->Draw(deviceContext, *camera);
 	}
 
 	// Present the buffer

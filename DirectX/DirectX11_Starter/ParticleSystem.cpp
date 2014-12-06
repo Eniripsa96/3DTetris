@@ -26,16 +26,11 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 
 	// Update constant buffer with camera info
 
-	// Set necessary settings for drawing
-	dc->IASetInputLayout(InputLayouts::Particle);
-
 	// Draw mesh and material
 		// This makes the vertex shader do its thing
 		// Then the geometry shader will do its thing following that and spit out to PS
 	material->Draw();
 	mesh->Draw();
-
-	dc->IASetInputLayout(InputLayouts::Vertex);
 }
 
 // TODO
