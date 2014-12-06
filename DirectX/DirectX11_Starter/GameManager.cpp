@@ -279,7 +279,7 @@ void GameManager::LoadShadersAndInputLayout()
 
 	// Load Geometry Shader -------------------------------------
 	// [Particle System]
-	LoadGeometryShader(L"GeometryShader.cso", &particleGeometryShader);
+	LoadGeometryShader(L"ParticleGeometryShader.cso", &particleGeometryShader);
 
 	// Load Pixel Shaders ---------------------------------------
 	LoadPixelShader(L"PixelShader.cso", &pixelShader);
@@ -318,8 +318,8 @@ void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader) {
 
 void GameManager::LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shader)
 {
-	ID3DBlob* gsBlob;
-	D3DReadFileToBlob(L"GeometryShader.cso", &gsBlob);
+	ID3DBlob* gsBlob; 
+	HRESULT r = D3DReadFileToBlob(file, &gsBlob);
 
 	// Create the shader on the device
 	HR(device->CreateGeometryShader(

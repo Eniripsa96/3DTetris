@@ -34,6 +34,8 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
 		// Then the geometry shader will do its thing following that and spit out to PS
 	material->Draw();
 	mesh->Draw();
+
+	dc->IASetInputLayout(InputLayouts::Vertex);
 }
 
 // TODO
