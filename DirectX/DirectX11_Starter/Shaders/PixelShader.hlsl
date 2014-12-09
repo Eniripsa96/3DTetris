@@ -21,16 +21,13 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	input.lightPos.xyz /= input.lightPos.w;
 	float shade = 1.0f;
-	if (input.lightPos.x >= -1.0f && input.lightPos.x <= 1.0f
-			&& input.lightPos.y >= -1.0f && input.lightPos.y <= 1.0f
-			&& input.lightPos.z >= -1.0f && input.lightPos.z <= 1.0f) {
 
-		input.lightPos.xy = input.lightPos.xy / 2 + 0.5f;
+	input.lightPos.y = -input.lightPos.y;
+	input.lightPos.xy = input.lightPos.xy / 2 + 0.5f;
 
-		float depth = shadowMap.Sample(shadowSampler, input.lightPos.xy).r;
-		if (depth < input.lightPos.z) {
-			shade = 0.0f;
-		}
+	float depth = shadowMap.Sample(shadowSampler, input.lightPos.xy).r;
+	if (depth < input.lightPos.z - 0.0001f) {
+		shade = 0.0f;
 	}
 
 	// Return color sampled from texture

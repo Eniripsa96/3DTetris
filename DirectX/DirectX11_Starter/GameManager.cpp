@@ -166,6 +166,14 @@ bool GameManager::Init()
 	BuildBlockTypes();
 	//CreateShadowMapResources();
 
+	activeShader = 0;
+	pixelShaders = new ID3D11PixelShader*[shaderCount] {
+		pixelShader,
+		grayscaleShader,
+		sepiaShader,
+		inverseShader
+	};
+
 	Camera* shadowCam = new Camera();
 	shadowCam->RotateY(-1.10715f);
 	shadowCam->Pitch(-0.930264f);
@@ -237,14 +245,17 @@ void GameManager::CreateSamplers() {
 	desc->AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	device->CreateSamplerState(desc, &linearSampler);
 
-	// Sample state - point wrap filtering
-	desc->Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	device->CreateSamplerState(desc, &pointSampler);
-
 	// Sample state - anisotropic wrap filtering
 	desc->Filter = D3D11_FILTER_ANISOTROPIC;
 	desc->MaxAnisotropy = 16;
 	device->CreateSamplerState(desc, &anisotropicSampler);
+	
+	// Sample state - point wrap filtering
+	desc->Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	desc->AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc->AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc->AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	device->CreateSamplerState(desc, &pointSampler);
 	delete desc;
 }
 
@@ -533,10 +544,10 @@ void GameManager::UpdateScene(float dt)
 	//shadowCam->Update(dt);
 
 	// [UPDATE] Update constant buffer data
-	//dataToSendToVSConstantBuffer.view = camera->viewMatrix;
-	//dataToSendToVSConstantBuffer.projection = projectionMatrix;
-	dataToSendToVSConstantBuffer.view = shadowView;
-	dataToSendToVSConstantBuffer.projection = shadowProjection;
+	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
+	//dataToSendToVSConstantBuffer.view = shadowView;
+	//dataToSendToVSConstantBuffer.projection = shadowProjection;
 	dataToSendToVSConstantBuffer.lightView = shadowView;
 	dataToSendToVSConstantBuffer.lightProjection = shadowProjection;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.95f);
@@ -585,7 +596,7 @@ void GameManager::UpdateScene(float dt)
 
 	// Set the shaders
 	deviceContext->VSSetShader(vertexShader, 0, 0);
-	deviceContext->PSSetShader(pixelShader, 0, 0);
+	deviceContext->PSSetShader(pixelShaders[activeShader], 0, 0);
 
 	//bind shadow map texture
 	deviceContext->PSSetShaderResources(1, 1, &shadowSRV);
@@ -775,6 +786,9 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		case VK_CAPITAL:
 			gameState = (gameState != DEBUG) ? DEBUG : GAME;
+			break;
+		case VK_TAB:
+			activeShader = (activeShader + 1) % shaderCount;
 			break;
 		}
 	}

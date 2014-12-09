@@ -60,12 +60,15 @@ public:
 	LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 
 	// Shaders
+	ID3D11PixelShader** pixelShaders;
 	ID3D11PixelShader* pixelShader;
 	ID3D11PixelShader* grayscaleShader;
 	ID3D11PixelShader* sepiaShader;
 	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
-	
+	UINT activeShader;
+	UINT shaderCount = 4;
+
 	// A few more odds and ends we'll need
 	ID3D11InputLayout* inputLayout;
 
