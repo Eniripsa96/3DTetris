@@ -88,7 +88,7 @@ void BlockManager::update(float dt)
 void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
 	cBufferData->lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.25f);
-	cBufferData->color.w = 0.6;
+	cBufferData->color.w = 0.6f;
 
 	// Active block
 	if (activeId != -1) {
@@ -122,7 +122,7 @@ void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffe
 	// Ghost block
 	if (activeId != -1) 
 	{
-		cBufferData->color.w = 0.3;
+		cBufferData->color.w = 0.3f;
 
 		XMFLOAT3 prev = blocks[typeOrder[activeId]].gameObject->position;
 		blocks[typeOrder[activeId]].gameObject->position = XMFLOAT3(prev.x, getGhostPos().y, prev.z);

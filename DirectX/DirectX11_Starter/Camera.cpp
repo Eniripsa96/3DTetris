@@ -201,4 +201,10 @@ XMFLOAT3 Camera::GetRight() const
 	return right;
 }
 
+XMFLOAT4 Camera::GetPos() const
+{
+	XMFLOAT4 temp = XMFLOAT4(position.x, position.y, position.z, 1.0f);
+	return temp;
+}
+
 #pragma endregion

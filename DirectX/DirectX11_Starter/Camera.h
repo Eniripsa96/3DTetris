@@ -30,6 +30,8 @@ public:
 	XMVECTOR GetUpXM() const;
 	XMFLOAT3 GetUp() const;
 
+	XMFLOAT4 GetPos() const;
+
 	// The matrices to go from model space
 	// to screen space
 	XMFLOAT4X4 viewMatrix;

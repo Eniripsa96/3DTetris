@@ -2,15 +2,18 @@
 #define GAMEMANAGER_H
 
 #include <DirectXMath.h>
+#include <vector>
+#include <SpriteFont.h>
+#include <SpriteBatch.h>
+
 #include "DirectXGame.h"
 #include "GameObject.h"
 #include "Button.h"
 #include "Camera.h"
 #include "BlockManager.h"
-#include <vector>
 #include "ObjLoader.h"
-#include <SpriteFont.h>
-#include <SpriteBatch.h>
+#include "InputLayouts.h"
+#include "ParticleSystem.h"
 
 // Include run-time memory checking in debug builds
 #if defined(DEBUG) || defined(_DEBUG)
@@ -43,6 +46,7 @@ public:
 	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
+	void LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shader);
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
 	void OnResize();
@@ -63,9 +67,8 @@ public:
 	ID3D11PixelShader* sepiaShader;
 	ID3D11PixelShader* inverseShader;
 	ID3D11VertexShader* vertexShader;
-	
-	// A few more odds and ends we'll need
-	ID3D11InputLayout* inputLayout;
+	ID3D11VertexShader* particleVertexShader;
+	ID3D11GeometryShader* particleGeometryShader;
 
 	// Blend state
 	ID3D11BlendState* blendState;
@@ -99,6 +102,7 @@ private:
 	Mesh* stairsBlockMesh;
 	Mesh* frameMesh;
 	Mesh* environmentMesh;
+	Mesh* particleMesh;
 
 	Material* shapeMaterial;
 	Material* buttonMaterial;
@@ -113,6 +117,7 @@ private:
 	Material* stairsBlockMaterial;
 	Material* frameMaterial;
 	Material* tileMaterial;
+	Material* particleMaterial;
 
 	ID3D11SamplerState* linearSampler;
 	ID3D11SamplerState* anisotropicSampler;
@@ -125,6 +130,7 @@ private:
 	Button* quitButton;
 	UIObject* scoreLabel;
 
+	ParticleSystem* particleSystem;
 	Camera* camera;
 	XMFLOAT4X4 projectionMatrix;
 

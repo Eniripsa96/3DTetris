@@ -1,12 +1,14 @@
 #include "Material.h"
 
-Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, ID3D11SamplerState* pSampler, const wchar_t* texPath)
+Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11VertexShader* vShader, ID3D11PixelShader* pShader, ID3D11SamplerState* pSampler, const wchar_t* texPath, ID3D11GeometryShader* gShader )
 {
 	// Set dx11 variables
 	deviceContext = context;
 	vertexShader = vShader;
 	pixelShader = pShader;
 	samplerState = pSampler;
+
+	geometryShader = gShader;
 
 	// Create SRV
 	//HRESULT result1 = device->CreateShaderResourceView(NULL , NULL, &resourceView);	// Error from having a NULL resource is intentional
@@ -36,8 +38,11 @@ Material::~Material()
 
 void Material::Draw()
 {
-	// Set the current vertex and pixel shaders
+	// Set the current vertex and pixel shaders and geometry shader (if it exists)
 	deviceContext->VSSetShader(vertexShader, NULL, 0);
+
+	deviceContext->GSSetShader(geometryShader, NULL, 0);
+
 	deviceContext->PSSetShader(pixelShader, NULL, 0);
 
 	deviceContext->PSSetShaderResources(0, 1, &resourceView); // Pass in the entity’s material’s shader resource view (the texture)
