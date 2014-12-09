@@ -551,26 +551,8 @@ void GameManager::UpdateScene(float dt)
 		deviceContext->IASetInputLayout(InputLayouts::Particle);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-		// Set cbuffer data
-		dataToSendToVSConstantBuffer.camPos = camera->GetPos();
-		// [UPDATE] Update the constant buffer itself
-		deviceContext->UpdateSubresource(
-			vsConstantBuffer,
-			0,
-			NULL,
-			&dataToSendToVSConstantBuffer,
-			0,
-			0
-			);
-
-		// [DRAW] Set the constant buffer in the device
-		deviceContext->VSSetConstantBuffers(
-			0,
-			1,
-			&(vsConstantBuffer)
-			);
-
-		particleSystem->Draw(deviceContext, *camera);
+		// [DRAW] Draw the particle system 
+		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
 
 	// Present the buffer

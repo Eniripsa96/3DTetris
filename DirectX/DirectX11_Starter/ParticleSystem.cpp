@@ -19,12 +19,30 @@ void ParticleSystem::Reset()
 	age = 0.0f;
 }
 
-void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam)
+void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
 	// Grab the current view-projection
 	XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));
 
 	// Update constant buffer with camera info
+	cBufferData->camPos = cam.GetPos();
+
+	// [UPDATE] Update the constant buffer itself
+	dc->UpdateSubresource(
+		cBuffer,
+		0,
+		NULL,
+		cBufferData,
+		0,
+		0
+		);
+
+	// [DRAW] Set the constant buffer in the device
+	dc->VSSetConstantBuffers(
+		0,
+		1,
+		&(cBuffer)
+		);
 
 	// Draw mesh and material
 		// This makes the vertex shader do its thing
