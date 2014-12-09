@@ -12,7 +12,7 @@ using namespace DirectX;
 class Material
 {
 public:
-	Material(ID3D11Device*, ID3D11DeviceContext*, ID3D11VertexShader*, ID3D11PixelShader*, ID3D11SamplerState*, const wchar_t*);
+	Material(ID3D11Device*, ID3D11DeviceContext*, ID3D11VertexShader*, ID3D11PixelShader*, ID3D11SamplerState*, const wchar_t*, ID3D11GeometryShader* gs = NULL);
 	~Material();
 
 	void Draw();
@@ -27,6 +27,7 @@ public:
 
 	// Shaders
 	ID3D11PixelShader* pixelShader;
+	ID3D11GeometryShader* geometryShader;
 	ID3D11VertexShader* vertexShader;
 
 private:

@@ -10,7 +10,7 @@ enum SHAPE
 	NONE = 0,
 	TRIANGLE = 1,
 	QUAD = 2,
-	PARTICLE = 2
+	PARTICLE
 };
 
 // Vertex struct for triangles
@@ -27,12 +27,14 @@ struct Vertex
 struct VertexShaderConstantBufferLayout
 {
 	XMFLOAT4X4 world;
+	//XMFLOAT3 world;
 	XMFLOAT4X4 view;
 	XMFLOAT4X4 projection;
 	XMFLOAT4X4 lightView;
 	XMFLOAT4X4 lightProjection;
 	XMFLOAT4 lightDirection;
 	XMFLOAT4 color;
+	XMFLOAT4 camPos;
 };
 
 class Mesh
@@ -43,8 +45,8 @@ public:
 	~Mesh();
 
 	void CreateTrianglePoints();
-	void CreateQuadPoints(bool);
-	void CreateGeometryBuffers(Vertex[], bool);
+	void CreateQuadPoints();
+	void CreateGeometryBuffers(Vertex[]);
 	void Draw();
 
 	// Buffers to hold actual geometry
