@@ -132,19 +132,27 @@ GameManager::~GameManager()
 
 	delete camera;
 	delete particleSystem;
-
+	
 	delete spriteBatch;
 	delete spriteFont24;
 	delete spriteFont32;
 	delete spriteFont72;
 
 	// Release DX
-	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(vertexShader);
+	ReleaseMacro(particleVertexShader);
+	ReleaseMacro(particleGeometryShader);
 	ReleaseMacro(pixelShader);
+	ReleaseMacro(grayscaleShader);
+	ReleaseMacro(sepiaShader);
+	//ReleaseMacro(inverseShader);
+
+	ReleaseMacro(vsConstantBuffer);
 	ReleaseMacro(blendState);
+
 	ReleaseMacro(linearSampler);
 	ReleaseMacro(anisotropicSampler);
+
 	ReleaseMacro(InputLayouts::Vertex);
 	ReleaseMacro(InputLayouts::Particle);
 }
@@ -279,6 +287,7 @@ void GameManager::LoadShadersAndInputLayout()
 
 	// Clean up
 	ReleaseMacro(vsBlob);
+	ReleaseMacro(pvsBlob);
 
 	// Load Geometry Shader -------------------------------------
 	// [Particle System]
