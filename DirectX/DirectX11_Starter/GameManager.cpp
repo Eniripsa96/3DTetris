@@ -492,12 +492,10 @@ void GameManager::UpdateScene(float dt)
 
 	// [UPDATE] Update constant buffer data
 	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
+	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.75f);
 	dataToSendToVSConstantBuffer.color = XMFLOAT4(1, 1, 1, 1);
 	//dataToSendToVSConstantBuffer.resolution = XMFLOAT2(windowWidth, windowHeight);
-
-	// Projection matrix
-	dataToSendToVSConstantBuffer.projection = projectionMatrix;
 
 	std::vector<GameObject*> *meshObjects = 0;
 	if (gameState == GAME || gameState == DEBUG) meshObjects = &gameObjects;
@@ -512,11 +510,11 @@ void GameManager::UpdateScene(float dt)
 		for (UINT i = 0; i < meshObjects->size(); i++)
 		{
 			// [UPDATE] Update this object
-		//	if (gameState != DEBUG)
-			//	(*meshObjects)[i]->Update(dt);
+			if (gameState != DEBUG)
+				(*meshObjects)[i]->Update(dt);
 
 			// [DRAW] Draw the object
-			//(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+			(*meshObjects)[i]->Draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 		}
 	}
 
@@ -552,6 +550,26 @@ void GameManager::UpdateScene(float dt)
 		// [DRAW] Set up the input assembler for particle system
 		deviceContext->IASetInputLayout(InputLayouts::Particle);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+		// Set cbuffer data
+		dataToSendToVSConstantBuffer.camPos = camera->GetPos();
+		// [UPDATE] Update the constant buffer itself
+		deviceContext->UpdateSubresource(
+			vsConstantBuffer,
+			0,
+			NULL,
+			&dataToSendToVSConstantBuffer,
+			0,
+			0
+			);
+
+		// [DRAW] Set the constant buffer in the device
+		deviceContext->VSSetConstantBuffers(
+			0,
+			1,
+			&(vsConstantBuffer)
+			);
+
 		particleSystem->Draw(deviceContext, *camera);
 	}
 

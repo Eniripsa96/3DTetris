@@ -27,10 +27,12 @@ struct Vertex
 struct VertexShaderConstantBufferLayout
 {
 	XMFLOAT4X4 world;
+	//XMFLOAT3 world;
 	XMFLOAT4X4 view;
 	XMFLOAT4X4 projection;
 	XMFLOAT4 lightDirection;
 	XMFLOAT4 color;
+	XMFLOAT4 camPos;
 	//XMFLOAT2 resolution;
 };
 

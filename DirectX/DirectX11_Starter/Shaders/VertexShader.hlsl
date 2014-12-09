@@ -5,6 +5,7 @@
 cbuffer perModel : register(b0)
 {
 	matrix world;
+	float3 camPos;
 	matrix view;
 	matrix projection;
 	float4 lightDirection;
