@@ -31,7 +31,7 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 
 Material::~Material()
 {
-	ReleaseMacro(samplerState);
+	//ReleaseMacro(samplerState);
 	//ReleaseMacro(resourceView);	// This causes error
 	resourceView->Release();
 }
