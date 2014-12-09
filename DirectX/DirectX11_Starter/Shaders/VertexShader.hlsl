@@ -5,11 +5,11 @@
 cbuffer perModel : register(b0)
 {
 	matrix world;
-	float3 camPos;
 	matrix view;
 	matrix projection;
 	float4 lightDirection;
 	float4 color;
+	float4 camPos;
 };
 
 // Defines what kind of data to expect as input
