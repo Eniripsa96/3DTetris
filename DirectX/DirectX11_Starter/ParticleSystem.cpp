@@ -38,7 +38,7 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buff
 		);
 
 	// [DRAW] Set the constant buffer in the device
-	dc->VSSetConstantBuffers(
+	dc->GSSetConstantBuffers(
 		0,
 		1,
 		&(cBuffer)

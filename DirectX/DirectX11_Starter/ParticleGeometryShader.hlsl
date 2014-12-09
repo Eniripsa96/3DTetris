@@ -15,8 +15,6 @@ struct VertexOutput
 	//float2 size			: SIZE;
 	//float age : AGE;
 	//unsigned int type : TYPE;
-	float4 camPos		: POSITION;
-	matrix viewProj		: MATRIX;
 };
 
 struct GSOutput
@@ -35,7 +33,7 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 	// - Assumes you have the camera’s world position in “camPos”
 	// - Assumes your VS output struct has vertex World Position
 	float3 pos = (float3)input[0].initialPos;
-	float3 look = normalize(input[0].camPos - pos);
+	float3 look = normalize(camPos - pos);
 	float3 right = normalize(cross(float3(0, 1, 0), look));
 	float3 up = cross(look, right);
 	// Calculate half the width/height of the resulting quad
@@ -73,7 +71,7 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 	{
 		// Already have the world position, need to multiple
 		// by the view and projection matrices
-		vert.position = mul(v[i], input[0].viewProj);
+		vert.position = mul(v[i], mul(view, projection));
 		vert.uv = quadUVs[i]; // Copy uv from array
 		vert.normal = (0, 0);
 		vert.lightDir = lightDirection;
