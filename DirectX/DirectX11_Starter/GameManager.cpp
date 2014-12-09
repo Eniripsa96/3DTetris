@@ -624,6 +624,9 @@ void GameManager::UpdateScene(float dt)
 		deviceContext->OMSetDepthStencilState(0, 0);
 	}
 
+	ID3D11ShaderResourceView* nullView = NULL;
+	deviceContext->PSSetShaderResources(1, 1, &nullView);
+
 	// Present the buffer
 	HR(swapChain->Present(0, 0));
 }
