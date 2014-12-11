@@ -22,6 +22,7 @@ struct GSOutput
 	float4 position		: SV_POSITION;
 	float3 normal		: NORMAL;		// Not used
 	float2 uv			: TEXCOORD0;
+	float4 lightPos     : TEXCOORD1;    // Not used
 	float4 lightDir     : LIGHT;		// Not used
 	float4 color        : COLOR;		// Not used
 };
@@ -72,9 +73,10 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 		// Already have the world position, need to multiple
 		// by the view and projection matrices
 		vert.position = mul(v[i], mul(view, projection));
-		vert.uv = quadUVs[i]; // Copy uv from array
 		vert.normal = (0, 0);
-		vert.lightDir = lightDirection;
+		vert.uv = quadUVs[i]; // Copy uv from array
+		vert.lightPos = float4(0, 0, 0, 1);
+		vert.lightDir = float4(1, 0, 0, 0);
 		//vert.color = color;
 		vert.color = float4(1.0f, 0.0f, 0.0f, 1.0f);
 		output.Append(vert); // Append this vertex!

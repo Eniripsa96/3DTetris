@@ -43,7 +43,7 @@ void Material::Draw()
 
 	deviceContext->GSSetShader(geometryShader, NULL, 0);
 
-	deviceContext->PSSetShader(pixelShader, NULL, 0);
+	//deviceContext->PSSetShader(pixelShader, NULL, 0);
 
 	deviceContext->PSSetShaderResources(0, 1, &resourceView); // Pass in the entity’s material’s shader resource view (the texture)
 	
