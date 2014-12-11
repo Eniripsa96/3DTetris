@@ -689,6 +689,17 @@ void GameManager::UpdateScene(float dt)
 	{
 		blockManager->draw(deviceContext, vsConstantBuffer, &dataToSendToVSConstantBuffer);
 	}
+
+	// Draw the particle system
+	if (gameState == GAME || gameState == DEBUG)
+	{
+		// [DRAW] Set up the input assembler for particle system
+		deviceContext->IASetInputLayout(particleInputLayout);
+		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+		// [DRAW] Draw the particle system 
+		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+	}
 	
 	// Draw UI Elements
 	if (uiObjects) {
@@ -710,17 +721,6 @@ void GameManager::UpdateScene(float dt)
 		deviceContext->OMSetDepthStencilState(0, 0);
 	}
 	
-	// Draw the particle system
-	if (gameState == GAME || gameState == DEBUG)
-	{
-		// [DRAW] Set up the input assembler for particle system
-		deviceContext->IASetInputLayout(InputLayouts::Particle);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-
-		// [DRAW] Draw the particle system 
-		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);
-	}
-
 	ID3D11ShaderResourceView* nullView = NULL;
 	deviceContext->PSSetShaderResources(1, 1, &nullView);
 
