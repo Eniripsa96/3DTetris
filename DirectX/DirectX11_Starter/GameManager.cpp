@@ -699,6 +699,8 @@ void GameManager::UpdateScene(float dt)
 
 		// [DRAW] Draw the particle system 
 		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+
+		deviceContext->GSSetShader(NULL, 0, 0);
 	}
 	
 	// Draw UI Elements
@@ -730,34 +732,7 @@ void GameManager::UpdateScene(float dt)
 
 // NOTE: DEPRECATED
 // Clear the screen, redraw everything, present
-void GameManager::DrawScene()
-{
-	//// Clear the buffer
-	//deviceContext->ClearRenderTargetView(renderTargetView, color);
-	//deviceContext->ClearDepthStencilView(
-	//	depthStencilView,
-	//	D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-	//	1.0f,
-	//	0);
-
-	//// Draw each entity
-	//for (UINT i = 0; i < entities.size(); i++)
-	//{
-	//	// Set up the input assembler
-	//	deviceContext->IASetInputLayout(inputLayout);
-	//	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	//	deviceContext->VSSetConstantBuffers(
-	//		0,	// Corresponds to the constant buffer's register in the vertex shader
-	//		1,
-	//		&(vsConstantBuffer));
-
-	//	entities[i]->Draw();
-	//}
-
-	//// Present the buffer
-	//HR(swapChain->Present(0, 0));
-}
+void GameManager::DrawScene() { } 
 
 #pragma endregion
 
