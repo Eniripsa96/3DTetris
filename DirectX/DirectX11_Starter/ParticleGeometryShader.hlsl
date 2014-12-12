@@ -13,9 +13,9 @@ cbuffer perModel : register(b0)
 struct VertexOutput
 {
 	float4 initialPos	: SV_POSITION;
-	float3 initialVel	: VELOCITY;
-	float2 size			: SIZE;
-	float age : AGE;
+	//float3 initialVel	: VELOCITY;
+	float2 size			: SIZE;	// Storing age in y
+	//float age : AGE;
 	//unsigned int type : TYPE;
 };
 
@@ -67,9 +67,6 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 		float2(0, 1),
 		float2(0, 0)
 	};
-
-	// Calculate lighting position
-	matrix lightWorldViewProj = mul(mul(world, lightView), lightProjection);
 
 	// Finalize the GS output by appending 4 verts worth of data
 	GSOutput vert; // Holds a single vertex (just Position and UV)

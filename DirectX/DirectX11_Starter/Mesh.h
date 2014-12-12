@@ -25,9 +25,9 @@ struct Vertex
 struct Particle
 {
 	XMFLOAT3 initialPos;
-	XMFLOAT3 initialVel;
+	//XMFLOAT3 initialVel;
 	XMFLOAT2 size;
-	float age;
+	//float age;
 	//unsigned int type;
 };
 

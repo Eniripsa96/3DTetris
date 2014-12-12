@@ -51,9 +51,9 @@ void Mesh::CreateParticlePoints()
 	// Set up points for particles
 	Particle particles[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(0.5f, 0.5f), 1.0f },
-		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), 1.0f },
-		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(2.0f, 2.0f), 1.0f },
+		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
+		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), XMFLOAT2(2.0f, 2.0f) },
 	};
 
 	CreateGeometryBuffers(NULL, particles);
