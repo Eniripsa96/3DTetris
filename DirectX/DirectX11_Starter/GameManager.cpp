@@ -99,6 +99,8 @@ GameManager::~GameManager()
 	delete[] blocks;
 	delete blockManager;
 
+	delete[] pixelShaders;
+
 	// Clean up meshes
 	delete triangleMesh;
 	delete quadMesh;
