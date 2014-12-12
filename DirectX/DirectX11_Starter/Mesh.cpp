@@ -14,7 +14,7 @@ Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, SHAPE type)
 	else if (shapeType == QUAD)
 		CreateQuadPoints();
 	else if (shapeType == PARTICLE)
-		CreateTrianglePoints();
+		CreateParticlePoints();
 }
 
 Mesh::Mesh(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Buffer* pVertexBuffer, ID3D11Buffer* pIndexBuffer, UINT iBufferSize)
@@ -38,12 +38,25 @@ void Mesh::CreateTrianglePoints()
 	// Set up the vertices for a triangle
 	Vertex vertices[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.5f, 0.0f)},
+		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.5f, 0.0f) },
 		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(0.0f, 1.0f) },
 		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), NORMALS_2D, XMFLOAT2(1.0f, 1.0f) },
 	};
 
-	CreateGeometryBuffers(vertices);
+	CreateGeometryBuffers(vertices, NULL);
+}
+
+void Mesh::CreateParticlePoints()
+{
+	// Set up points for particles
+	Particle particles[] =
+	{
+		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(0.5f, 0.5f), 1.0f },
+		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), 1.0f },
+		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT2(2.0f, 2.0f), 1.0f },
+	};
+
+	CreateGeometryBuffers(NULL, particles);
 }
 
 // Create the points for a quad. Particle=true means this quad is for a particle system
@@ -59,15 +72,14 @@ void Mesh::CreateQuadPoints()
 		{ XMFLOAT3(1, 0, 0), NORMALS_2D, XMFLOAT2(1.0f, 1.0f) },	// Bottom right
 	};
 
-	CreateGeometryBuffers(vertices);
+	CreateGeometryBuffers(vertices, NULL);
 }
 
 // Creates the vertex and index buffers for a single triangle. Dynamic=true means a dynamic vertex buffer
-void Mesh::CreateGeometryBuffers(Vertex vertices[])
+void Mesh::CreateGeometryBuffers(Vertex vertices[], Particle particles[])
 {
 	// Create a dynamic vertex buffer
 	D3D11_BUFFER_DESC vbd;
-	vbd.ByteWidth = sizeof(Vertex) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.MiscFlags = 0;
 	vbd.StructureByteStride = 0;
@@ -75,7 +87,18 @@ void Mesh::CreateGeometryBuffers(Vertex vertices[])
 	vbd.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA initialVertexData;
-	initialVertexData.pSysMem = vertices;
+
+	if (vertices)
+	{
+		vbd.ByteWidth = sizeof(Vertex) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
+		initialVertexData.pSysMem = vertices;
+	}
+	else if (particles)
+	{
+		vbd.ByteWidth = sizeof(Particle) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
+		initialVertexData.pSysMem = particles;
+	}
+
 	HR(device->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer));
 
 	// Set up the indices
@@ -97,7 +120,7 @@ void Mesh::CreateGeometryBuffers(Vertex vertices[])
 void Mesh::Draw()
 {
 	// Set buffers in the input assembler
-	UINT stride = sizeof(Vertex);
+	UINT stride = (shapeType != PARTICLE) ? sizeof(Vertex) : sizeof(Particle);
 	UINT offset = 0;
 	deviceContext->IASetVertexBuffers(0, 1, &(vertexBuffer), &stride, &offset);
 	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);

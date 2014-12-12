@@ -15,6 +15,7 @@ public:
 
 	// Change Look
 	void Move(XMFLOAT3*);
+	void MoveTo(XMFLOAT3*);
 	void MoveVertical(float);
 	void MoveHorizontal(float);
 	void MoveDepth(float);

@@ -16,6 +16,7 @@ public:
 	~Material();
 
 	void Draw();
+	void SetShaders();
 
 	UINT getTexWidth();
 	UINT getTexHeight();

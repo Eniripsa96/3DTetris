@@ -46,9 +46,11 @@ public:
 	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
+	void LoadVertexShader(wchar_t* file, LAYOUT inputLayoutType, ID3D11VertexShader** shader);
 	void LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shader);
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
+	void CreateShadowMapResources();
 	void OnResize();
 	void UpdateScene(float dt);
 	void CheckKeyBoard(float dt);
@@ -62,6 +64,7 @@ public:
 	LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
 
 	// Shaders
+	ID3D11PixelShader** pixelShaders;
 	ID3D11PixelShader* pixelShader;
 	ID3D11PixelShader* grayscaleShader;
 	ID3D11PixelShader* sepiaShader;
@@ -69,6 +72,13 @@ public:
 	ID3D11VertexShader* vertexShader;
 	ID3D11VertexShader* particleVertexShader;
 	ID3D11GeometryShader* particleGeometryShader;
+	ID3D11PixelShader* particlePixelShader;
+	UINT activeShader;
+	UINT shaderCount = 4;
+
+	// A few more odds and ends we'll need
+	ID3D11InputLayout* inputLayout;
+	ID3D11InputLayout* particleInputLayout;
 
 	// Blend state
 	ID3D11BlendState* blendState;
@@ -120,6 +130,7 @@ private:
 	Material* particleMaterial;
 
 	ID3D11SamplerState* linearSampler;
+	ID3D11SamplerState* pointSampler;
 	ID3D11SamplerState* anisotropicSampler;
 
 	Block* blocks;
@@ -140,6 +151,15 @@ private:
 
 	const float CAMERA_MOVE_FACTOR = 10.0f;
 	const float CAMERA_TURN_FACTOR = 1.0f;
+
+	XMFLOAT4X4 shadowView;
+	XMFLOAT4X4 shadowProjection;
+	ID3D11Texture2D* shadowTex;
+	ID3D11ShaderResourceView* shadowSRV;
+	ID3D11DepthStencilView* shadowDSV;
+	ID3D11VertexShader* shadowVS;
+	ID3D11PixelShader* shadowPS;
+	ID3D11InputLayout* shadowIL;
 };
 
 #endif

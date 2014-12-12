@@ -31,7 +31,7 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 
 Material::~Material()
 {
-	//ReleaseMacro(samplerState);
+	ReleaseMacro(samplerState);
 	//ReleaseMacro(resourceView);	// This causes error
 	resourceView->Release();
 }
@@ -39,15 +39,24 @@ Material::~Material()
 void Material::Draw()
 {
 	// Set the current vertex and pixel shaders and geometry shader (if it exists)
-	deviceContext->VSSetShader(vertexShader, NULL, 0);
+	//deviceContext->VSSetShader(vertexShader, NULL, 0);
 
 	deviceContext->GSSetShader(geometryShader, NULL, 0);
 
-	deviceContext->PSSetShader(pixelShader, NULL, 0);
+	//deviceContext->PSSetShader(pixelShader, NULL, 0);
 
 	deviceContext->PSSetShaderResources(0, 1, &resourceView); // Pass in the entity’s material’s shader resource view (the texture)
 	
 	deviceContext->PSSetSamplers(0, 1, &samplerState);	// Pass in the entity’s material’s sampler state
+}
+
+void Material::SetShaders()
+{
+	deviceContext->VSSetShader(vertexShader, NULL, 0);
+
+	//deviceContext->GSSetShader(geometryShader, NULL, 0);
+
+	deviceContext->PSSetShader(pixelShader, NULL, 0);
 }
 
 UINT Material::getTexWidth() {

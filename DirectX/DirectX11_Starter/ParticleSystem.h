@@ -12,15 +12,6 @@
 
 using namespace DirectX;
 
-struct Particle
-{
-	XMFLOAT3 initialPos;
-	XMFLOAT3 initialVel;
-	XMFLOAT2 size;
-	float age;
-	unsigned int type;
-};
-
 class ParticleSystem
 {
 public:
@@ -29,6 +20,7 @@ public:
 
 	// Time elapsed since the systm was reset
 	float GetAge() const;
+	Material* GetMaterial() const;
 
 	void SetEyePos(const XMFLOAT3& eyePosW);
 	void SetEmitPos(const XMFLOAT3& emitPosW);

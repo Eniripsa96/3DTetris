@@ -31,6 +31,17 @@ void Camera::Move(XMFLOAT3* move)
 	target.z += move->z / 10.0f;
 }
 
+void Camera::MoveTo(XMFLOAT3* pos)
+{
+	target.x += pos->x - position.x;
+	target.y += pos->y - position.y;
+	target.z += pos->z - position.z;
+
+	position.x = pos->x;
+	position.y = pos->y;
+	position.z = pos->z;
+}
+
 void Camera::MoveVertical(float move)
 {
 	// Translate camera along up vector
