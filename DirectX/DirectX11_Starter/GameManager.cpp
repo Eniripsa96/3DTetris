@@ -277,65 +277,12 @@ void GameManager::CreateSamplers() {
 // vertex data to the device
 void GameManager::LoadShadersAndInputLayout()
 {
-	// Main vertex description
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	// Shadow vertex description
-	D3D11_INPUT_ELEMENT_DESC shadowDesc[] = 
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
-	// Particle vertex description
-	D3D11_INPUT_ELEMENT_DESC particleDesc[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "AGE", 0, DXGI_FORMAT_R32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-
 	// Load Vertex Shaders --------------------------------------
-	LoadVertexShader(L"VertexShader.cso", vertexDesc, ARRAYSIZE(vertexDesc), &vertexShader, &inputLayout);
-	LoadVertexShader(L"ShadowVertexShader.cso", shadowDesc, ARRAYSIZE(shadowDesc), &shadowVS, &shadowIL);
-	LoadVertexShader(L"ParticleVertexShader.cso", particleDesc, ARRAYSIZE(particleDesc), &particleVertexShader, &particleInputLayout);
-
-	// Load Vertex Shader --------------------------------------
-	ID3DBlob* vsBlob;
-	D3DReadFileToBlob(L"VertexShader.cso", &vsBlob);
-
-	// Create the shader on the device
-	HR(device->CreateVertexShader(
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		NULL,
-		&vertexShader));
-
-	InputLayouts::InitializeVertexLayout(device, vsBlob);
-
-	// Create the particle vertex shader on the device
-	ID3DBlob* pvsBlob;
-	D3DReadFileToBlob(L"ParticleVertexShader.cso", &pvsBlob);
-	// Create the shader on the device
-	HR(device->CreateVertexShader(
-		pvsBlob->GetBufferPointer(),
-		pvsBlob->GetBufferSize(),
-		NULL,
-		&particleVertexShader));
-
-	InputLayouts::InitializeParticleLayout(device, pvsBlob);
-
-	// Clean up
-	ReleaseMacro(vsBlob);
-	ReleaseMacro(pvsBlob);
+	LoadVertexShader(L"VertexShader.cso", VERTEX_LAYOUT, &vertexShader, &inputLayout);
+	LoadVertexShader(L"ShadowVertexShader.cso", SHADOW_LAYOUT, &shadowVS, &shadowIL);
+	LoadVertexShader(L"ParticleVertexShader.cso", PARTICLE_LAYOUT, &particleVertexShader, &particleInputLayout);
 
 	// Load Geometry Shader -------------------------------------
-	// [Particle System]
 	LoadGeometryShader(L"ParticleGeometryShader.cso", &particleGeometryShader);
 
 	// Load Pixel Shaders ---------------------------------------
@@ -359,7 +306,8 @@ void GameManager::LoadShadersAndInputLayout()
 		&vsConstantBuffer));
 }
 
-void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader) {
+void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader)
+{
 	ID3DBlob* psBlob;
 	D3DReadFileToBlob(file, &psBlob);
 
@@ -374,10 +322,18 @@ void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader) {
 	ReleaseMacro(psBlob);
 }
 
-void GameManager::LoadVertexShader(wchar_t* file, D3D11_INPUT_ELEMENT_DESC* vertexDesc, int size, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout)
+void GameManager::LoadVertexShader(wchar_t* file, LAYOUT inputLayoutType, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout)
 {
+	// Load shader blob
 	ID3DBlob* vsBlob;
 	D3DReadFileToBlob(file, &vsBlob);
+
+	if (inputLayoutType == VERTEX_LAYOUT)
+		InputLayouts::InitializeVertexLayout(device, vsBlob);
+	else if (inputLayoutType == PARTICLE_LAYOUT)
+		InputLayouts::InitializeParticleLayout(device, vsBlob);
+	else
+		InputLayouts::InitializeShadowLayout(device, vsBlob);
 
 	// Create the shader on the device
 	HR(device->CreateVertexShader(
@@ -385,14 +341,6 @@ void GameManager::LoadVertexShader(wchar_t* file, D3D11_INPUT_ELEMENT_DESC* vert
 		vsBlob->GetBufferSize(),
 		NULL,
 		shader));
-
-	// Before cleaning up the data, create the input layout
-	HR(device->CreateInputLayout(
-		vertexDesc,
-		size,
-		vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(),
-		inputLayout));
 
 	// Clean up
 	ReleaseMacro(vsBlob);

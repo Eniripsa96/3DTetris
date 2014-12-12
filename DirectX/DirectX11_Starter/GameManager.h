@@ -46,7 +46,7 @@ public:
 	void CreateSamplers();
 	void LoadShadersAndInputLayout();
 	void LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader);
-	void LoadVertexShader(wchar_t* file, D3D11_INPUT_ELEMENT_DESC* vertexDesc, int size, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout);
+	void LoadVertexShader(wchar_t* file, LAYOUT inputLayoutType, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout);
 	void LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shader);
 	void BuildBlockTypes();
 	void LoadMeshesAndMaterials();
