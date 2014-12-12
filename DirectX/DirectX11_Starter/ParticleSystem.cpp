@@ -19,6 +19,11 @@ void ParticleSystem::Reset()
 	age = 0.0f;
 }
 
+Material* ParticleSystem::GetMaterial() const
+{
+	return this->material;
+}
+
 void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
 	// Grab the current view-projection

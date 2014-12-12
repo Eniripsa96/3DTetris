@@ -278,9 +278,9 @@ void GameManager::CreateSamplers() {
 void GameManager::LoadShadersAndInputLayout()
 {
 	// Load Vertex Shaders --------------------------------------
-	LoadVertexShader(L"VertexShader.cso", VERTEX_LAYOUT, &vertexShader, &inputLayout);
-	LoadVertexShader(L"ShadowVertexShader.cso", SHADOW_LAYOUT, &shadowVS, &shadowIL);
-	LoadVertexShader(L"ParticleVertexShader.cso", PARTICLE_LAYOUT, &particleVertexShader, &particleInputLayout);
+	LoadVertexShader(L"VertexShader.cso", VERTEX_LAYOUT, &vertexShader);
+	LoadVertexShader(L"ShadowVertexShader.cso", SHADOW_LAYOUT, &shadowVS);
+	LoadVertexShader(L"ParticleVertexShader.cso", PARTICLE_LAYOUT, &particleVertexShader);
 
 	// Load Geometry Shader -------------------------------------
 	LoadGeometryShader(L"ParticleGeometryShader.cso", &particleGeometryShader);
@@ -322,7 +322,7 @@ void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader)
 	ReleaseMacro(psBlob);
 }
 
-void GameManager::LoadVertexShader(wchar_t* file, LAYOUT inputLayoutType, ID3D11VertexShader** shader, ID3D11InputLayout** inputLayout)
+void GameManager::LoadVertexShader(wchar_t* file, LAYOUT inputLayoutType, ID3D11VertexShader** shader)
 {
 	// Load shader blob
 	ID3DBlob* vsBlob;
@@ -642,9 +642,11 @@ void GameManager::UpdateScene(float dt)
 	if (gameState == GAME || gameState == DEBUG)
 	{
 		// [DRAW] Set up the input assembler for particle system
-		deviceContext->IASetInputLayout(particleInputLayout);
+		deviceContext->IASetInputLayout(InputLayouts::Particle);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-		deviceContext->VSSetShader(particleVertexShader, 0, 0);
+		//deviceContext->VSSetShader(particleVertexShader, 0, 0);
+
+		particleSystem->GetMaterial()->SetShaders();
 
 		// [DRAW] Draw the particle system 
 		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);

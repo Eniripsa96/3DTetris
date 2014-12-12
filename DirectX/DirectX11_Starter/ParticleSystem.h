@@ -29,6 +29,7 @@ public:
 
 	// Time elapsed since the systm was reset
 	float GetAge() const;
+	Material* GetMaterial() const;
 
 	void SetEyePos(const XMFLOAT3& eyePosW);
 	void SetEmitPos(const XMFLOAT3& emitPosW);

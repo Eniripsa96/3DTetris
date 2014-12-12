@@ -50,6 +50,15 @@ void Material::Draw()
 	deviceContext->PSSetSamplers(0, 1, &samplerState);	// Pass in the entity’s material’s sampler state
 }
 
+void Material::SetShaders()
+{
+	deviceContext->VSSetShader(vertexShader, NULL, 0);
+
+	//deviceContext->GSSetShader(geometryShader, NULL, 0);
+
+	deviceContext->PSSetShader(pixelShader, NULL, 0);
+}
+
 UINT Material::getTexWidth() {
 	return texWidth;
 }
