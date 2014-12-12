@@ -3,10 +3,6 @@ cbuffer perModel : register(b0)
 	matrix world;
 	matrix view;
 	matrix projection;
-	matrix lightView;
-	matrix lightProjection;
-	float4 lightDirection;
-	float4 color;
 	float4 camPos;
 };
 

@@ -24,7 +24,7 @@ Material* ParticleSystem::GetMaterial() const
 	return this->material;
 }
 
-void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
+void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData)
 {
 	// Grab the current view-projection
 	XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));

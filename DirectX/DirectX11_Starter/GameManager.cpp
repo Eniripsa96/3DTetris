@@ -307,6 +307,18 @@ void GameManager::LoadShadersAndInputLayout()
 		&cBufferDesc,
 		NULL,
 		&vsConstantBuffer));
+
+	D3D11_BUFFER_DESC GSCBufferDesc;
+	GSCBufferDesc.ByteWidth = sizeof(dataToSendToGSConstantBuffer);
+	GSCBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	GSCBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	GSCBufferDesc.CPUAccessFlags = 0;
+	GSCBufferDesc.MiscFlags = 0;
+	GSCBufferDesc.StructureByteStride = 0;
+	HR(device->CreateBuffer(
+		&GSCBufferDesc,
+		NULL,
+		&gsConstantBuffer));
 }
 
 void GameManager::LoadPixelShader(wchar_t* file, ID3D11PixelShader** shader)
@@ -573,12 +585,13 @@ void GameManager::UpdateScene(float dt)
 	// [UPDATE] Update constant buffer data
 	dataToSendToVSConstantBuffer.view = camera->viewMatrix;
 	dataToSendToVSConstantBuffer.projection = projectionMatrix;
-	//dataToSendToVSConstantBuffer.view = shadowView;
-	//dataToSendToVSConstantBuffer.projection = shadowProjection;
 	dataToSendToVSConstantBuffer.lightView = shadowView;
 	dataToSendToVSConstantBuffer.lightProjection = shadowProjection;
 	dataToSendToVSConstantBuffer.lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.95f);
 	dataToSendToVSConstantBuffer.color = XMFLOAT4(1, 1, 1, 1);
+
+	dataToSendToGSConstantBuffer.view = camera->viewMatrix;
+	dataToSendToGSConstantBuffer.projection = projectionMatrix;
 
 	// Shadow map
 	deviceContext->OMSetRenderTargets(0, 0, shadowDSV);
@@ -647,12 +660,11 @@ void GameManager::UpdateScene(float dt)
 		// [DRAW] Set up the input assembler for particle system
 		deviceContext->IASetInputLayout(InputLayouts::Particle);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-		//deviceContext->VSSetShader(particleVertexShader, 0, 0);
 
 		particleSystem->GetMaterial()->SetShaders();
 
 		// [DRAW] Draw the particle system 
-		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);
+		particleSystem->Draw(deviceContext, *camera, gsConstantBuffer, &dataToSendToGSConstantBuffer);
 
 		deviceContext->GSSetShader(NULL, 0, 0);
 	}

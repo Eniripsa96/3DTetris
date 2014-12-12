@@ -85,7 +85,9 @@ public:
 
 	// Constant buffer info
 	ID3D11Buffer* vsConstantBuffer;
+	ID3D11Buffer* gsConstantBuffer;;
 	VertexShaderConstantBufferLayout dataToSendToVSConstantBuffer;
+	GeometryShaderConstantBufferLayout dataToSendToGSConstantBuffer;
 
 	GAME_STATE gameState;
 

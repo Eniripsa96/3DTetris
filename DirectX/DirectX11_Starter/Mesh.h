@@ -46,6 +46,16 @@ struct VertexShaderConstantBufferLayout
 	XMFLOAT4 camPos;
 };
 
+// Struct to match particle geometry shader's constant buffer
+// Update locally then push to corresponding buffer
+struct GeometryShaderConstantBufferLayout
+{
+	XMFLOAT4X4 world;
+	XMFLOAT4X4 view;
+	XMFLOAT4X4 projection;
+	XMFLOAT4 camPos;
+};
+
 class Mesh
 {
 public:
