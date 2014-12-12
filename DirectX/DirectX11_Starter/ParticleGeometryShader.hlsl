@@ -13,20 +13,16 @@ cbuffer perModel : register(b0)
 struct VertexOutput
 {
 	float4 initialPos	: SV_POSITION;
-	//float3 initialVel	: VELOCITY;
+	float3 initialVel	: VELOCITY;
 	float2 size			: SIZE;
-	//float age : AGE;
+	float age : AGE;
 	//unsigned int type : TYPE;
 };
 
 struct GSOutput
 {
 	float4 position		: SV_POSITION;
-	float3 normal		: NORMAL;		// Not used
 	float2 uv			: TEXCOORD0;
-	float4 lightPos     : TEXCOORD1;    // Not used
-	float4 lightDir     : LIGHT;		// Not used
-	float4 color        : COLOR;		// Not used
 };
 
 [maxvertexcount(4)]
@@ -35,6 +31,7 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 	// Compute world-space directions to camera
 	// - Assumes you have the camera’s world position in “camPos”
 	// - Assumes your VS output struct has vertex World Position
+	input[0].initialPos.w = 1.0f;
 	float3 pos = (float3)input[0].initialPos;
 	float3 look = normalize(camPos - pos);
 	float3 right = normalize(cross(float3(0, 1, 0), look));
@@ -54,6 +51,10 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 	v[1] = float4(input[0].initialPos + halfW*right + halfH*up, 1);
 	v[2] = float4(input[0].initialPos - halfW*right - halfH*up, 1);
 	v[3] = float4(input[0].initialPos - halfW*right + halfH*up, 1);
+	/*v[3] = float4(input[0].initialPos + halfW*right - halfH*up, 1);
+	v[2] = float4(input[0].initialPos + halfW*right + halfH*up, 1);
+	v[1] = float4(input[0].initialPos - halfW*right - halfH*up, 1);
+	v[0] = float4(input[0].initialPos - halfW*right + halfH*up, 1);*/
 
 	// Define an array of texture coordinates to match
 	// the four corners of the quad, allowing us to loop
@@ -67,6 +68,9 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 		float2(0, 0)
 	};
 
+	// Calculate lighting position
+	matrix lightWorldViewProj = mul(mul(world, lightView), lightProjection);
+
 	// Finalize the GS output by appending 4 verts worth of data
 	GSOutput vert; // Holds a single vertex (just Position and UV)
 	[unroll]
@@ -75,12 +79,8 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 		// Already have the world position, need to multiple
 		// by the view and projection matrices
 		vert.position = mul(v[i], mul(view, projection));
-		vert.normal = (0, 0);
 		vert.uv = quadUVs[i]; // Copy uv from array
-		vert.lightPos = float4(0, 0, 0, 1);
-		vert.lightDir = float4(1, 0, 0, 0);
-		//vert.color = color;
-		vert.color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+
 		output.Append(vert); // Append this vertex!
 	}
 }

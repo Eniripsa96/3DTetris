@@ -72,6 +72,7 @@ public:
 	ID3D11VertexShader* vertexShader;
 	ID3D11VertexShader* particleVertexShader;
 	ID3D11GeometryShader* particleGeometryShader;
+	ID3D11PixelShader* particlePixelShader;
 	UINT activeShader;
 	UINT shaderCount = 4;
 

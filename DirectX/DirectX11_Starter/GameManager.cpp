@@ -291,6 +291,7 @@ void GameManager::LoadShadersAndInputLayout()
 	LoadPixelShader(L"SepiaPixelShader.cso", &sepiaShader);
 	LoadPixelShader(L"InversePixelShader.cso", &inverseShader);
 	LoadPixelShader(L"ShadowPixelShader.cso", &shadowPS);
+	LoadPixelShader(L"ParticlePixelShader.cso", &particlePixelShader);
 
 	// Constant buffers ----------------------------------------
 	D3D11_BUFFER_DESC cBufferDesc;
@@ -387,7 +388,7 @@ void GameManager::LoadMeshesAndMaterials()
 	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texStairsBlock.png");
 	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texFrame.png");
 	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, anisotropicSampler, L"tile.png");
-	particleMaterial = new Material(device, deviceContext, particleVertexShader, pixelShader, linearSampler, L"image.png", particleGeometryShader);
+	particleMaterial = new Material(device, deviceContext, particleVertexShader, particlePixelShader, linearSampler, L"texJBlock.png", particleGeometryShader);
 
 	// Load meshes
 	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
