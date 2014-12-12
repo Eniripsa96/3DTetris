@@ -21,6 +21,16 @@ struct Vertex
 	XMFLOAT2 UV;
 };
 
+// Vertex struct for particles
+struct Particle
+{
+	XMFLOAT3 initialPos;
+	XMFLOAT3 initialVel;
+	XMFLOAT2 size;
+	float age;
+	//unsigned int type;
+};
+
 // Struct to match vertex shader's constant buffer
 // You update one of these locally, then push it to the corresponding
 // constant buffer on the device when it needs to be updated
@@ -44,8 +54,9 @@ public:
 	~Mesh();
 
 	void CreateTrianglePoints();
+	void CreateParticlePoints();
 	void CreateQuadPoints();
-	void CreateGeometryBuffers(Vertex[]);
+	void CreateGeometryBuffers(Vertex[], Particle[]);
 	void Draw();
 
 	// Buffers to hold actual geometry
