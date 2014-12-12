@@ -39,7 +39,7 @@ Material::~Material()
 void Material::Draw()
 {
 	// Set the current vertex and pixel shaders and geometry shader (if it exists)
-	deviceContext->VSSetShader(vertexShader, NULL, 0);
+	//deviceContext->VSSetShader(vertexShader, NULL, 0);
 
 	deviceContext->GSSetShader(geometryShader, NULL, 0);
 

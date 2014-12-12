@@ -696,6 +696,7 @@ void GameManager::UpdateScene(float dt)
 		// [DRAW] Set up the input assembler for particle system
 		deviceContext->IASetInputLayout(particleInputLayout);
 		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+		deviceContext->VSSetShader(particleVertexShader, 0, 0);
 
 		// [DRAW] Draw the particle system 
 		particleSystem->Draw(deviceContext, *camera, vsConstantBuffer, &dataToSendToVSConstantBuffer);
