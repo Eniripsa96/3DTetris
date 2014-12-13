@@ -76,6 +76,7 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 			// Already have the world position, need to multiple
 			// by the view and projection matrices
 			vert.position = mul(v[i], mul(view, projection));
+			vert.position = mul(world, vert.position);
 			vert.uv = quadUVs[i]; // Copy uv from array
 
 			output.Append(vert); // Append this vertex!

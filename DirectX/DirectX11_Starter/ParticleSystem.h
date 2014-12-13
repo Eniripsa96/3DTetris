@@ -50,6 +50,8 @@ private:
 
 	Mesh* mesh;
 	Material* material;
+
+	XMFLOAT4X4 world;
 };
 
 #endif

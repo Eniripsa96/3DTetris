@@ -14,6 +14,8 @@ ParticleSystem::ParticleSystem(Mesh* mesh, Material* mat)
 		{ XMFLOAT3(-1.0f, -0.5f, +0.0f) },
 		{ XMFLOAT3(+1.0f, -0.5f, +0.0f) },
 	};
+
+	XMStoreFloat4x4(&world, (XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
 }
 
 
@@ -43,6 +45,9 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buff
 	cBufferData->camPos = cam.GetPos();
 	age -= 1.0f * dt;
 	cBufferData->age = XMFLOAT4(age, 0, 0, 0);
+	XMMATRIX tempWorld = XMMatrixTranslation(0.0f, 0.1f * dt, 0.0f);
+	XMStoreFloat4x4(&world, XMLoadFloat4x4(&world) * tempWorld);
+	cBufferData->world = world;
 
 	// [UPDATE] Update the constant buffer itself
 	dc->UpdateSubresource(
@@ -62,8 +67,6 @@ void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buff
 		);
 
 	// Draw mesh and material
-		// This makes the vertex shader do its thing
-		// Then the geometry shader will do its thing following that and spit out to PS
 	material->Draw();
 	mesh->Draw();
 }
