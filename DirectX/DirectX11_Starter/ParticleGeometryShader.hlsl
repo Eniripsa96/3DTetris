@@ -4,6 +4,7 @@ cbuffer perModel : register(b0)
 	matrix view;
 	matrix projection;
 	float4 camPos;
+	float4 age;
 };
 
 struct VertexOutput
@@ -64,16 +65,20 @@ void main(point VertexOutput input[1] /*: SV_POSITION*/, inout TriangleStream<GS
 		float2(0, 0)
 	};
 
-	// Finalize the GS output by appending 4 verts worth of data
-	GSOutput vert; // Holds a single vertex (just Position and UV)
 	[unroll]
-	for (int i = 0; i < 4; i++)
+	if (age.x >= 0.0f)
 	{
-		// Already have the world position, need to multiple
-		// by the view and projection matrices
-		vert.position = mul(v[i], mul(view, projection));
-		vert.uv = quadUVs[i]; // Copy uv from array
+		// Finalize the GS output by appending 4 verts worth of data
+		GSOutput vert; // Holds a single vertex (just Position and UV)
+		[unroll]
+		for (int i = 0; i < 4; i++)
+		{
+			// Already have the world position, need to multiple
+			// by the view and projection matrices
+			vert.position = mul(v[i], mul(view, projection));
+			vert.uv = quadUVs[i]; // Copy uv from array
 
-		output.Append(vert); // Append this vertex!
+			output.Append(vert); // Append this vertex!
+		}
 	}
 }

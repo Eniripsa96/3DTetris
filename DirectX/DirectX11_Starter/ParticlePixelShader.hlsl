@@ -6,9 +6,8 @@ SamplerState mySampler: register(s0);
 // - Should match the output of our corresponding vertex shader
 struct PSInput
 {
-	float4 position        : SV_POSITION;
-	float4 color        : COLOR;
-	float2 uv            : TEXCOORD0;
+	float4 position		: SV_POSITION;
+	float2 uv			: TEXCOORD0;
 };
 
 // Entry point for this pixel shader

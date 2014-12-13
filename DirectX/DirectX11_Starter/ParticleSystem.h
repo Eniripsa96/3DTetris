@@ -30,7 +30,7 @@ public:
 
 	void Reset();
 	void Update(float dt, float gameTime);
-	void Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData);
+	void Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData, float dt);
 
 private:
 	void BuildVB(ID3D11Device* device);
@@ -46,19 +46,7 @@ private:
 	float timeStep;
 	float age;
 
-	XMFLOAT3 eyePosW;
-	XMFLOAT3 emitPosW;
-	XMFLOAT3 emitDirW;
-
-	float fx;	// shader???
-
-	// Used by stream???
-	/*ID3D11Buffer* initVB;
-	ID3D11Buffer* drawVB;
-	ID3D11Buffer* streamOutVB;
-
-	ID3D11ShaderResourceView* texArraySRV;
-	ID3D11ShaderResourceView* randomTexSRV;*/
+	XMFLOAT3 particles[3];
 
 	Mesh* mesh;
 	Material* material;

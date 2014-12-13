@@ -664,7 +664,7 @@ void GameManager::UpdateScene(float dt)
 		particleSystem->GetMaterial()->SetShaders();
 
 		// [DRAW] Draw the particle system 
-		particleSystem->Draw(deviceContext, *camera, gsConstantBuffer, &dataToSendToGSConstantBuffer);
+		particleSystem->Draw(deviceContext, *camera, gsConstantBuffer, &dataToSendToGSConstantBuffer, dt);
 
 		deviceContext->GSSetShader(NULL, 0, 0);
 	}
