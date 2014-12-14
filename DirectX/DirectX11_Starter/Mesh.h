@@ -15,7 +15,7 @@ enum SHAPE
 	NONE = 0,
 	TRIANGLE = 1,
 	QUAD = 2,
-	PARTICLE = 20
+	PARTICLE = 50
 };
 
 // Vertex struct for triangles
@@ -92,6 +92,8 @@ public:
 private:
 	ID3D11Device* device;
 	UINT iBufferSize;
+
+	const float PARTICLE_SIZE = 0.1875f;
 };
 
 #endif

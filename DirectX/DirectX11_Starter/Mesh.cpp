@@ -48,21 +48,13 @@ void Mesh::CreateTrianglePoints()
 
 void Mesh::CreateParticlePoints()
 {
-	// Set up points for particles
-	/*Particle particles[] =
-	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
-		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
-		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
-	};*/
-
 	//srand(time(NULL));
 
 	vector<Particle> particles;
 	
 	for (int i = 0; i < (int)PARTICLE; i++)
 	{
-		particles.push_back(Particle{ XMFLOAT3((rand() % 100) / 10.0f - 5.0f, ((rand() % 50) / 10.0f - 2.5f) - 5.0f, -1.0f), XMFLOAT2(0.5f, 0.5f) });
+		particles.push_back(Particle{ XMFLOAT3((rand() % 100) / 10.0f - 5.0f, ((rand() % 50) / 10.0f - 2.5f) - 4.0f, -1.0f), XMFLOAT2(PARTICLE_SIZE, PARTICLE_SIZE) });
 	}
 	CreateGeometryBuffers(NULL, &particles[0]);
 }
@@ -120,7 +112,10 @@ void Mesh::CreateGeometryBuffers(Vertex vertices[], Particle particles[])
 		vbd.ByteWidth = sizeof(Particle) * (int)PARTICLE; // Number of vertices in the "model" you want to draw
 		initialVertexData.pSysMem = particles;
 
-		UINT particleIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+		UINT particleIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49 };
+		/*vector<UINT> particleIndices;
+		for (int i = 0; i < (int)PARTICLE; i++)
+			particleIndices.push_back(i);*/
 		initialIndexData.pSysMem = particleIndices;
 		ibd.ByteWidth = sizeof(UINT) * (int)PARTICLE; // Number of indices in the "model" you want to draw
 	}

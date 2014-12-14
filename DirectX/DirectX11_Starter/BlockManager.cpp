@@ -3,8 +3,10 @@
 // Initializes the BlockManager given 
 // the minimum coordinates for blocks, the hold position for blocks, 
 // and the width of each block
-BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> pCubes, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth)
+BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> pCubes, XMFLOAT3 pMin, XMFLOAT3 pHoldPos, float pBlockWidth, ParticleSystem* particleSystem)
 {
+	this->particleSystem = particleSystem;
+
 	blocks = pBlocks;
 	numBlocks = pNumBlocks;
 	cubes = pCubes;
@@ -410,6 +412,7 @@ void BlockManager::checkLines(int min, int max)
 			cleared++;
 
 			// TODO change our gameobjects to an effect if desired
+			particleSystem->Reset();
 
 			// Delete the game objects for now
 			for (int j = 0; j < GRID_WIDTH; j++)

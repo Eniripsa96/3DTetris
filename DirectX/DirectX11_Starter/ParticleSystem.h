@@ -52,6 +52,8 @@ private:
 	Material* material;
 
 	XMFLOAT4X4 world;
+
+	const float INITIAL_AGE = 10.0f;
 };
 
 #endif

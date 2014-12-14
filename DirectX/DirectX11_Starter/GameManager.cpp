@@ -204,13 +204,16 @@ bool GameManager::Init()
 	gameObjects.emplace_back(new GameObject(frameMesh, frameMaterial, &XMFLOAT3(-3.0f, -5.0f, 0.0f), &XMFLOAT3(0.0f, 0.0f, 0.0f)));
 	gameObjects.emplace_back(new GameObject(environmentMesh, tileMaterial, &XMFLOAT3(-50.0f, -5.0f, -75.0f), &XMFLOAT3(0, 0, 0)));
 
+	// Create particle system
+	particleSystem = new ParticleSystem(particleMesh, particleMaterial);
+
 	// Set up block manager
 	for (int j = 0; j < GRID_HEIGHT; j++) {
 		for (int i = 0; i < GRID_WIDTH; i++) {
 			cubes.push_back(new GameObject(cubeMesh, shapeMaterial, &XMFLOAT3((float)i - 4.5f, (float)j - 5.0f, 0), &XMFLOAT3(0, 0, 0)));
 		}
 	}
-	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-4.5, -5, 0), XMFLOAT3(-8.5, 12.5, 0), 1);
+	blockManager = new BlockManager(blocks, 7, cubes, XMFLOAT3(-4.5, -5, 0), XMFLOAT3(-8.5, 12.5, 0), 1, particleSystem);
 	blockManager->spawnFallingBlock();
 
 	// Create 2D meshes
@@ -238,7 +241,6 @@ bool GameManager::Init()
 	device->CreateBlendState(&blendDesc, &blendState);
 
 	camera = new Camera();
-	particleSystem = new ParticleSystem(particleMesh, particleMaterial);
 
 	// Set up the world matrix for each mesh
 	XMMATRIX W = XMMatrixIdentity();
@@ -797,6 +799,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			// Movement of game object
 		case VK_NUMPAD8:
+			particleSystem->Reset();
 			//allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
 			break;
 		case VK_NUMPAD5:

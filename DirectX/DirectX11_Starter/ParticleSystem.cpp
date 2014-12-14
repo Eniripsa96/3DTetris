@@ -6,7 +6,7 @@ ParticleSystem::ParticleSystem(Mesh* mesh, Material* mat)
 	this->mesh = mesh;
 	this->material = mat;
 
-	age = 10.0f;	// 10 second life span
+	age = 0.0f;
 
 	XMFLOAT3 particles[3] =
 	{
@@ -24,11 +24,16 @@ ParticleSystem::~ParticleSystem()
 	//delete[] particles;
 }
 
+float velocity = 0.5f;
+float gravity = -2.0f;
+
 // Restart the particle system
 void ParticleSystem::Reset()
 {
 	firstRun = true;
-	age = 0.0f;
+	age = INITIAL_AGE;
+	velocity = 0.5f;
+	XMStoreFloat4x4(&world, (XMMatrixTranslation(0.0f, 0.0f, 0.0f)));
 }
 
 Material* ParticleSystem::GetMaterial() const
@@ -41,12 +46,18 @@ void ParticleSystem::Update(GeometryShaderConstantBufferLayout* cBufferData, flo
 	// Grab the current view-projection
 	//XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));
 
-	
 	age -= 1.0f * dt;
 	cBufferData->age = XMFLOAT4(age, 0, 0, 0);
 
-	//XMMATRIX tempWorld = (i == 0) ? XMMatrixTranslation(0.0f, 0.1f * dt, 0.0f) : XMMatrixTranslation(0.0f, -0.1f * dt, 0.0f);
-	//XMStoreFloat4x4(&world, XMLoadFloat4x4(&world) * tempWorld);
+	velocity += gravity * dt;
+
+	/*if (age > INITIAL_AGE - 0.1f)
+		displacement = 0.5f;
+	else
+		displacement = -0.5f;*/
+
+	XMMATRIX tempWorld = XMMatrixTranslation(0.0f, velocity * dt, 0.0f );
+	XMStoreFloat4x4(&world, XMLoadFloat4x4(&world) * tempWorld);
 	cBufferData->world = world;
 }
 

@@ -3,6 +3,8 @@
 #endif
 
 #include "GameObject.h"
+#include "ParticleSystem.h"
+
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
@@ -41,7 +43,7 @@ enum MoveDirection
 class BlockManager
 {
 public:
-	BlockManager(Block* blocks, int numBlocks, vector<GameObject*> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth);
+	BlockManager(Block* blocks, int numBlocks, vector<GameObject*> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth, ParticleSystem* particleSystem);
 	~BlockManager();
 
 	void update(float dt);
@@ -85,5 +87,7 @@ private:
 
 	void copy(bool* src, bool* dest, int num);
 	void shuffle();
+
+	ParticleSystem* particleSystem;
 };
 
