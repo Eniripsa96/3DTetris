@@ -22,12 +22,6 @@ public:
 	float GetAge() const;
 	Material* GetMaterial() const;
 
-	void SetEyePos(const XMFLOAT3& eyePosW);
-	void SetEmitPos(const XMFLOAT3& emitPosW);
-	void SetEmitDir(const XMFLOAT3& emitDirW);
-
-	void Init(ID3D11Device* device, float fx /* shader??? */, ID3D11ShaderResourceView* texArraySRV, ID3D11ShaderResourceView* randomTexSRV, UINT maxParticles);
-
 	void Reset();
 	void Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData);
 	void Update(GeometryShaderConstantBufferLayout* cBufferData, float dt);
@@ -39,20 +33,17 @@ private:
 	ParticleSystem& operator=(const ParticleSystem& rhs);
 
 private:
-	UINT maxParticles;
-	bool firstRun;
-
-	float gameTime;
-	float timeStep;
-	float age;
-
 	XMFLOAT3 particles[3];
 
 	Mesh* mesh;
 	Material* material;
 
 	XMFLOAT4X4 world;
+	float velocity;
+	float age;
 
+	const float INITIAL_VEL = 0.5f;
+	const float GRAVITY = -2.0f;
 	const float INITIAL_AGE = 10.0f;
 };
 
