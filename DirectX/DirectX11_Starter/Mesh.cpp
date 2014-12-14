@@ -49,14 +49,22 @@ void Mesh::CreateTrianglePoints()
 void Mesh::CreateParticlePoints()
 {
 	// Set up points for particles
-	Particle particles[] =
+	/*Particle particles[] =
 	{
 		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
 		{ XMFLOAT3(-1.0f, -0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
 		{ XMFLOAT3(+1.0f, -0.5f, +0.0f), XMFLOAT2(0.5f, 0.5f) },
-	};
+	};*/
 
-	CreateGeometryBuffers(NULL, particles);
+	//srand(time(NULL));
+
+	vector<Particle> particles;
+	
+	for (int i = 0; i < (int)PARTICLE; i++)
+	{
+		particles.push_back(Particle{ XMFLOAT3((rand() % 100) / 10.0f - 5.0f, ((rand() % 50) / 10.0f - 2.5f) - 5.0f, -1.0f), XMFLOAT2(0.5f, 0.5f) });
+	}
+	CreateGeometryBuffers(NULL, &particles[0]);
 }
 
 // Create the points for a quad. Particle=true means this quad is for a particle system
@@ -88,32 +96,37 @@ void Mesh::CreateGeometryBuffers(Vertex vertices[], Particle particles[])
 
 	D3D11_SUBRESOURCE_DATA initialVertexData;
 
-	if (vertices)
-	{
-		vbd.ByteWidth = sizeof(Vertex) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
-		initialVertexData.pSysMem = vertices;
-	}
-	else if (particles)
-	{
-		vbd.ByteWidth = sizeof(Particle) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
-		initialVertexData.pSysMem = particles;
-	}
-
-	HR(device->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer));
-
-	// Set up the indices
-	UINT indices[] = { 0, 2, 1, 1, 2, 3 };
-
 	// Create the index buffer
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(UINT) * 3 * (int)shapeType; // Number of indices in the "model" you want to draw
 	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	ibd.CPUAccessFlags = 0;
 	ibd.MiscFlags = 0;
 	ibd.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA initialIndexData;
-	initialIndexData.pSysMem = indices;
+
+	if (vertices)
+	{
+		vbd.ByteWidth = sizeof(Vertex) * 3 * (int)shapeType; // Number of vertices in the "model" you want to draw
+		initialVertexData.pSysMem = vertices;
+
+		// Set up the indices
+		UINT indices[] = { 0, 2, 1, 1, 2, 3 };
+		initialIndexData.pSysMem = indices;
+		ibd.ByteWidth = sizeof(UINT) * 3 * (int)shapeType; // Number of indices in the "model" you want to draw
+	}
+	else if (particles)
+	{
+		vbd.ByteWidth = sizeof(Particle) * (int)PARTICLE; // Number of vertices in the "model" you want to draw
+		initialVertexData.pSysMem = particles;
+
+		UINT particleIndices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+		initialIndexData.pSysMem = particleIndices;
+		ibd.ByteWidth = sizeof(UINT) * (int)PARTICLE; // Number of indices in the "model" you want to draw
+	}
+
+	HR(device->CreateBuffer(&vbd, &initialVertexData, &vertexBuffer));
+
 	HR(device->CreateBuffer(&ibd, &initialIndexData, &indexBuffer));
 }
 
@@ -135,7 +148,7 @@ void Mesh::Draw()
 				0);
 		else
 			deviceContext->DrawIndexed(
-				3,	// The number of indices we're using in this draw
+				(int)PARTICLE,	// The number of indices we're using in this draw
 				0,
 				0);
 	}

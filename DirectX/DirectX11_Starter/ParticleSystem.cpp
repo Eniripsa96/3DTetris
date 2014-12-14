@@ -36,18 +36,24 @@ Material* ParticleSystem::GetMaterial() const
 	return this->material;
 }
 
-void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData, float dt)
+void ParticleSystem::Update(GeometryShaderConstantBufferLayout* cBufferData, float dt)
 {
 	// Grab the current view-projection
-	XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));
+	//XMMATRIX VP = XMMatrixMultiply(XMLoadFloat4x4(&cam.viewMatrix), XMLoadFloat4x4(&cam.projectionMatrix));
 
-	// Update constant buffer with camera info
-	cBufferData->camPos = cam.GetPos();
+	
 	age -= 1.0f * dt;
 	cBufferData->age = XMFLOAT4(age, 0, 0, 0);
-	XMMATRIX tempWorld = XMMatrixTranslation(0.0f, 0.1f * dt, 0.0f);
-	XMStoreFloat4x4(&world, XMLoadFloat4x4(&world) * tempWorld);
+
+	//XMMATRIX tempWorld = (i == 0) ? XMMatrixTranslation(0.0f, 0.1f * dt, 0.0f) : XMMatrixTranslation(0.0f, -0.1f * dt, 0.0f);
+	//XMStoreFloat4x4(&world, XMLoadFloat4x4(&world) * tempWorld);
 	cBufferData->world = world;
+}
+
+void ParticleSystem::Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData)
+{
+	// Update constant buffer with camera info
+	cBufferData->camPos = cam.GetPos();
 
 	// [UPDATE] Update the constant buffer itself
 	dc->UpdateSubresource(

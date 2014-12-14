@@ -29,8 +29,8 @@ public:
 	void Init(ID3D11Device* device, float fx /* shader??? */, ID3D11ShaderResourceView* texArraySRV, ID3D11ShaderResourceView* randomTexSRV, UINT maxParticles);
 
 	void Reset();
-	void Update(float dt, float gameTime);
-	void Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData, float dt);
+	void Draw(ID3D11DeviceContext* dc, const Camera& cam, ID3D11Buffer* cBuffer, GeometryShaderConstantBufferLayout* cBufferData);
+	void Update(GeometryShaderConstantBufferLayout* cBufferData, float dt);
 
 private:
 	void BuildVB(ID3D11Device* device);

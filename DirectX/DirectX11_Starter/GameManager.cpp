@@ -402,7 +402,7 @@ void GameManager::LoadMeshesAndMaterials()
 	stairsBlockMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texStairsBlock.png");
 	frameMaterial = new Material(device, deviceContext, vertexShader, pixelShader, linearSampler, L"texFrame.png");
 	tileMaterial = new Material(device, deviceContext, vertexShader, pixelShader, anisotropicSampler, L"tile.png");
-	particleMaterial = new Material(device, deviceContext, particleVertexShader, particlePixelShader, linearSampler, L"texJBlock.png", particleGeometryShader);
+	particleMaterial = new Material(device, deviceContext, particleVertexShader, particlePixelShader, linearSampler, L"texLBlock.png", particleGeometryShader);
 
 	// Load meshes
 	size = loader.Load("cube.txt", device, &vertexBuffer, &indexBuffer);
@@ -663,8 +663,12 @@ void GameManager::UpdateScene(float dt)
 
 		particleSystem->GetMaterial()->SetShaders();
 
-		// [DRAW] Draw the particle system 
-		particleSystem->Draw(deviceContext, *camera, gsConstantBuffer, &dataToSendToGSConstantBuffer, dt);
+		if (gameState != DEBUG)
+			// [UPDATE] Update the particle system 
+			particleSystem->Update(&dataToSendToGSConstantBuffer, dt);
+
+		// [DRAW] Draw the particle system
+		particleSystem->Draw(deviceContext, *camera, gsConstantBuffer, &dataToSendToGSConstantBuffer);
 
 		deviceContext->GSSetShader(NULL, 0, 0);
 	}

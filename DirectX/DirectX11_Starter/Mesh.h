@@ -1,8 +1,13 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <vector>
+#include <stdlib.h>
+#include <time.h>
+
 #include "Material.h"
 
+using namespace std;
 using namespace DirectX;
 
 enum SHAPE
@@ -10,7 +15,7 @@ enum SHAPE
 	NONE = 0,
 	TRIANGLE = 1,
 	QUAD = 2,
-	PARTICLE
+	PARTICLE = 20
 };
 
 // Vertex struct for triangles
