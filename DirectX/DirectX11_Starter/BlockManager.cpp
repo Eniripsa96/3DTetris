@@ -14,13 +14,8 @@ BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> p
 	holdPos = pHoldPos;
 	blockWidth = pBlockWidth;
 	gameGrid = new bool[GRID_WIDTH * GRID_HEIGHT];
-	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) 
-	{
-		gameGrid[i] = NULL;
-	}
 	typeOrder = new int[numBlocks];
 	scores = new int[4] { 40, 100, 300, 1200 };
-	shuffle();
 }
 
 // Clears the pointers used by the block manager on deconstruct
@@ -29,6 +24,18 @@ BlockManager::~BlockManager()
 	delete[] gameGrid;
 	delete[] typeOrder;
 	delete[] scores;
+}
+
+// Resets the game for a new one
+void BlockManager::reset()
+{
+	activeId = 0;
+	gameOver = false;
+	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++)
+	{
+		gameGrid[i] = false;
+	}
+	shuffle();
 }
 
 // Updates the blocks in the game
@@ -268,9 +275,12 @@ void BlockManager::move(MoveDirection direction)
 // Instantly drops the active block
 void BlockManager::drop()
 {
-	targetY = getGhostPos().x;
-	XMFLOAT3 pos = blocks[typeOrder[activeId]].gameObject->position;
-	blocks[typeOrder[activeId]].gameObject->Move(&XMFLOAT3(targetX * blockWidth + min.x - pos.x, targetY * blockWidth + min.y - pos.y, 0));
+	if (activeId >= 0)
+	{
+		targetY = getGhostPos().x;
+		XMFLOAT3 pos = blocks[typeOrder[activeId]].gameObject->position;
+		blocks[typeOrder[activeId]].gameObject->Move(&XMFLOAT3(targetX * blockWidth + min.x - pos.x, targetY * blockWidth + min.y - pos.y, 0));
+	}
 }
 
 // Rotates the active block if able to
