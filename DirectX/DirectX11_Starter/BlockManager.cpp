@@ -265,6 +265,14 @@ void BlockManager::move(MoveDirection direction)
 	}
 }
 
+// Instantly drops the active block
+void BlockManager::drop()
+{
+	targetY = getGhostPos().x;
+	XMFLOAT3 pos = blocks[typeOrder[activeId]].gameObject->position;
+	blocks[typeOrder[activeId]].gameObject->Move(&XMFLOAT3(targetX * blockWidth + min.x - pos.x, targetY * blockWidth + min.y - pos.y, 0));
+}
+
 // Rotates the active block if able to
 void BlockManager::rotate()
 {
@@ -441,15 +449,15 @@ void BlockManager::checkLines(int min, int max)
 	}
 }
 
-// Retrieves the position of the ghost block
-XMFLOAT3 BlockManager::getGhostPos() {
+// Retrieves the position of the ghost block vertically in the format x=index, y=world
+XMFLOAT2 BlockManager::getGhostPos() {
 	int tx = targetX;
 	int ty = targetY;
 	
 	while (canOccupy(tx, --ty));
 	ty++;
 
-	return XMFLOAT3(tx * blockWidth + min.x, ty * blockWidth + min.y, min.z);
+	return XMFLOAT2(ty, ty * blockWidth + min.y);
 }
 
 // Copies the elements from the source array to the target array

@@ -797,6 +797,10 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 			*/
 
+			// Instant drop
+		case VK_SHIFT:
+			blockManager->drop();
+
 			// Movement of game object
 		case VK_NUMPAD8:
 			particleSystem->Reset();
