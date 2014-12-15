@@ -570,7 +570,7 @@ void GameManager::UpdateScene(float dt)
 	if (gameState == GAME)
 	{
 		blockManager->update(dt);
-		if (blockManager->isGameOver())
+		if (blockManager->isGameOver)
 		{
 			gameState = GAME_OVER;
 		}
@@ -869,15 +869,14 @@ void GameManager::OnMouseUp(WPARAM btnState, int x, int y)
 	// Main menu buttons
 	if (gameState == MENU) {
 		if (playButton->IsOver(x, y)) {
-			blockManager->reset();
 			gameState = GAME;
 		}
 		if (quitButton->IsOver(x, y)) {
 			PostQuitMessage(0);
 		}
-	}
-	else if (gameState == GAME_OVER && mainMenuButton->IsOver(x, y)) {
-		gameState = MENU;
+		if (gameState == GAME && mainMenuButton->IsOver(x, y)) {
+			gameState = MENU;
+		}
 	}
 }
 

@@ -14,13 +14,8 @@ BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> p
 	holdPos = pHoldPos;
 	blockWidth = pBlockWidth;
 	gameGrid = new bool[GRID_WIDTH * GRID_HEIGHT];
-	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) 
-	{
-		gameGrid[i] = NULL;
-	}
 	typeOrder = new int[numBlocks];
 	scores = new int[4] { 40, 100, 300, 1200 };
-	shuffle();
 }
 
 // Clears the pointers used by the block manager on deconstruct
@@ -29,6 +24,18 @@ BlockManager::~BlockManager()
 	delete[] gameGrid;
 	delete[] typeOrder;
 	delete[] scores;
+}
+
+// Resets the game for a new one
+void BlockManager::reset()
+{
+	activeId = 0;
+	gameOver = false;
+	for (int i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++)
+	{
+		gameGrid[i] = false;
+	}
+	shuffle();
 }
 
 // Updates the blocks in the game
@@ -90,7 +97,7 @@ void BlockManager::update(float dt)
 void BlockManager::draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData)
 {
 	cBufferData->lightDirection = XMFLOAT4(2.0f, -3.0f, 1.0f, 0.25f);
-	cBufferData->color.w = 0.6f;
+	cBufferData->color.w = 0.7f;
 
 	// Active block
 	if (activeId != -1) {
@@ -262,6 +269,17 @@ void BlockManager::move(MoveDirection direction)
 	case RIGHT:
 		targetX++;
 		break;
+	}
+}
+
+// Instantly drops the active block
+void BlockManager::drop()
+{
+	if (activeId >= 0)
+	{
+		targetY = getGhostPos().x;
+		XMFLOAT3 pos = blocks[typeOrder[activeId]].gameObject->position;
+		blocks[typeOrder[activeId]].gameObject->Move(&XMFLOAT3(targetX * blockWidth + min.x - pos.x, targetY * blockWidth + min.y - pos.y, 0));
 	}
 }
 
@@ -441,15 +459,15 @@ void BlockManager::checkLines(int min, int max)
 	}
 }
 
-// Retrieves the position of the ghost block
-XMFLOAT3 BlockManager::getGhostPos() {
+// Retrieves the position of the ghost block vertically in the format x=index, y=world
+XMFLOAT2 BlockManager::getGhostPos() {
 	int tx = targetX;
 	int ty = targetY;
 	
 	while (canOccupy(tx, --ty));
 	ty++;
 
-	return XMFLOAT3(tx * blockWidth + min.x, ty * blockWidth + min.y, min.z);
+	return XMFLOAT2(ty, ty * blockWidth + min.y);
 }
 
 // Copies the elements from the source array to the target array

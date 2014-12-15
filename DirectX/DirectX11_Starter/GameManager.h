@@ -29,6 +29,7 @@ enum GAME_STATE
 {
 	MENU,
 	GAME,
+	GAME_OVER,
 	DEBUG
 };
 
@@ -95,6 +96,7 @@ private:
 	std::vector<GameObject*> gameObjects;
 	std::vector<UIObject*> gameUIObjects;
 	std::vector<UIObject*> menuObjects;
+	std::vector<UIObject*> gameOverObjects;
 	BlockManager* blockManager;
 
 	SpriteBatch* spriteBatch;
@@ -141,6 +143,7 @@ private:
 
 	Button* playButton;
 	Button* quitButton;
+	Button* mainMenuButton;
 	UIObject* scoreLabel;
 
 	ParticleSystem* particleSystem;

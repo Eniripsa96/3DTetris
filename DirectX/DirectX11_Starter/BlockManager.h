@@ -45,7 +45,8 @@ class BlockManager
 public:
 	BlockManager(Block* blocks, int numBlocks, vector<GameObject*> cubes, XMFLOAT3 min, XMFLOAT3 holdPos, float blockWidth, ParticleSystem* particleSystem);
 	~BlockManager();
-
+	
+	void reset();
 	void update(float dt);
 	void draw(ID3D11DeviceContext* deviceContext, ID3D11Buffer* cBuffer, VertexShaderConstantBufferLayout* cBufferData);
 
@@ -55,11 +56,12 @@ public:
 	void spawnFallingBlock();
 	void resetActiveBlock();
 	void move(MoveDirection direction);
+	void drop();
 	void rotate();
 	void holdBlock();
 	void mergeBlock();
 	void checkLines(int min, int max);
-	XMFLOAT3 getGhostPos();
+	XMFLOAT2 getGhostPos();
 	bool isGameOver() { return gameOver; }
 	int getScore() { return score; }
 
