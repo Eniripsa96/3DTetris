@@ -16,6 +16,7 @@ BlockManager::BlockManager(Block* pBlocks, int pNumBlocks, vector<GameObject*> p
 	gameGrid = new bool[GRID_WIDTH * GRID_HEIGHT];
 	typeOrder = new int[numBlocks];
 	scores = new int[4] { 40, 100, 300, 1200 };
+	reset();
 }
 
 // Clears the pointers used by the block manager on deconstruct
