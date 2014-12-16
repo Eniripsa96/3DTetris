@@ -10,11 +10,8 @@ Material::Material(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11Ver
 
 	geometryShader = gShader;
 
-	// Create SRV
-	//HRESULT result1 = device->CreateShaderResourceView(NULL , NULL, &resourceView);	// Error from having a NULL resource is intentional
-
 	// Create texture
-	HRESULT result2 = CreateWICTextureFromFile(device, context, texPath, 0, &resourceView);
+	HR(CreateWICTextureFromFile(device, context, texPath, 0, &resourceView));
 
 	// Get the dimensions of the texture
 	ID3D11Texture2D *tex = 0;

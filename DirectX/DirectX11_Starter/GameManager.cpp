@@ -374,7 +374,7 @@ void GameManager::LoadVertexShader(wchar_t* file, LAYOUT inputLayoutType, ID3D11
 void GameManager::LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shader)
 {
 	ID3DBlob* gsBlob; 
-	HRESULT r = D3DReadFileToBlob(file, &gsBlob);
+	HR(D3DReadFileToBlob(file, &gsBlob));
 
 	// Create the shader on the device
 	HR(device->CreateGeometryShader(
@@ -382,8 +382,6 @@ void GameManager::LoadGeometryShader(wchar_t* file, ID3D11GeometryShader** shade
 		gsBlob->GetBufferSize(),
 		NULL,
 		&particleGeometryShader));
-	// Result: S_OK
-	// Original: D3D11Device->CreateGeometryShaderWithStreamOut( pShaderBytecode, ShaderBytecodesize, pDecl, sizeof(pDecl), NULL, 0, 0, NULL, &pStreamOutGS );
 
 	// Clean up
 	ReleaseMacro(gsBlob);
