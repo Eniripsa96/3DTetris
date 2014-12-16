@@ -821,7 +821,7 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			// Movement of game object
 		case VK_NUMPAD8:
-			particleSystem->Reset();
+			//particleSystem->Reset();
 			//allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
 			break;
 		case VK_NUMPAD5:
