@@ -735,19 +735,19 @@ void GameManager::CheckKeyBoard(float dt)
 	if (gameState == GAME)
 	{
 		// Move left
-		if (GetAsyncKeyState('A'))
+		if (GetAsyncKeyState('A') || GetAsyncKeyState(VK_LEFT))
 		{
 			blockManager->move(LEFT);
 		}
 
 		// Move Right
-		if (GetAsyncKeyState('D'))
+		if (GetAsyncKeyState('D') || GetAsyncKeyState(VK_RIGHT))
 		{
 			blockManager->move(RIGHT);
 		}
 
 		// Move down faster
-		if (GetAsyncKeyState('S'))
+		if (GetAsyncKeyState('S') || GetAsyncKeyState(VK_DOWN))
 		{
 			blockManager->fallSpeed = FAST_FALL_SPEED;
 		}
@@ -757,7 +757,7 @@ void GameManager::CheckKeyBoard(float dt)
 		}
 
 		// Rotation
-		if (GetAsyncKeyState('W'))
+		if (GetAsyncKeyState('W') || GetAsyncKeyState(VK_UP))
 		{
 			if (canRotate)
 			{
@@ -803,46 +803,14 @@ LRESULT GameManager::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
-			// Change state
-			/*
-			case VK_SPACE:
-			gameState = (gameState == MENU) ? GAME : MENU;
-
-			if (gameState == MENU)
-			allObjects = menuObjects;
-			else if (gameState == GAME)
-			allObjects = gameObjects;
-			break;
-			*/
-
-			// Instant drop
+		// Instant drop
 		case VK_SHIFT:
 			blockManager->drop();
-
-			// Movement of game object
-		case VK_NUMPAD8:
-			//particleSystem->Reset();
-			//allObjects[0]->Move(&XMFLOAT3(0.0f, 0.2f, 0.0f));
-			break;
-		case VK_NUMPAD5:
-			//allObjects[0]->Move(&XMFLOAT3(0.0f, -0.2f, 0.0f));
-			break;
-		case VK_NUMPAD6:
-			//allObjects[0]->Move(&XMFLOAT3(0.2f, 0.0f, 0.0f));
-			break;
-		case VK_NUMPAD4:
-			//allObjects[0]->Move(&XMFLOAT3(-0.2f, 0.0f, 0.0f));
-			break;
-			// Rotation of game object
-		case VK_NUMPAD7:
-			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, XM_PI / 2));
-			break;
-		case VK_NUMPAD9:
-			//allObjects[0]->Rotate(&XMFLOAT3(0.0f, 0.0f, -XM_PI / 2));
-			break;
+		// Switch to debug mode
 		case VK_CAPITAL:
 			gameState = (gameState != DEBUG) ? DEBUG : GAME;
 			break;
+		// Change the active shader
 		case VK_TAB:
 			activeShader = (activeShader + 1) % shaderCount;
 			break;
