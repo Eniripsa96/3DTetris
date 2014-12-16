@@ -74,6 +74,7 @@ private:
 	int* typeOrder;
 	int* scores;
 	int score = 0;
+	bool hacked = false;
 	
 	XMFLOAT3 min;
 	XMFLOAT3 holdPos;

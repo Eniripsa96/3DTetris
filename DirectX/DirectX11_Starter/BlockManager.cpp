@@ -42,6 +42,12 @@ void BlockManager::reset()
 // Updates the blocks in the game
 void BlockManager::update(float dt) 
 {
+	if (!hacked)
+	{
+		hacked = true;
+		mergeBlock();
+	}
+
 	// Cannot update if the game is not active
 	if (activeId == -1) {
 		return;
@@ -375,7 +381,8 @@ void BlockManager::mergeBlock()
 	int size = blocks[typeOrder[activeId]].threeByThree ? 3 : 4;
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
-			if (blocks[typeOrder[activeId]].localGrid[i + j * size])
+			bool cell = blocks[typeOrder[activeId]].localGrid[i + j * size];
+			if (cell && cell != 205)
 			{
 				// Game over
 				if (targetY + j >= GRID_HEIGHT || gameGrid[i + targetX + (j + targetY) * GRID_WIDTH] != NULL)  
