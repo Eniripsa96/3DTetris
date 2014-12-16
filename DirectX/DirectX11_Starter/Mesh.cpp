@@ -48,7 +48,7 @@ void Mesh::CreateTrianglePoints()
 
 void Mesh::CreateParticlePoints()
 {
-	//srand(time(NULL));
+	srand(time(NULL));
 
 	vector<Particle> particles;
 	
